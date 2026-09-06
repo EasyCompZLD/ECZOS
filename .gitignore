@@ -18,9 +18,9 @@
 *.udeb
 *.substvars
 *.debhelper.log
-debian/.debhelper/
-debian/debhelper-build-stamp
-debian/files
+**/debian/.debhelper/
+**/debian/debhelper-build-stamp
+**/debian/files
 /packages/*/debian/*-tmp/
 /packages/eczos-branding/debian/eczos-branding/
 
