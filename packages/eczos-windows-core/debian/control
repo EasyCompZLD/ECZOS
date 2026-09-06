@@ -1,0 +1,27 @@
+Source: eczos-windows-core
+Section: otherosfs
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-windows-core
+Architecture: amd64
+Depends:
+ ${misc:Depends},
+ desktop-file-utils,
+ file,
+ jq,
+ kdialog,
+ libglib2.0-bin,
+ util-linux,
+ wine (>= 10.0~repack-6),
+ wine64 (>= 10.0~repack-6),
+ xdg-utils
+Recommends:
+ wine32
+Description: managed Windows application compatibility for ECZOS
+ Provides confirmation, inspection, isolated Wine prefixes, application
+ records and desktop integration for Windows executables and MSI installers.

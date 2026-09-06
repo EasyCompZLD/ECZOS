@@ -1,0 +1,3 @@
+# /etc/os-release is intentionally an unowned compatibility symlink supplied
+# by Debian. ECZOS diverts and restores that exact symlink so removal is safe.
+eczos-release: diversion-for-unknown-file etc/os-release [preinst:*]

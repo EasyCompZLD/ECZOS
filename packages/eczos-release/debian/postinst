@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = configure ]; then
+    /usr/lib/eczos/update-os-release
+fi
+
+#DEBHELPER#
+
+exit 0

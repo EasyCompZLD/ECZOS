@@ -1,3 +1,27 @@
+eczos-desktop (0.1.0~dev10) UNRELEASED; urgency=medium
+
+  * Require the contrasting shell logo and corrected ECZ Windows installer.
+  * Require the ECZ Windows runtime preflight.
+  * Require the valid internal working-directory fix for Windows installers.
+  * Require Start Menu shortcut discovery for installed Windows applications.
+  * Require corrected per-application install locking.
+  * Require C:-native Windows shortcut launching.
+  * Require verified executable discovery from Windows shortcuts.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 18:15:00 +0200
+
+eczos-desktop (0.1.0~dev3) UNRELEASED; urgency=medium
+
+  * Add the initial managed ECZ Windows compatibility layer.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 17:30:00 +0200
+
+eczos-desktop (0.1.0~dev2) UNRELEASED; urgency=medium
+
+  * Require the complete ECZOS shell and release branding batch.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 17:00:00 +0200
+
 eczos-desktop (0.1.0~dev1) UNRELEASED; urgency=medium
 
   * Add the initial ECZOS desktop metapackage.

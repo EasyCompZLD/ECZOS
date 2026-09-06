@@ -48,18 +48,43 @@ if [[ "$ACTIVE_MODE" = default ]]; then
     LOOK_AND_FEEL=org.kde.breeze.desktop
     COLOR_SCHEME=BreezeLight
     WALLPAPER=/usr/share/eczos/branding/wallpapers/eczoswallpaper.png
+    START_ICON=eczos-start-dark
 elif [[ "$ACTIVE_MODE" = light ]]; then
     LOOK_AND_FEEL=org.kde.breeze.desktop
     COLOR_SCHEME=BreezeLight
     WALLPAPER=/usr/share/eczos/branding/wallpapers/eczoswallpaper-light.png
+    START_ICON=eczos-start-dark
 else
     LOOK_AND_FEEL=org.kde.breezedark.desktop
     COLOR_SCHEME=BreezeDark
     WALLPAPER=/usr/share/eczos/branding/wallpapers/eczoswallpaper-dark.png
+    START_ICON=eczos-start-light
 fi
 
 lookandfeeltool -a "$LOOK_AND_FEEL"
 plasma-apply-colorscheme "$COLOR_SCHEME"
 plasma-apply-wallpaperimage --fill-mode preserveAspectCrop "$WALLPAPER"
+
+WALLPAPER_URL="file://$WALLPAPER"
+kwriteconfig6 --file kscreenlockerrc \
+    --group Greeter --key WallpaperPlugin org.kde.image
+kwriteconfig6 --file kscreenlockerrc \
+    --group Greeter --group Wallpaper --group org.kde.image --group General \
+    --key Image "$WALLPAPER_URL"
+kwriteconfig6 --file kscreenlockerrc \
+    --group Greeter --group Wallpaper --group org.kde.image --group General \
+    --key PreviewImage "$WALLPAPER_URL"
+
+qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+var allPanels = panels();
+for (var panelIndex = 0; panelIndex < allPanels.length; panelIndex++) {
+    var panelWidgets = allPanels[panelIndex].widgets();
+    for (var widgetIndex = 0; widgetIndex < panelWidgets.length; widgetIndex++) {
+        if (panelWidgets[widgetIndex].type == \"org.kde.plasma.kickoff\") {
+            panelWidgets[widgetIndex].currentConfigGroup = [\"General\"];
+            panelWidgets[widgetIndex].writeConfig(\"icon\", \"$START_ICON\");
+        }
+    }
+}"
 
 printf 'ECZOS appearance set to %s (preference: %s).\n' "$ACTIVE_MODE" "$MODE"

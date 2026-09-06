@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+operation=${1:-}
+if [[ "$operation" = check ]]; then
+    if ! dpkg-query -W -f='${Status}\n' wine32:i386 2>/dev/null | \
+        grep -Fx 'install ok installed' >/dev/null; then
+        printf '%s\n' \
+            'ECZ Windows mist de 32-bit compatibiliteitsruntime.' \
+            'Voer als beheerder scripts/enable-windows-runtime-vm.sh uit.' >&2
+        exit 69
+    fi
+    wine --version
+    exit 0
+fi
+
+prefix=${2:-}
+[[ -n "$operation" && -n "$prefix" && "$prefix" = /* ]] || {
+    printf 'Invalid ECZ Windows runtime request.\n' >&2
+    exit 2
+}
+shift 2
+
+export WINEPREFIX="$prefix"
+export WINEDEBUG=-all
+export WINEDLLOVERRIDES='winemenubuilder.exe=d'
+
+case "$operation" in
+    initialize|repair)
+        [[ $# -eq 0 ]] || exit 2
+        mkdir -p "$prefix"
+        cd "$prefix"
+        exec wineboot -u
+        ;;
+    execute)
+        [[ $# -ge 1 ]] || exit 2
+        cd "$prefix/drive_c"
+        exec wine "$@"
+        ;;
+    execute-link)
+        [[ $# -eq 1 ]] || exit 2
+        shortcut=$1
+        [[ "$shortcut" = "$prefix/drive_c/"* ]] || {
+            printf 'Unsafe Windows shortcut path.\n' >&2
+            exit 1
+        }
+        relative=${shortcut#"$prefix/drive_c/"}
+        windows_shortcut="C:\\${relative//\//\\}"
+        cd "$prefix/drive_c"
+        exec wine start "$windows_shortcut"
+        ;;
+    install-msi)
+        [[ $# -eq 1 ]] || exit 2
+        cd "$prefix/drive_c"
+        exec wine msiexec /i "$1"
+        ;;
+    *)
+        printf 'Unknown ECZ Windows runtime operation.\n' >&2
+        exit 2
+        ;;
+esac

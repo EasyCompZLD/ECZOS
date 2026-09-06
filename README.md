@@ -28,6 +28,7 @@ packages/eczos-sddm-theme/  ECZOS login theme and SDDM configuration
 packages/eczos-plymouth-theme/ ECZOS boot-splash theme
 packages/eczos-desktop-defaults/ One-time Plasma appearance defaults
 packages/eczos-release/       Product identity without masking Debian
+packages/eczos-windows-core/  Managed EXE/MSI compatibility MVP
 packages/eczos-desktop/       Complete desktop product-layer metapackage
 scripts/                    Source-tree developer checks
 tests/                      Automated source and package tests
@@ -58,7 +59,9 @@ sudo ./scripts/test-desktop-defaults-package-vm.sh
 No production image should include the historical remote-support package. See
 `docs/security.md`.
 
-Build the complete development ISO on Debian 13 with:
+The complete image pipeline is present, but `image/BUILD_BLOCKED.md` prevents a
+premature ISO build until the remaining desktop and ECZ Windows gates pass.
+After that reviewed gate is removed, build on Debian 13 with:
 
 ```sh
 sudo ./scripts/build-image-vm.sh

@@ -11,7 +11,10 @@ test -x /usr/bin/eczos-info
 test -s /usr/lib/eczos/release/eczos-release
 grep -Fx 'ECZOS_BASE_ID=debian' /usr/lib/eczos/release/eczos-release
 /usr/bin/eczos-info | grep -Fx 'ECZOS Development'
+grep -Fx 'PRETTY_NAME="ECZOS Development 0.1"' /etc/os-release
 grep -Fx 'ID=debian' /etc/os-release
+grep -Fx 'GRUB_DISTRIBUTOR=ECZOS' /etc/default/grub.d/80-eczos-release.cfg
+test -e /etc/os-release.debian
 dpkg --audit
 apt-get check
 

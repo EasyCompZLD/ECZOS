@@ -12,7 +12,8 @@ for package in \
     eczos-branding \
     eczos-desktop-defaults \
     eczos-plymouth-theme \
-    eczos-sddm-theme; do
+    eczos-sddm-theme \
+    eczos-windows-core; do
     dpkg-query -W -f='${Status}\n' "$package" | grep -Fx 'install ok installed'
 done
 dpkg --audit

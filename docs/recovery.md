@@ -16,6 +16,10 @@ or rescue boot. User defaults are applied once and are not enforced every login.
 Removing `eczos-desktop-defaults` removes its autostart and commands but preserves
 each user's chosen appearance and versioned first-run marker.
 
+`eczos-release` diverts only `/etc/os-release`; Debian's canonical
+`/usr/lib/os-release` remains untouched. Removing the package deletes the ECZOS
+display file and restores the original Debian symlink through `dpkg-divert`.
+
 ## Boot recovery
 
 Plymouth and GRUB changes are introduced only after desktop/login packages pass

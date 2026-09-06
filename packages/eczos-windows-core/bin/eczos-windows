@@ -1,0 +1,532 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+DATA_HOME=${XDG_DATA_HOME:-"$HOME/.local/share"}
+STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
+APPS_ROOT="$DATA_HOME/eczos/windows/apps"
+LAUNCHERS_DIR="$DATA_HOME/applications"
+REGISTER_MARKER="$STATE_HOME/eczos/windows-associations-v1"
+RUNTIME_ADAPTER=/usr/lib/eczos/windows/runtime-wine-system
+LOCKS_ROOT="$STATE_HOME/eczos/windows-locks"
+
+usage() {
+    printf '%s\n' 'Usage:'
+    printf '%s\n' '  eczos-windows register'
+    printf '%s\n' '  eczos-windows inspect FILE'
+    printf '%s\n' '  eczos-windows install [--yes] FILE'
+    printf '%s\n' '  eczos-windows manage'
+    printf '%s\n' '  eczos-windows list'
+    printf '%s\n' '  eczos-windows info APP-ID'
+    printf '%s\n' '  eczos-windows run APP-ID [ARG ...]'
+    printf '%s\n' '  eczos-windows rescan APP-ID'
+    printf '%s\n' '  eczos-windows repair APP-ID'
+    printf '%s\n' '  eczos-windows remove [--yes] APP-ID'
+}
+
+require_unprivileged() {
+    if [[ $(id -u) -eq 0 ]]; then
+        printf 'ECZ Windows applications must not run as root.\n' >&2
+        exit 1
+    fi
+}
+
+validate_id() {
+    [[ $1 =~ ^[a-z0-9][a-z0-9._-]{0,79}$ ]] || {
+        printf 'Invalid application ID.\n' >&2
+        exit 2
+    }
+}
+
+app_dir_for() {
+    validate_id "$1"
+    printf '%s/%s\n' "$APPS_ROOT" "$1"
+}
+
+confirm_action() {
+    local message=$1
+    local assume_yes=${2:-false}
+    if [[ "$assume_yes" = true ]]; then
+        return 0
+    fi
+    if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+        printf 'Confirmation requires a graphical session, or use --yes.\n' >&2
+        return 1
+    fi
+    kdialog --title 'ECZ Windows' --warningcontinuecancel "$message"
+}
+
+register_handler() {
+    require_unprivileged
+    if [[ -s "$REGISTER_MARKER" ]]; then
+        return 0
+    fi
+    for mime in \
+        application/x-ms-dos-executable \
+        application/vnd.microsoft.portable-executable \
+        application/x-msi; do
+        xdg-mime default org.eczos.Windows.desktop "$mime"
+    done
+    mkdir -p "$(dirname "$REGISTER_MARKER")"
+    printf 'registered=%s\n' "$(date --iso-8601=seconds)" > "$REGISTER_MARKER"
+    printf 'ECZ Windows file associations registered.\n'
+}
+
+restrict_prefix() {
+    local prefix=$1 canonical_prefix link target
+    canonical_prefix=$(realpath "$prefix")
+    rm -f "$prefix/dosdevices/z:"
+    while IFS= read -r -d '' link; do
+        target=$(realpath "$link" 2>/dev/null || true)
+        if [[ -n "$target" && "$target" != "$canonical_prefix" && \
+            "$target" != "$canonical_prefix/"* ]]; then
+            rm -f "$link"
+        fi
+    done < <(find "$prefix" -type l -print0)
+}
+
+runtime_call() {
+    [[ -x "$RUNTIME_ADAPTER" ]] || {
+        printf 'The ECZ Windows runtime is unavailable.\n' >&2
+        exit 1
+    }
+    "$RUNTIME_ADAPTER" "$@"
+}
+
+inspect_file() {
+    local input=$1
+    local resolved
+    [[ -f "$input" ]] || {
+        printf 'Not a regular file: %s\n' "$input" >&2
+        exit 2
+    }
+    resolved=$(realpath "$input")
+    printf 'File: %s\n' "$resolved"
+    printf 'Type: %s\n' "$(file -b "$resolved")"
+    printf 'SHA-256: %s\n' "$(sha256sum "$resolved" | awk '{print $1}')"
+}
+
+write_launcher() {
+    local app_id=$1
+    local display_name=$2
+    mkdir -p "$LAUNCHERS_DIR"
+    cat > "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=$display_name
+Exec=eczos-windows run $app_id
+Icon=application-x-executable
+Terminal=false
+Categories=Utility;
+EOF
+    chmod 0644 "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop"
+    update-desktop-database "$LAUNCHERS_DIR" >/dev/null 2>&1 || true
+}
+
+safe_display_name() {
+    local value=$1
+    if [[ "$value" == *$'\n'* || "$value" == *$'\r'* ]]; then
+        printf 'The filename contains unsupported line breaks.\n' >&2
+        exit 2
+    fi
+    printf '%s\n' "$value"
+}
+
+discover_entrypoint() {
+    local prefix=$1 kind=$2 portable_payload=$3 fallback_name=$4
+    local runtime_user shortcut_root shortcut candidate_root windows_target relative target canonical_target
+    local -a shortcut_roots=() shortcuts=() candidate_roots=() candidates=()
+    DISCOVERED_ENTRYPOINT=null
+    DISCOVERED_ENTRYPOINT_TYPE=null
+    DISCOVERED_NAME=$fallback_name
+
+    if [[ "$kind" = portable-executable && -f "$portable_payload" ]]; then
+        DISCOVERED_ENTRYPOINT=$portable_payload
+        DISCOVERED_ENTRYPOINT_TYPE=executable
+        return 0
+    fi
+
+    runtime_user=$(id -un)
+    for shortcut_root in \
+        "$prefix/drive_c/ProgramData/Microsoft/Windows/Start Menu/Programs" \
+        "$prefix/drive_c/users/$runtime_user/AppData/Roaming/Microsoft/Windows/Start Menu/Programs"; do
+        [[ ! -d "$shortcut_root" ]] || shortcut_roots+=("$shortcut_root")
+    done
+    if [[ ${#shortcut_roots[@]} -gt 0 ]]; then
+        mapfile -d '' shortcuts < <(find "${shortcut_roots[@]}" -type f -iname '*.lnk' \
+            ! -iname '*uninstall*.lnk' ! -iname '*unins*.lnk' -print0 2>/dev/null)
+    fi
+    if [[ ${#shortcuts[@]} -eq 1 ]]; then
+        shortcut=${shortcuts[0]}
+        DISCOVERED_NAME=$(safe_display_name "$(basename "${shortcut%.lnk}")")
+        windows_target=$(LC_ALL=C grep -aoP '(?i)[a-z]:\\[\x20-\x7e]+?\.exe' \
+            "$shortcut" | head -n1 || true)
+        if [[ "$windows_target" =~ ^[Cc]:\\ ]]; then
+            relative=${windows_target:3}
+            relative=${relative//\\//}
+            target="$prefix/drive_c/$relative"
+            canonical_target=$(realpath "$target" 2>/dev/null || true)
+            if [[ -f "$canonical_target" && "$canonical_target" = "$prefix/drive_c/"* ]]; then
+                DISCOVERED_ENTRYPOINT=$canonical_target
+                DISCOVERED_ENTRYPOINT_TYPE=executable
+                return 0
+            fi
+        fi
+    fi
+
+    for candidate_root in \
+        "$prefix/drive_c/Program Files" \
+        "$prefix/drive_c/Program Files (x86)" \
+        "$prefix/drive_c/users/$runtime_user/AppData/Local/Programs"; do
+        [[ ! -d "$candidate_root" ]] || candidate_roots+=("$candidate_root")
+    done
+    if [[ ${#candidate_roots[@]} -gt 0 ]]; then
+        mapfile -d '' candidates < <(find "${candidate_roots[@]}" -type f -iname '*.exe' \
+            ! -iname 'unins*.exe' ! -iname 'uninstall*.exe' \
+            ! -iname 'setup*.exe' ! -iname 'update*.exe' -print0 2>/dev/null)
+    fi
+    if [[ ${#candidates[@]} -eq 1 ]]; then
+        DISCOVERED_ENTRYPOINT=${candidates[0]}
+        DISCOVERED_ENTRYPOINT_TYPE=executable
+    fi
+}
+
+install_file() {
+    require_unprivileged
+    local assume_yes=false
+    if [[ ${1:-} = --yes ]]; then
+        assume_yes=true
+        shift
+    fi
+    [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+    runtime_call check >/dev/null
+
+    local input=$1
+    local resolved extension kind checksum base lower_base display_name slug app_id app_dir
+    local source_dir copied prefix runtime_dir runtime_payload runtime_windows_path
+    local install_log result entrypoint entrypoint_type temp_manifest existing_status failed_dir
+    local initialization_log initialization_result detected_name retry_existing=false
+    [[ -f "$input" ]] || { printf 'Not a regular file: %s\n' "$input" >&2; exit 2; }
+    resolved=$(realpath "$input")
+    extension=${resolved##*.}
+    extension=${extension,,}
+    checksum=$(sha256sum "$resolved" | awk '{print $1}')
+    base=$(basename "$resolved")
+    display_name=$(safe_display_name "${base%.*}")
+    lower_base=${base,,}
+    case "$extension" in
+        exe)
+            if [[ "$lower_base" =~ (^|[-_.])(setup|install|installer)([-_.0-9]|$) ]]; then
+                kind=exe-installer
+            else
+                kind=portable-executable
+            fi
+            ;;
+        msi) kind=msi-installer ;;
+        *) printf 'Only .exe and .msi are supported.\n' >&2; exit 2 ;;
+    esac
+
+    slug=$(printf '%s' "$display_name" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$//')
+    [[ -n "$slug" ]] || slug=windows-app
+    slug=${slug:0:50}
+    app_id="$slug-${checksum:0:8}"
+    app_dir=$(app_dir_for "$app_id")
+    mkdir -p "$LOCKS_ROOT"
+    exec {app_lock_fd}>"$LOCKS_ROOT/$app_id.lock"
+    if ! flock -n "$app_lock_fd"; then
+        printf 'An installation for %s is already active.\n' "$app_id" >&2
+        exit 1
+    fi
+    if [[ -e "$app_dir" ]]; then
+        existing_status=$(jq -er '.status' "$app_dir/manifest.json" 2>/dev/null || true)
+        if [[ "$existing_status" =~ ^(installer-failed|runtime-initialization-failed|initializing)$ ]]; then
+            retry_existing=true
+        else
+            printf 'This file is already managed as %s.\n' "$app_id" >&2
+            exit 1
+        fi
+    fi
+
+    if [[ "$retry_existing" = true ]]; then
+        confirm_action "Retry the failed installation of '$base'?" "$assume_yes"
+        failed_dir="$app_dir/failed-attempts/$(date +%Y%m%d-%H%M%S)"
+        mkdir -p "$failed_dir"
+        [[ ! -d "$app_dir/prefix" ]] || mv "$app_dir/prefix" "$failed_dir/prefix"
+        [[ ! -f "$app_dir/install.log" ]] || mv "$app_dir/install.log" "$failed_dir/install.log"
+    else
+        confirm_action "Install/open '$base' in an isolated ECZ Windows environment?\n\nSHA-256: $checksum\n\nWindows software is not sandboxed and can still access granted user files." "$assume_yes"
+    fi
+
+    source_dir="$app_dir/source"
+    prefix="$app_dir/prefix"
+    mkdir -p "$source_dir" "$prefix"
+    chmod 0700 "$app_dir" "$source_dir" "$prefix"
+    copied="$source_dir/$base"
+    if [[ "$resolved" != "$copied" ]]; then
+        install -m 0600 "$resolved" "$copied"
+    fi
+
+    jq -n \
+        --arg id "$app_id" \
+        --arg name "$display_name" \
+        --arg kind "$kind" \
+        --arg source "$resolved" \
+        --arg sha256 "$checksum" \
+        --arg prefix "$prefix" \
+        --arg created "$(date --iso-8601=seconds)" \
+        '{schema:1,id:$id,name:$name,kind:$kind,source:$source,sha256:$sha256,runtime:"wine-system-v1",prefix:$prefix,status:"initializing",created:$created,entrypoint:null,entrypointType:null}' \
+        > "$app_dir/manifest.json"
+    chmod 0600 "$app_dir/manifest.json"
+
+    initialization_log="$app_dir/initialization.log"
+    set +e
+    runtime_call initialize "$prefix" {app_lock_fd}>&- >"$initialization_log" 2>&1
+    initialization_result=$?
+    set -e
+    chmod 0600 "$initialization_log"
+    if ((initialization_result != 0)); then
+        temp_manifest="$app_dir/manifest.json.new"
+        jq --argjson result "$initialization_result" \
+            '.status="runtime-initialization-failed" | .runtimeExit=$result' \
+            "$app_dir/manifest.json" >"$temp_manifest"
+        chmod 0600 "$temp_manifest"
+        mv -f "$temp_manifest" "$app_dir/manifest.json"
+        printf 'ECZ Windows could not initialize the application environment.\n' >&2
+        exit "$initialization_result"
+    fi
+    restrict_prefix "$prefix"
+    runtime_dir="$prefix/drive_c/ECZOS-Install"
+    runtime_payload="$runtime_dir/payload.$extension"
+    runtime_windows_path="C:\\ECZOS-Install\\payload.$extension"
+    mkdir -p "$runtime_dir"
+    install -m 0600 "$copied" "$runtime_payload"
+
+    install_log="$app_dir/install.log"
+    set +e
+    if [[ "$kind" = msi-installer ]]; then
+        runtime_call install-msi "$prefix" "$runtime_windows_path" \
+            {app_lock_fd}>&- 2>&1 | tee "$install_log"
+    else
+        runtime_call execute "$prefix" "$runtime_windows_path" \
+            {app_lock_fd}>&- 2>&1 | tee "$install_log"
+    fi
+    result=${PIPESTATUS[0]}
+    set -e
+    chmod 0600 "$install_log"
+    restrict_prefix "$prefix"
+
+    discover_entrypoint "$prefix" "$kind" "$runtime_payload" "$display_name"
+    entrypoint=$DISCOVERED_ENTRYPOINT
+    entrypoint_type=$DISCOVERED_ENTRYPOINT_TYPE
+    detected_name=$DISCOVERED_NAME
+
+    temp_manifest="$app_dir/manifest.json.new"
+    if ((result != 0)); then
+        jq --argjson result "$result" '.status="installer-failed" | .installerExit=$result' \
+            "$app_dir/manifest.json" > "$temp_manifest"
+    elif [[ "$entrypoint" = null ]]; then
+        jq --argjson result "$result" '.status="installed-needs-entrypoint" | .installerExit=$result' \
+            "$app_dir/manifest.json" > "$temp_manifest"
+    else
+        jq --argjson result "$result" --arg entrypoint "$entrypoint" \
+            --arg entrypointType "$entrypoint_type" --arg name "$detected_name" \
+            '.status="installed" | .installerExit=$result | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name' \
+            "$app_dir/manifest.json" > "$temp_manifest"
+    fi
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$app_dir/manifest.json"
+
+    if ((result == 0)) && [[ "$entrypoint" != null ]]; then
+        write_launcher "$app_id" "$detected_name"
+    fi
+    printf 'ECZ Windows application ID: %s\n' "$app_id"
+    printf 'Installer exit status: %s\n' "$result"
+}
+
+manage_apps() {
+    require_unprivileged
+    [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] || {
+        printf 'ECZ Windows app management requires a graphical session.\n' >&2
+        exit 1
+    }
+
+    local manifest app_id name status selection action details source_file
+    local -a menu_items=()
+    if [[ -d "$APPS_ROOT" ]]; then
+        while IFS= read -r -d '' manifest; do
+            app_id=$(jq -er '.id' "$manifest")
+            name=$(jq -er '.name' "$manifest")
+            status=$(jq -er '.status' "$manifest")
+            menu_items+=("$app_id" "$name — $status")
+        done < <(find "$APPS_ROOT" -mindepth 2 -maxdepth 2 -name manifest.json -print0 | sort -z)
+    fi
+    if [[ ${#menu_items[@]} -eq 0 ]]; then
+        kdialog --title 'ECZ Windows-apps' --msgbox 'Er zijn nog geen beheerde Windows-applicaties.'
+        return 0
+    fi
+
+    selection=$(kdialog --title 'ECZ Windows-apps' --menu \
+        'Kies een Windows-applicatie:' "${menu_items[@]}") || return 0
+    manifest=$(read_manifest "$selection")
+    status=$(jq -er '.status' "$manifest")
+    action=$(kdialog --title 'ECZ Windows-apps' --menu 'Kies een actie:' \
+        details 'Details bekijken' \
+        run 'Starten' \
+        retry 'Installatie opnieuw proberen' \
+        rescan 'Geïnstalleerd programma opnieuw zoeken' \
+        repair 'Omgeving herstellen' \
+        remove 'Verwijderen') || return 0
+
+    case "$action" in
+        details)
+            details=$(jq -r '"Naam: \(.name)\nStatus: \(.status)\nRuntime: \(.runtime)\nSHA-256: \(.sha256)"' "$manifest")
+            kdialog --title 'ECZ Windows-details' --msgbox "$details"
+            ;;
+        run)
+            if [[ "$status" != installed ]]; then
+                kdialog --title 'ECZ Windows' --error 'Deze applicatie heeft nog geen startbaar programma.'
+            else
+                eczos-windows run "$selection" >/dev/null 2>&1 &
+            fi
+            ;;
+        retry)
+            source_file=$(find "$(app_dir_for "$selection")/source" -maxdepth 1 -type f -print -quit)
+            if [[ ! "$status" =~ ^(installer-failed|runtime-initialization-failed|initializing)$ || -z "$source_file" ]]; then
+                kdialog --title 'ECZ Windows' --error 'Deze installatie kan niet automatisch opnieuw worden geprobeerd.'
+            else
+                eczos-windows install "$source_file"
+            fi
+            ;;
+        rescan) eczos-windows rescan "$selection" ;;
+        repair) eczos-windows repair "$selection" ;;
+        remove) eczos-windows remove "$selection" ;;
+    esac
+}
+
+list_apps() {
+    require_unprivileged
+    if [[ ! -d "$APPS_ROOT" ]]; then
+        printf 'No managed Windows applications.\n'
+        return 0
+    fi
+    find "$APPS_ROOT" -mindepth 2 -maxdepth 2 -name manifest.json -print0 | sort -z |
+        while IFS= read -r -d '' manifest; do
+            jq -r '[.id,.name,.status,.runtime] | @tsv' "$manifest"
+        done
+}
+
+read_manifest() {
+    local app_id=$1
+    local app_dir manifest
+    app_dir=$(app_dir_for "$app_id")
+    manifest="$app_dir/manifest.json"
+    [[ -f "$manifest" ]] || { printf 'Unknown application: %s\n' "$app_id" >&2; exit 2; }
+    printf '%s\n' "$manifest"
+}
+
+run_app() {
+    require_unprivileged
+    local app_id=$1
+    shift
+    local manifest prefix entrypoint entrypoint_type app_dir canonical_app_dir canonical_entrypoint
+    manifest=$(read_manifest "$app_id")
+    app_dir=$(app_dir_for "$app_id")
+    prefix=$(jq -er '.prefix' "$manifest")
+    entrypoint=$(jq -er '.entrypoint' "$manifest")
+    entrypoint_type=$(jq -r '.entrypointType // "executable"' "$manifest")
+    canonical_app_dir=$(realpath "$app_dir")
+    canonical_entrypoint=$(realpath "$entrypoint" 2>/dev/null || true)
+    [[ "$prefix" = "$app_dir/prefix" && -f "$canonical_entrypoint" && \
+        "$canonical_entrypoint" = "$canonical_app_dir/"* ]] || {
+        printf 'No safe entry point is configured for %s.\n' "$app_id" >&2
+        exit 1
+    }
+    restrict_prefix "$prefix"
+    case "$entrypoint_type" in
+        executable) exec "$RUNTIME_ADAPTER" execute "$prefix" "$canonical_entrypoint" "$@" ;;
+        windows-shortcut) exec "$RUNTIME_ADAPTER" execute-link "$prefix" "$canonical_entrypoint" ;;
+        *) printf 'Unknown application entry-point type.\n' >&2; exit 1 ;;
+    esac
+}
+
+rescan_app() {
+    require_unprivileged
+    local app_id=$1 app_dir manifest prefix kind name payload temp_manifest
+    app_dir=$(app_dir_for "$app_id")
+    manifest=$(read_manifest "$app_id")
+    prefix=$(jq -er '.prefix' "$manifest")
+    kind=$(jq -er '.kind' "$manifest")
+    name=$(jq -er '.name' "$manifest")
+    [[ "$prefix" = "$app_dir/prefix" && -d "$prefix" ]] || {
+        printf 'Unsafe application environment.\n' >&2
+        exit 1
+    }
+    mkdir -p "$LOCKS_ROOT"
+    exec {rescan_lock_fd}>"$LOCKS_ROOT/$app_id.lock"
+    if ! flock -n "$rescan_lock_fd"; then
+        printf 'Finish the active installer before rescanning.\n' >&2
+        exit 1
+    fi
+    payload="$prefix/drive_c/ECZOS-Install/payload.exe"
+    discover_entrypoint "$prefix" "$kind" "$payload" "$name"
+    [[ "$DISCOVERED_ENTRYPOINT" != null ]] || {
+        printf 'No unambiguous installed application was found.\n' >&2
+        exit 1
+    }
+    temp_manifest="$app_dir/manifest.json.new"
+    jq --arg entrypoint "$DISCOVERED_ENTRYPOINT" \
+        --arg entrypointType "$DISCOVERED_ENTRYPOINT_TYPE" \
+        --arg name "$DISCOVERED_NAME" --arg rescanned "$(date --iso-8601=seconds)" \
+        '.status="installed" | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name | .rescanned=$rescanned' \
+        "$manifest" >"$temp_manifest"
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$manifest"
+    write_launcher "$app_id" "$DISCOVERED_NAME"
+    printf 'Registered installed application: %s\n' "$DISCOVERED_NAME"
+}
+
+repair_app() {
+    require_unprivileged
+    local manifest prefix app_dir
+    manifest=$(read_manifest "$1")
+    app_dir=$(app_dir_for "$1")
+    prefix=$(jq -er '.prefix' "$manifest")
+    [[ "$prefix" = "$app_dir/prefix" && -d "$prefix" ]] || {
+        printf 'Unsafe Wine prefix in application record.\n' >&2
+        exit 1
+    }
+    runtime_call repair "$prefix"
+    restrict_prefix "$prefix"
+    printf 'Repaired %s.\n' "$1"
+}
+
+remove_app() {
+    require_unprivileged
+    local assume_yes=false
+    if [[ ${1:-} = --yes ]]; then assume_yes=true; shift; fi
+    [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+    local app_id=$1 app_dir
+    app_dir=$(app_dir_for "$app_id")
+    [[ -f "$app_dir/manifest.json" ]] || { printf 'Unknown application: %s\n' "$app_id" >&2; exit 2; }
+    confirm_action "Move managed Windows application '$app_id' to the trash?" "$assume_yes"
+    rm -f "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop"
+    gio trash "$app_dir"
+    update-desktop-database "$LAUNCHERS_DIR" >/dev/null 2>&1 || true
+    printf 'Moved %s to the trash.\n' "$app_id"
+}
+
+command_name=${1:-help}
+shift || true
+case "$command_name" in
+    register) register_handler "$@" ;;
+    inspect) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; inspect_file "$1" ;;
+    install) install_file "$@" ;;
+    manage) [[ $# -eq 0 ]] || { usage >&2; exit 2; }; manage_apps ;;
+    list) [[ $# -eq 0 ]] || { usage >&2; exit 2; }; list_apps ;;
+    info) require_unprivileged; [[ $# -eq 1 ]] || { usage >&2; exit 2; }; jq . "$(read_manifest "$1")" ;;
+    run) [[ $# -ge 1 ]] || { usage >&2; exit 2; }; app_id=$1; shift; run_app "$app_id" "$@" ;;
+    rescan) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; rescan_app "$1" ;;
+    repair) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; repair_app "$1" ;;
+    remove) remove_app "$@" ;;
+    help|-h|--help) usage ;;
+    *) usage >&2; exit 2 ;;
+esac

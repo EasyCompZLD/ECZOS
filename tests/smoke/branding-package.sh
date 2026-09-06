@@ -12,10 +12,20 @@ for asset in \
     /usr/share/eczos/branding/login/login-bg.png \
     /usr/share/eczos/branding/login/login-logo.png \
     /usr/share/eczos/branding/logo/logo.png \
+    /usr/share/eczos/branding/logo/logo-dark.png \
     /usr/share/eczos/branding/wallpapers/eczoswallpaper.png \
     /usr/share/eczos/branding/wallpapers/eczoswallpaper-dark.png \
     /usr/share/eczos/branding/wallpapers/eczoswallpaper-light.png; do
     test -s "$asset"
+done
+
+for link in \
+    /usr/share/icons/hicolor/512x512/apps/eczos-start.png \
+    /usr/share/icons/hicolor/512x512/apps/eczos-start-light.png \
+    /usr/share/icons/hicolor/512x512/apps/eczos-start-dark.png \
+    /usr/share/pixmaps/eczos-start.png; do
+    test -L "$link"
+    test -e "$link"
 done
 
 dpkg --audit

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+BASE_RELEASE=/usr/lib/os-release
+TARGET_RELEASE=/etc/os-release
+TEMP_RELEASE=/etc/.os-release.eczos-new
+
+if [[ ! -r "$BASE_RELEASE" ]]; then
+    printf 'Cannot read Debian base release metadata.\n' >&2
+    exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$BASE_RELEASE"
+
+cat > "$TEMP_RELEASE" <<EOF
+PRETTY_NAME="ECZOS Development 0.1"
+NAME="ECZOS"
+VERSION_ID="${VERSION_ID}"
+VERSION="Development 0.1"
+VERSION_CODENAME=${VERSION_CODENAME}
+DEBIAN_VERSION_FULL=${DEBIAN_VERSION_FULL:-$VERSION_ID}
+ID=debian
+ID_LIKE=debian
+VARIANT="ECZOS Development"
+VARIANT_ID=eczos
+LOGO=eczos-start
+HOME_URL="https://easycompzeeland.nl/"
+SUPPORT_URL="https://easycompzeeland.nl/"
+BUG_REPORT_URL="https://easycompzeeland.nl/"
+EOF
+
+chmod 0644 "$TEMP_RELEASE"
+mv -f "$TEMP_RELEASE" "$TARGET_RELEASE"

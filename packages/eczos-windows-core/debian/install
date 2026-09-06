@@ -1,0 +1,5 @@
+applications/org.eczos.Windows.desktop usr/share/applications/
+applications/org.eczos.Windows.Manager.desktop usr/share/applications/
+bin/eczos-windows usr/bin/
+lib/runtime-wine-system usr/lib/eczos/windows/
+xdg/eczos-windows-first-run.desktop etc/xdg/autostart/

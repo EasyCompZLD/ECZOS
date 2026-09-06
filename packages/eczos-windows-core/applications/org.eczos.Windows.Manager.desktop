@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ECZ Windows-apps
+Comment=Windows-applicaties bekijken, starten en herstellen
+Exec=eczos-windows manage
+Icon=eczos-start
+Terminal=false
+Categories=System;Utility;
+Keywords=Windows;EXE;MSI;Apps;

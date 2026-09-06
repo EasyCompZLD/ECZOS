@@ -11,8 +11,10 @@ Package: eczos-desktop-defaults
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding (>= 0.1.0~dev1),
- plasma-workspace
+ eczos-branding (>= 0.1.0~dev3),
+ libkf6config-bin,
+ plasma-workspace,
+ qdbus-qt6
 Description: ECZOS defaults for KDE Plasma
  Applies the ECZOS wallpaper and Breeze appearance once for new Plasma users,
  while retaining user control after first run.

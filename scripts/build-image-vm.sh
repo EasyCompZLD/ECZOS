@@ -21,6 +21,12 @@ LOG_DIR="$BUILD_DIR/logs"
 BUILD_ID=$(date -u +%Y%m%d-%H%M%S)
 ISO_NAME="ECZOS-development-amd64-${BUILD_ID}.iso"
 
+if [[ -e "$IMAGE_DIR/BUILD_BLOCKED.md" ]]; then
+    printf 'ECZOS image build is intentionally blocked by:\n%s\n' \
+        "$IMAGE_DIR/BUILD_BLOCKED.md" >&2
+    exit 2
+fi
+
 for command_name in lb dpkg-buildpackage dpkg-parsechangelog lintian sha256sum xorriso; do
     command -v "$command_name" >/dev/null || {
         printf 'Missing build dependency: %s\n' "$command_name" >&2

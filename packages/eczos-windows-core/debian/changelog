@@ -1,0 +1,21 @@
+eczos-windows-core (0.1.0~dev8) UNRELEASED; urgency=medium
+
+  * Run installers from the isolated Windows C: drive.
+  * Add a visible ECZ Windows application manager and failed-install retry.
+  * Detect a missing 32-bit Wine runtime before creating an application.
+  * Start Wine inside C: so self-extracting installers receive a valid working
+    directory after the unsafe Z: mapping is removed.
+  * Prevent concurrent installation attempts for one application record.
+  * Prefer Windows Start Menu shortcuts for application discovery and support
+    rescanning completed installations.
+  * Keep Wine background processes from inheriting the installation lock.
+  * Launch Start Menu shortcuts through their internal C: path without Z:.
+  * Resolve verified executable targets from Windows shortcut metadata.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 18:15:00 +0200
+
+eczos-windows-core (0.1.0~dev1) UNRELEASED; urgency=medium
+
+  * Add the first safe managed EXE/MSI workflow.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 17:00:00 +0200

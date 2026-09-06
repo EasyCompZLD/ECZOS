@@ -8,13 +8,15 @@ copied from the historical workstation overlay.
 The prototype uses Debian Installer in live mode plus its desktop launcher.
 Calamares remains a separate future decision.
 
-From the repository root on the Debian 13 build host:
+The build pipeline is prepared but intentionally blocked by `BUILD_BLOCKED.md`
+until the desktop branding and first ECZ Windows MVP gates pass. After that file
+is removed in a reviewed commit, the entry point will be:
 
 ```sh
 sudo ./scripts/build-image-vm.sh
 ```
 
-The script builds every ECZOS package, stages the resulting `.deb` files in
+The script will build every ECZOS package, stage the resulting `.deb` files in
 `config/packages.chroot`, configures live-build, produces the ISO and writes a
 SHA-256 checksum below `image/.build/artifacts/`.
 

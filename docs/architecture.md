@@ -52,5 +52,6 @@ eczos-release / eczos-branding / eczos-defaults
       optional product and feature packages
 ```
 
-Windows compatibility, gaming and remote support are optional layers and must
-not become boot dependencies.
+ECZ Windows ships in the desktop product set because it is a core ECZOS feature,
+but remains removable and must never become a boot dependency. Gaming and remote
+support remain optional layers.

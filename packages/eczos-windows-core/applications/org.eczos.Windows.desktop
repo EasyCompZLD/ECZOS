@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Windows-app installeren
+Comment=Open veilig met ECZ Windows
+Exec=eczos-windows install %f
+Icon=eczos-start
+Terminal=false
+NoDisplay=true
+Categories=System;
+MimeType=application/x-ms-dos-executable;application/vnd.microsoft.portable-executable;application/x-msi;

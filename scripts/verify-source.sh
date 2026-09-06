@@ -21,7 +21,12 @@ for required in \
     packages/eczos-desktop-defaults/debian/control \
     packages/eczos-desktop-defaults/lib/apply-desktop-defaults \
     packages/eczos-release/debian/control \
+    packages/eczos-release/lib/update-os-release \
     packages/eczos-release/release/eczos-release \
+    packages/eczos-windows-core/debian/control \
+    packages/eczos-windows-core/bin/eczos-windows \
+    packages/eczos-windows-core/lib/runtime-wine-system \
+    packages/eczos-windows-core/applications/org.eczos.Windows.desktop \
     packages/eczos-desktop/debian/control; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
@@ -35,6 +40,7 @@ for asset in \
     assets/login/login-bg.png \
     assets/login/login-logo.png \
     assets/logo/logo.png \
+    assets/logo/logo-dark.png \
     assets/wallpapers/eczoswallpaper.png \
     assets/wallpapers/eczoswallpaper-dark.png \
     assets/wallpapers/eczoswallpaper-light.png; do
@@ -43,7 +49,8 @@ done
 
 while IFS= read -r script; do
     bash -n "$script" || fail "invalid shell syntax: ${script#"$ROOT_DIR/"}"
-done < <(find "$ROOT_DIR/scripts" "$ROOT_DIR/tests" -type f -name '*.sh' -print)
+done < <(find "$ROOT_DIR/scripts" "$ROOT_DIR/tests" "$ROOT_DIR/packages" \
+    -type f \( -name '*.sh' -o -path '*/bin/*' -o -path '*/lib/*' \) -print)
 
 "$ROOT_DIR/scripts/verify-image-config.sh" || fail 'invalid image configuration'
 

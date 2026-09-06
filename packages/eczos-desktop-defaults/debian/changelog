@@ -1,3 +1,16 @@
+eczos-desktop-defaults (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Use a dark launcher logo on light panels and a light logo on dark panels.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 18:15:00 +0200
+
+eczos-desktop-defaults (0.1.0~dev3) UNRELEASED; urgency=medium
+
+  * Apply the selected ECZOS wallpaper to the lock screen.
+  * Set the Plasma Kickoff launcher icon to the ECZOS start icon.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 17:00:00 +0200
+
 eczos-desktop-defaults (0.1.0~dev2) UNRELEASED; urgency=medium
 
   * Use the blue ECZOS main wallpaper as the fixed first-run default.

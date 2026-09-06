@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
 STATE_DIR="$STATE_HOME/eczos"
-MARKER="$STATE_DIR/desktop-defaults-v2"
+MARKER="$STATE_DIR/desktop-defaults-v4"
 
 if [[ ${1:-} != --force && -e "$MARKER" ]]; then
     exit 0

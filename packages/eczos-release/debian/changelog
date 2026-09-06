@@ -1,3 +1,10 @@
+eczos-release (0.1.0~dev2) UNRELEASED; urgency=medium
+
+  * Present ECZOS in os-release display fields while preserving ID=debian.
+  * Set the generated GRUB distributor label to ECZOS.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 17:00:00 +0200
+
 eczos-release (0.1.0~dev1) UNRELEASED; urgency=medium
 
   * Add ECZOS development release identity and information command.

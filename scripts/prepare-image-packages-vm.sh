@@ -23,6 +23,7 @@ PACKAGES=(
     eczos-plymouth-theme
     eczos-desktop-defaults
     eczos-release
+    eczos-windows-core
     eczos-desktop
 )
 
@@ -33,13 +34,18 @@ for package in "${PACKAGES[@]}"; do
     package_dir="$ROOT_DIR/packages/$package"
     find "$package_dir/debian" -type f -exec chmod 0644 {} +
     chmod 0755 "$package_dir/debian/rules"
+    for maintainer_script in preinst postinst prerm postrm; do
+        if [[ -f "$package_dir/debian/$maintainer_script" ]]; then
+            chmod 0755 "$package_dir/debian/$maintainer_script"
+        fi
+    done
 
     for executable_dir in bin lib; do
         if [[ -d "$package_dir/$executable_dir" ]]; then
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in assets config release theme xdg; do
+    for data_dir in applications assets config release theme xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi
@@ -47,7 +53,11 @@ for package in "${PACKAGES[@]}"; do
 
     (cd "$package_dir" && dpkg-buildpackage -us -uc -b)
     version=$(dpkg-parsechangelog -l"$package_dir/debian/changelog" -S Version)
-    built="$OUTPUT_DIR/${package}_${version}_all.deb"
+    package_arch=$(awk '/^Architecture:/ {print $2; exit}' "$package_dir/debian/control")
+    if [[ "$package_arch" != all ]]; then
+        package_arch=$(dpkg-architecture -qDEB_HOST_ARCH)
+    fi
+    built="$OUTPUT_DIR/${package}_${version}_${package_arch}.deb"
     if [[ ! -f "$built" ]]; then
         printf 'Expected package output is missing: %s\n' "$built" >&2
         exit 1

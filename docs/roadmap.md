@@ -19,17 +19,17 @@
 - [ ] Plasma defaults and Windows-style layout
 - [ ] first-run state mechanism
 - [x] versioned Debian 13 KDE live-build configuration
-- [ ] first ECZOS ISO build and boot test
+- [ ] first ECZOS ISO build and boot test (blocked until desktop and ECZ Windows MVP gates pass)
 - UEFI VM boot, install, upgrade and removal tests
 
 ## Phase 2 — ECZ Windows MVP
 
-- safe `.exe` and `.msi` handler
-- isolated prefixes and versioned application records
-- Wine runtime adapter
-- launcher/icon/menu integration
-- logs, repair and removal
-- constrained file and drive access
+- [ ] safe `.exe` and `.msi` handler (`.exe` physical test passed; MSI pending)
+- [x] isolated prefixes and versioned application records
+- [x] 32-bit/64-bit system Wine runtime adapter
+- [ ] launcher/icon/menu integration (launcher passed; real icon extraction pending)
+- [ ] install logs, repair and recoverable removal (implemented; test pending)
+- [x] constrained default file mappings without a Linux-root `Z:` drive
 
 ## Phase 3 — ECZ Gaming
 

@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove|abort-install)
+        if [ "$(dpkg-divert --listpackage /etc/os-release)" = eczos-release ]; then
+            rm -f /etc/os-release /etc/.os-release.eczos-new
+            dpkg-divert \
+                --package eczos-release \
+                --remove \
+                --rename \
+                --divert /etc/os-release.debian \
+                /etc/os-release
+        fi
+        ;;
+    purge)
+        rm -f /etc/.os-release.eczos-new
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

@@ -16,6 +16,9 @@ for file in \
 done
 test -s /etc/xdg/autostart/eczos-desktop-first-run.desktop
 grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
+grep -F 'START_ICON=eczos-start-dark' /usr/bin/eczos-theme-switch
+grep -F 'START_ICON=eczos-start-light' /usr/bin/eczos-theme-switch
+grep -F 'kscreenlockerrc' /usr/bin/eczos-theme-switch
 for wallpaper in \
     eczoswallpaper.png \
     eczoswallpaper-light.png \
