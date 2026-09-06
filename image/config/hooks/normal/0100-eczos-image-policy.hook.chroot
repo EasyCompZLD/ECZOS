@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+plymouth-set-default-theme eczos
+update-initramfs -u
+
+if [ -f /etc/plymouth/plymouthd.conf ]; then
+    grep -q '^Theme=eczos$' /etc/plymouth/plymouthd.conf
+fi

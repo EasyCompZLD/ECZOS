@@ -45,6 +45,8 @@ while IFS= read -r script; do
     bash -n "$script" || fail "invalid shell syntax: ${script#"$ROOT_DIR/"}"
 done < <(find "$ROOT_DIR/scripts" "$ROOT_DIR/tests" -type f -name '*.sh' -print)
 
+"$ROOT_DIR/scripts/verify-image-config.sh" || fail 'invalid image configuration'
+
 if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     if git -C "$ROOT_DIR" ls-files | grep -E '\.(iso|deb)$' >/dev/null; then
         fail 'ISO or binary Debian package is tracked by Git'

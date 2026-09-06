@@ -31,6 +31,14 @@
 /image/binary/
 /image/*.iso
 /image/*.img
+/image/config/packages.chroot/*.deb
+/image/config/bootstrap
+/image/config/binary
+/image/config/build
+/image/config/chroot
+/image/config/common
+/image/config/rootfs
+/image/config/source
 
 # Test output
 /.test-results/

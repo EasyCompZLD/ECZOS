@@ -72,6 +72,14 @@ for one reboot. It does not purge the already working SDDM or branding packages.
 ECZOS release identity and the aggregate desktop metapackage in one run. Its
 smoke tests also confirm that Debian remains the underlying compatibility ID.
 
+## Development image
+
+`build-image-vm.sh` is the single entry point for a full image build. It verifies
+the source, creates all ECZOS packages in dependency order, stages them for
+live-build, cleans previous generated state and builds a Debian 13 KDE hybrid
+ISO. A successful build is not a release: the ISO must still pass BIOS and UEFI
+boot, live-session, installer, installed-system and removal tests.
+
 ## Required gates for image work
 
 - source checks pass;

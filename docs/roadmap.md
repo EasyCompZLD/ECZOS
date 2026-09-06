@@ -18,7 +18,8 @@
 - [x] visual Plymouth boot-splash test
 - [ ] Plasma defaults and Windows-style layout
 - [ ] first-run state mechanism
-- reproducible live-build configuration
+- [x] versioned Debian 13 KDE live-build configuration
+- [ ] first ECZOS ISO build and boot test
 - UEFI VM boot, install, upgrade and removal tests
 
 ## Phase 2 — ECZ Windows MVP

@@ -31,7 +31,7 @@ packages/eczos-release/       Product identity without masking Debian
 packages/eczos-desktop/       Complete desktop product-layer metapackage
 scripts/                    Source-tree developer checks
 tests/                      Automated source and package tests
-image/                      Future reproducible live-build configuration
+image/                      Versioned Debian live-build configuration
 ```
 
 The directories `Build/`, `Assets/` and `easycomp-desktop/` predate this source
@@ -57,3 +57,9 @@ sudo ./scripts/test-desktop-defaults-package-vm.sh
 
 No production image should include the historical remote-support package. See
 `docs/security.md`.
+
+Build the complete development ISO on Debian 13 with:
+
+```sh
+sudo ./scripts/build-image-vm.sh
+```

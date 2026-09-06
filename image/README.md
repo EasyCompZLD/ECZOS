@@ -1,9 +1,24 @@
-# ECZOS image configuration
+# ECZOS development image
 
-This directory will contain the reproducible Debian live-build configuration.
-It is intentionally not populated from the historical host overlay.
+This directory contains the versioned Debian Live configuration for the first
+ECZOS development image. It is generated from Debian 13 (Trixie), the official
+KDE live task and the ECZOS Debian packages in this repository. Nothing is
+copied from the historical workstation overlay.
 
-Image work starts after `eczos-branding` can be built, installed, upgraded and
-removed successfully inside a clean Debian 13 environment. Installer selection
-is a separate decision and is not implied by the presence of Calamares in old
-experimental images.
+The prototype uses Debian Installer in live mode plus its desktop launcher.
+Calamares remains a separate future decision.
+
+From the repository root on the Debian 13 build host:
+
+```sh
+sudo ./scripts/build-image-vm.sh
+```
+
+The script builds every ECZOS package, stages the resulting `.deb` files in
+`config/packages.chroot`, configures live-build, produces the ISO and writes a
+SHA-256 checksum below `image/.build/artifacts/`.
+
+Generated packages, caches, logs and images are intentionally ignored by Git.
+The development build uses the current Trixie repositories; bit-for-bit release
+reproducibility will require a pinned Debian snapshot and a signed ECZOS APT
+repository.
