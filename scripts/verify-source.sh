@@ -27,6 +27,10 @@ for required in \
     packages/eczos-windows-core/bin/eczos-windows \
     packages/eczos-windows-core/lib/runtime-wine-system \
     packages/eczos-windows-core/applications/org.eczos.Windows.desktop \
+    packages/eczos-gaming-core/debian/control \
+    packages/eczos-gaming-core/bin/eczos-gaming \
+    packages/eczos-gaming-core/lib/runtime-umu \
+    packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json \
     packages/eczos-desktop/debian/control; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done

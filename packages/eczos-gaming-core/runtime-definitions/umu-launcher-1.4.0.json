@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "umu-launcher",
+  "version": "1.4.0-1",
+  "architecture": "amd64",
+  "distribution": "debian-13",
+  "package": "python3-umu-launcher",
+  "url": "https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.4.0/python3-umu-launcher_1.4.0-1_amd64_debian-13.deb",
+  "sha256": "3de80fdcffdc5daabd65e7c9567aff4b8beeecc238eae11529fe737c0b4083f7",
+  "source": "https://github.com/Open-Wine-Components/umu-launcher/releases/tag/1.4.0"
+}

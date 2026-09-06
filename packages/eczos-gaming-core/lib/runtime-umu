@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+usage() {
+    printf 'Gebruik: runtime-umu check | run PREFIX GAME-ID STORE EXE [ARGUMENTEN...]\n' >&2
+}
+
+case ${1:-} in
+    check)
+        command -v umu-run >/dev/null
+        command -v gamemoderun >/dev/null
+        /usr/bin/eczos-gaming check-ready >/dev/null
+        ;;
+    run)
+        shift
+        [[ $# -ge 4 ]] || { usage; exit 2; }
+        if [[ $(id -u) -eq 0 ]]; then
+            printf 'Start games niet als root.\n' >&2
+            exit 2
+        fi
+        prefix=$1 game_id=$2 store=$3 executable=$4
+        shift 4
+        [[ "$prefix" == /* && "$executable" == /* && -f "$executable" ]] || {
+            printf 'ECZ Gaming accepteert alleen bestaande absolute paden.\n' >&2
+            exit 2
+        }
+        case "$store" in
+            none|egs|gog|battlenet|amazon|humble|itchio|ubisoft) ;;
+            *) printf 'Onbekende winkel: %s\n' "$store" >&2; exit 2 ;;
+        esac
+        data_root=${XDG_DATA_HOME:-"$HOME/.local/share"}/eczos/gaming/prefixes
+        normalized_prefix=$(realpath -m -- "$prefix")
+        normalized_root=$(realpath -m -- "$data_root")
+        if [[ "$normalized_prefix" != "$normalized_root"/* ]]; then
+            printf 'De gameprefix moet onder %s staan.\n' "$normalized_root" >&2
+            exit 2
+        fi
+        /usr/bin/eczos-gaming check-ready >/dev/null
+        install -d -m 0700 "$normalized_prefix"
+        exec env WINEPREFIX="$normalized_prefix" GAMEID="$game_id" STORE="$store" \
+            PROTONPATH=UMU-Proton UMU_LOG=1 gamemoderun umu-run "$executable" "$@"
+        ;;
+    *)
+        usage
+        exit 2
+        ;;
+esac

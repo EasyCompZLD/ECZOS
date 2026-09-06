@@ -1,0 +1,23 @@
+Source: eczos-gaming-core
+Section: games
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-gaming-core
+Architecture: amd64
+Depends:
+ ${misc:Depends},
+ jq,
+ kdialog,
+ pciutils,
+ vulkan-tools
+Recommends:
+ gamemode,
+ mesa-vulkan-drivers
+Description: hardware and Proton runtime foundation for ECZ Gaming
+ Diagnoses Vulkan hardware, 32-bit graphics support and optional UMU and
+ GameMode components before ECZOS attempts to run Windows games with Proton.

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ECZ Gaming
+Comment=Controleer of deze computer klaar is voor Windows-games
+Exec=eczos-gaming manage
+Icon=applications-games
+Terminal=false
+Categories=Game;System;
+Keywords=gaming;games;proton;vulkan;umu;

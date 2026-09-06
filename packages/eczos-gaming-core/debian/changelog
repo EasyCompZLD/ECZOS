@@ -1,0 +1,7 @@
+eczos-gaming-core (0.1.0~dev2) UNRELEASED; urgency=medium
+
+  * Add Vulkan, 32-bit graphics and gaming-runtime diagnostics.
+  * Add the reviewed UMU runtime adapter and graphical status entry.
+  * Detect Debian multiarch Vulkan libraries and constrain game prefixes.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 19:15:00 +0200

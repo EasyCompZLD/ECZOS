@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+usage() {
+    cat <<'EOF'
+Gebruik: eczos-gaming COMMAND
+
+  doctor [--json]  Controleer GPU, Vulkan, 32-bit drivers en runtimes
+  status           Hetzelfde als doctor
+  check-ready      Slaag alleen wanneer Proton-gaming volledig gereed is
+  manage           Toon de status grafisch
+  runtime-info     Toon de vastgelegde UMU-runtime-informatie
+EOF
+}
+
+collect_status() {
+    gpu=$(lspci -nnk 2>/dev/null | awk '
+        /VGA compatible controller|3D controller|Display controller/ {
+            if (seen++) printf "; ";
+            sub(/^[^ ]+ /, ""); printf "%s", $0; in_gpu=1; next
+        }
+        in_gpu && /Kernel driver in use:/ {
+            sub(/^[[:space:]]+/, ""); printf " (%s)", $0; in_gpu=0
+        }
+        END {print ""}' | head -c 2000)
+    [[ -n "$gpu" ]] || gpu='Onbekende grafische adapter'
+
+    vulkan_summary=''
+    if command -v vulkaninfo >/dev/null 2>&1; then
+        vulkan_summary=$(timeout 15s vulkaninfo --summary 2>&1 || true)
+    fi
+    vulkan_devices=$(awk -F= '/deviceName[[:space:]]*=/{gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); if (out) out=out "; "; out=out $2} END{print out}' <<<"$vulkan_summary")
+    [[ -n "$vulkan_devices" ]] || vulkan_devices='Geen Vulkan-apparaat gevonden'
+
+    hardware_vulkan=false
+    if grep -Eq 'PHYSICAL_DEVICE_TYPE_(DISCRETE|INTEGRATED|VIRTUAL)_GPU' <<<"$vulkan_summary"; then
+        hardware_vulkan=true
+    fi
+    software_vulkan=false
+    if grep -Eiq 'llvmpipe|lavapipe|PHYSICAL_DEVICE_TYPE_CPU' <<<"$vulkan_summary"; then
+        software_vulkan=true
+    fi
+
+    vulkan_32=false
+    if [[ -e /usr/lib/i386-linux-gnu/libvulkan.so.1 ]] && \
+        find /usr/lib/i386-linux-gnu -maxdepth 1 -type f -name 'libvulkan_*.so' \
+        -print -quit 2>/dev/null | grep -q .; then
+        vulkan_32=true
+    fi
+
+    umu=false
+    command -v umu-run >/dev/null 2>&1 && umu=true
+    gamemode=false
+    command -v gamemoderun >/dev/null 2>&1 && gamemode=true
+
+    memory_mib=$(awk '/MemTotal:/ {printf "%d", $2 / 1024}' /proc/meminfo)
+    avx=false
+    grep -qm1 -w avx /proc/cpuinfo && avx=true
+
+    if [[ "$hardware_vulkan" != true ]]; then
+        verdict=unsupported
+        summary='Niet geschikt voor Proton/DXVK: geen Vulkan-GPU gevonden.'
+    elif [[ "$vulkan_32" != true || "$umu" != true || "$gamemode" != true ]]; then
+        verdict=setup-required
+        summary='Geschikte Vulkan-GPU gevonden, maar de gaming-runtime is nog niet compleet.'
+    else
+        verdict=ready
+        summary='Deze computer is technisch klaar voor ECZ Gaming.'
+    fi
+}
+
+print_json() {
+    jq -n \
+        --arg verdict "$verdict" --arg summary "$summary" --arg gpu "$gpu" \
+        --arg devices "$vulkan_devices" --argjson hardwareVulkan "$hardware_vulkan" \
+        --argjson softwareVulkan "$software_vulkan" --argjson vulkan32 "$vulkan_32" \
+        --argjson umu "$umu" --argjson gameMode "$gamemode" \
+        --argjson memoryMiB "$memory_mib" --argjson cpuAvx "$avx" \
+        '{schemaVersion:1, verdict:$verdict, summary:$summary, gpu:$gpu,
+          vulkan:{hardware:$hardwareVulkan, softwareOnly:$softwareVulkan, devices:$devices, driver32Bit:$vulkan32},
+          runtime:{umu:$umu, gameMode:$gameMode}, system:{memoryMiB:$memoryMiB, cpuAvx:$cpuAvx}}'
+}
+
+print_human() {
+    local mark_hw='nee' mark_32='nee' mark_umu='nee' mark_gm='nee'
+    [[ "$hardware_vulkan" == true ]] && mark_hw='ja'
+    [[ "$vulkan_32" == true ]] && mark_32='ja'
+    [[ "$umu" == true ]] && mark_umu='ja'
+    [[ "$gamemode" == true ]] && mark_gm='ja'
+    cat <<EOF
+ECZ Gaming-controle
+
+Resultaat: $summary
+GPU: $gpu
+Vulkan-apparaat: $vulkan_devices
+Hardware-Vulkan: $mark_hw
+32-bit Vulkan-driver: $mark_32
+UMU/Proton-adapter: $mark_umu
+GameMode: $mark_gm
+Werkgeheugen: ${memory_mib} MiB
+EOF
+    if (( memory_mib < 8192 )); then
+        printf 'Waarschuwing: minder dan 8 GiB RAM; moderne games kunnen zwaar wisselgeheugen gebruiken.\n'
+    fi
+    if [[ "$avx" != true ]]; then
+        printf 'Waarschuwing: deze CPU heeft geen AVX; veel moderne games starten daardoor niet.\n'
+    fi
+    if [[ "$software_vulkan" == true && "$hardware_vulkan" != true ]]; then
+        printf 'Let op: llvmpipe/lavapipe is software-rendering en telt niet als gaming-GPU.\n'
+    fi
+}
+
+doctor() {
+    collect_status
+    if [[ ${1:-} == --json ]]; then
+        print_json
+    else
+        print_human
+    fi
+}
+
+manage() {
+    collect_status
+    report=$(print_human)
+    if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] && command -v kdialog >/dev/null 2>&1; then
+        kdialog --title 'ECZ Gaming' --msgbox "$report"
+    else
+        printf '%s\n' "$report"
+    fi
+}
+
+case ${1:-} in
+    doctor|status)
+        shift
+        if (( $# > 1 )) || [[ $# -eq 1 && $1 != --json ]]; then
+            usage >&2
+            exit 2
+        fi
+        doctor "${1:-}"
+        ;;
+    check-ready)
+        collect_status
+        print_human
+        [[ "$verdict" == ready ]]
+        ;;
+    manage)
+        manage
+        ;;
+    runtime-info)
+        jq . /usr/share/eczos/gaming/runtime-definitions/umu-launcher-1.4.0.json
+        ;;
+    -h|--help|help|'')
+        usage
+        ;;
+    *)
+        usage >&2
+        exit 2
+        ;;
+esac

@@ -33,11 +33,11 @@
 
 ## Phase 3 — ECZ Gaming
 
-- Vulkan and 32-bit graphics diagnostics
+- [x] Vulkan and 32-bit graphics diagnostics
 - Steam integration
-- reviewed UMU adapter for non-Steam games
+- [x] reviewed UMU adapter for non-Steam games (positive GPU test pending)
 - per-game DXVK/VKD3D and runtime profiles
-- explicit Gaming Mode
+- [x] explicit Gaming Mode through GameMode adapter
 
 ## Phase 4 — broader product experience
 
