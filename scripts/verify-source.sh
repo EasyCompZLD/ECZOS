@@ -14,9 +14,16 @@ for required in \
     docs/architecture.md \
     docs/security.md \
     packages/eczos-branding/debian/control \
-    packages/eczos-branding/debian/install; do
+    packages/eczos-branding/debian/install \
+    packages/eczos-sddm-theme/debian/control \
+    packages/eczos-plymouth-theme/debian/control \
+    packages/eczos-plymouth-theme/theme/eczos.plymouth \
+    packages/eczos-plymouth-theme/theme/eczos.script; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
+
+[[ -s "$ROOT_DIR/packages/eczos-plymouth-theme/theme/logo.png" ]] || \
+    fail 'missing or empty Plymouth logo'
 
 for asset in \
     assets/login/login-bg.png \

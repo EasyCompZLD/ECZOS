@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=ECZOS
+Description=EasyComp Zeeland boot screen
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/eczos
+ScriptFile=/usr/share/plymouth/themes/eczos/eczos.script

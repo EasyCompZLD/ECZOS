@@ -22,6 +22,6 @@ traverse the temporary staging directory, which was created with mode `0700`.
 The test now changes only that disposable directory to mode `0755`; staged
 packages remain mode `0644` and the directory is removed on exit.
 
-The test deliberately did not restart SDDM, so visual rendering of the login
-screen is still pending. The separate preview installer leaves both packages
-installed for that test.
+The automated test deliberately did not restart SDDM. A subsequent preview
+installation and reboot confirmed that the ECZOS login screen renders and works
+on the physical test host. The visual SDDM test therefore passed.

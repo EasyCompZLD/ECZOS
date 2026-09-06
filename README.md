@@ -24,6 +24,7 @@ Neither package replaces files owned by Debian packages.
 docs/                       Architecture, decisions, security and roadmap
 packages/eczos-branding/    First Debian source package
 packages/eczos-sddm-theme/  ECZOS login theme and SDDM configuration
+packages/eczos-plymouth-theme/ ECZOS boot-splash theme
 scripts/                    Source-tree developer checks
 tests/                      Automated source and package tests
 image/                      Future reproducible live-build configuration
@@ -46,6 +47,7 @@ Run the package lifecycle tests on the dedicated Debian 13 test host:
 ```sh
 sudo ./scripts/test-branding-package-vm.sh
 sudo ./scripts/test-sddm-theme-package-vm.sh
+sudo ./scripts/test-plymouth-theme-package-vm.sh
 ```
 
 No production image should include the historical remote-support package. See

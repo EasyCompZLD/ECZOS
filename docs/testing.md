@@ -43,6 +43,26 @@ that no branding payload remains and that dpkg/APT are healthy. Packages with
 maintainer scripts or system configuration changes must not use this shortcut;
 test those on a disposable target first.
 
+## Login and boot theme lifecycles
+
+The SDDM lifecycle test installs both login-theme packages, verifies the live
+service configuration and then purges both packages:
+
+```sh
+sudo ./scripts/test-sddm-theme-package-vm.sh
+```
+
+The Plymouth lifecycle test builds, installs, temporarily selects, restores and
+purges the boot theme without rebuilding the initramfs:
+
+```sh
+sudo ./scripts/test-plymouth-theme-package-vm.sh
+```
+
+Only after that lifecycle passes, use `install-plymouth-theme-preview.sh`. It
+records the previous theme, enables the GRUB `splash` argument and rebuilds the
+initramfs. `remove-plymouth-theme-preview.sh` performs the tested rollback.
+
 ## Required gates for image work
 
 - source checks pass;

@@ -1,0 +1,17 @@
+Source: eczos-plymouth-theme
+Section: misc
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-plymouth-theme
+Architecture: all
+Depends:
+ ${misc:Depends},
+ plymouth (>= 24.004.60)
+Description: ECZOS boot splash theme for Plymouth
+ Provides a lightweight ECZOS boot presentation using Plymouth's standard
+ script plugin.

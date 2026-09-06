@@ -13,7 +13,7 @@
 
 - [x] ECZOS branding package lifecycle
 - [x] ECZOS SDDM package lifecycle
-- [ ] visual SDDM login-screen test
+- [x] visual SDDM login-screen test
 - [ ] Plymouth package and boot-splash test
 - Plasma defaults and Windows-style layout
 - first-run state mechanism
