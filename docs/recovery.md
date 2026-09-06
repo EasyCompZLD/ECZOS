@@ -13,6 +13,8 @@ to a separate package so missing artwork cannot damage package management.
 Keep a standard Plasma session available throughout development. An SDDM theme
 failure must be recoverable by selecting a known Debian theme from a text console
 or rescue boot. User defaults are applied once and are not enforced every login.
+Removing `eczos-desktop-defaults` removes its autostart and commands but preserves
+each user's chosen appearance and versioned first-run marker.
 
 ## Boot recovery
 

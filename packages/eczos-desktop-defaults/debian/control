@@ -1,0 +1,18 @@
+Source: eczos-desktop-defaults
+Section: kde
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-desktop-defaults
+Architecture: all
+Depends:
+ ${misc:Depends},
+ eczos-branding (>= 0.1.0~dev1),
+ plasma-workspace
+Description: ECZOS defaults for KDE Plasma
+ Applies the ECZOS wallpaper and Breeze appearance once for new Plasma users,
+ while retaining user control after first run.

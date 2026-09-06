@@ -16,7 +16,8 @@ on the share for reference, but is intentionally excluded from Git.
 The first components are `eczos-branding`, which installs EasyComp-owned assets
 below `/usr/share/eczos/branding`, and `eczos-sddm-theme`, which selects an
 ECZOS login theme while inheriting Debian's packaged Breeze implementation.
-Neither package replaces files owned by Debian packages.
+The animated Plymouth theme and one-time Plasma defaults extend that visible
+prototype without replacing files owned by Debian packages.
 
 ## Layout
 
@@ -25,6 +26,7 @@ docs/                       Architecture, decisions, security and roadmap
 packages/eczos-branding/    First Debian source package
 packages/eczos-sddm-theme/  ECZOS login theme and SDDM configuration
 packages/eczos-plymouth-theme/ ECZOS boot-splash theme
+packages/eczos-desktop-defaults/ One-time Plasma appearance defaults
 scripts/                    Source-tree developer checks
 tests/                      Automated source and package tests
 image/                      Future reproducible live-build configuration
@@ -48,6 +50,7 @@ Run the package lifecycle tests on the dedicated Debian 13 test host:
 sudo ./scripts/test-branding-package-vm.sh
 sudo ./scripts/test-sddm-theme-package-vm.sh
 sudo ./scripts/test-plymouth-theme-package-vm.sh
+sudo ./scripts/test-desktop-defaults-package-vm.sh
 ```
 
 No production image should include the historical remote-support package. See

@@ -1,3 +1,2 @@
 theme/eczos.plymouth usr/share/plymouth/themes/eczos/
-theme/eczos.script usr/share/plymouth/themes/eczos/
-theme/logo.png usr/share/plymouth/themes/eczos/
+theme/images usr/share/plymouth/themes/eczos/

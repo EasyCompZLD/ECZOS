@@ -11,7 +11,8 @@ Package: eczos-plymouth-theme
 Architecture: all
 Depends:
  ${misc:Depends},
- plymouth (>= 24.004.60)
+ plymouth (>= 24.004.60),
+ plymouth-themes (>= 24.004.60)
 Description: ECZOS boot splash theme for Plymouth
- Provides a lightweight ECZOS boot presentation using Plymouth's standard
- script plugin.
+ Provides the animated ECZOS power-logo boot presentation using Plymouth's
+ standard two-step plugin.

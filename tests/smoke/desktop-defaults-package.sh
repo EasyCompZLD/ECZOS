@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ $(id -u) -ne 0 ]]; then
+    printf 'Run this installed-package smoke test as root on the test host.\n' >&2
+    exit 2
+fi
+
+dpkg-query -W -f='${Status}\n' eczos-desktop-defaults | grep -Fx 'install ok installed'
+for file in \
+    /usr/bin/eczos-theme-switch \
+    /usr/bin/eczos-theme-toggle \
+    /usr/lib/eczos/apply-desktop-defaults; do
+    test -x "$file"
+    bash -n "$file"
+done
+test -s /etc/xdg/autostart/eczos-desktop-first-run.desktop
+grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
+for wallpaper in eczoswallpaper-light.png eczoswallpaper-dark.png; do
+    test -r "/usr/share/eczos/branding/wallpapers/$wallpaper"
+done
+dpkg --audit
+apt-get check
+
+printf 'eczos-desktop-defaults installed-package smoke test passed\n'

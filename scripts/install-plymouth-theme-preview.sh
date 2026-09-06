@@ -15,6 +15,7 @@ fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 OUTPUT_DIR="$ROOT_DIR/packages"
+PACKAGE_DIR="$ROOT_DIR/packages/eczos-plymouth-theme"
 STATE_DIR=/var/lib/eczos/preview
 PREVIOUS_THEME_FILE="$STATE_DIR/plymouth-theme.previous"
 GRUB_DROPIN=/etc/default/grub.d/90-eczos-plymouth-preview.cfg
@@ -22,9 +23,9 @@ TEMP_DIR=$(mktemp -d /tmp/eczos-plymouth-preview.XXXXXX)
 chmod 0755 "$TEMP_DIR"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-PACKAGE_FILE=$(find "$OUTPUT_DIR" -maxdepth 1 -type f \
-    -name 'eczos-plymouth-theme_*_all.deb' -print -quit)
-if [[ -z "$PACKAGE_FILE" ]]; then
+PACKAGE_VERSION=$(dpkg-parsechangelog -l"$PACKAGE_DIR/debian/changelog" -S Version)
+PACKAGE_FILE="$OUTPUT_DIR/eczos-plymouth-theme_${PACKAGE_VERSION}_all.deb"
+if [[ ! -f "$PACKAGE_FILE" ]]; then
     printf 'Package output is missing. Run test-plymouth-theme-package-vm.sh first.\n' >&2
     exit 1
 fi

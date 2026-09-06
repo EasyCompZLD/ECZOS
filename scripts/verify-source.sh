@@ -18,12 +18,15 @@ for required in \
     packages/eczos-sddm-theme/debian/control \
     packages/eczos-plymouth-theme/debian/control \
     packages/eczos-plymouth-theme/theme/eczos.plymouth \
-    packages/eczos-plymouth-theme/theme/eczos.script; do
+    packages/eczos-desktop-defaults/debian/control \
+    packages/eczos-desktop-defaults/lib/apply-desktop-defaults; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
 
-[[ -s "$ROOT_DIR/packages/eczos-plymouth-theme/theme/logo.png" ]] || \
-    fail 'missing or empty Plymouth logo'
+if [[ $(find "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images" -maxdepth 1 \
+    -type f -name 'animation-*.png' | wc -l | tr -d ' ') -ne 12 ]]; then
+    fail 'Plymouth animation must contain 12 runtime frames'
+fi
 
 for asset in \
     assets/login/login-bg.png \

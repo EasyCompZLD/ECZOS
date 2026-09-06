@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
+MODE_FILE="$CONFIG_HOME/eczos/theme-mode"
+REQUESTED_MODE=${1:-}
+
+if [[ -n "$REQUESTED_MODE" ]]; then
+    case "$REQUESTED_MODE" in
+        auto|light|dark)
+            mkdir -p "$(dirname "$MODE_FILE")"
+            printf '%s\n' "$REQUESTED_MODE" > "$MODE_FILE"
+            ;;
+        *)
+            printf 'Usage: eczos-theme-switch [auto|light|dark]\n' >&2
+            exit 2
+            ;;
+    esac
+fi
+
+MODE=auto
+if [[ -s "$MODE_FILE" ]]; then
+    MODE=$(cat "$MODE_FILE")
+fi
+
+case "$MODE" in
+    auto)
+        HOUR=$(date +%H)
+        if ((10#$HOUR >= 8 && 10#$HOUR < 19)); then
+            ACTIVE_MODE=light
+        else
+            ACTIVE_MODE=dark
+        fi
+        ;;
+    light|dark)
+        ACTIVE_MODE=$MODE
+        ;;
+    *)
+        printf 'Invalid mode in %s; using auto.\n' "$MODE_FILE" >&2
+        ACTIVE_MODE=light
+        ;;
+esac
+
+if [[ "$ACTIVE_MODE" = light ]]; then
+    LOOK_AND_FEEL=org.kde.breeze.desktop
+    COLOR_SCHEME=BreezeLight
+    WALLPAPER=/usr/share/eczos/branding/wallpapers/eczoswallpaper-light.png
+else
+    LOOK_AND_FEEL=org.kde.breezedark.desktop
+    COLOR_SCHEME=BreezeDark
+    WALLPAPER=/usr/share/eczos/branding/wallpapers/eczoswallpaper-dark.png
+fi
+
+lookandfeeltool -a "$LOOK_AND_FEEL"
+plasma-apply-colorscheme "$COLOR_SCHEME"
+plasma-apply-wallpaperimage --fill-mode preserveAspectCrop "$WALLPAPER"
+
+printf 'ECZOS appearance set to %s (preference: %s).\n' "$ACTIVE_MODE" "$MODE"

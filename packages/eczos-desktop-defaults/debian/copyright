@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ECZOS Desktop Defaults
+Source: internal EasyComp Zeeland project configuration
+
+Files: *
+Copyright: 2026 EasyComp Zeeland
+License: All-rights-reserved
+ These ECZOS-specific files may not be redistributed outside EasyComp Zeeland
+ until a formal project license has been approved.

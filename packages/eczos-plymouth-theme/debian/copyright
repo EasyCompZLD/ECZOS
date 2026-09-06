@@ -1,6 +1,10 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: ECZOS Plymouth Theme
-Source: internal EasyComp Zeeland project
+Source: existing EasyComp Zeeland ECZOS prototype theme
+Comment:
+ The project owner explicitly approved reuse of the existing ECZOS animation.
+ Only files required at runtime are included; editor, preview and source-frame
+ files from the historical working directory are excluded.
 
 Files: *
 Copyright: 2026 EasyComp Zeeland

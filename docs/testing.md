@@ -63,6 +63,11 @@ Only after that lifecycle passes, use `install-plymouth-theme-preview.sh`. It
 records the previous theme, enables the GRUB `splash` argument and rebuilds the
 initramfs. `remove-plymouth-theme-preview.sh` performs the tested rollback.
 
+During rapid prototype work, `stage-next-desktop-preview-vm.sh` builds and
+installs the current Plymouth and desktop-default packages, runs both installed
+package smoke tests, activates the Plymouth preview and leaves the batch ready
+for one reboot. It does not purge the already working SDDM or branding packages.
+
 ## Required gates for image work
 
 - source checks pass;

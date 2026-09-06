@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
+STATE_DIR="$STATE_HOME/eczos"
+MARKER="$STATE_DIR/desktop-defaults-v1"
+
+if [[ ${1:-} != --force && -e "$MARKER" ]]; then
+    exit 0
+fi
+
+if [[ -z ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then
+    printf 'A graphical Plasma session is required.\n' >&2
+    exit 1
+fi
+
+eczos-theme-switch auto
+mkdir -p "$STATE_DIR"
+printf 'applied=%s\n' "$(date --iso-8601=seconds)" > "$MARKER"

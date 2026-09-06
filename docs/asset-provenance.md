@@ -9,7 +9,7 @@ asset are recorded.
 | Login background | historical `Assets/` directory | confirmation required |
 | ECZOS wallpapers | historical `Assets/` directory | confirmation required |
 | SDDM theme | derived from KDE Breeze | CC-BY-SA attribution and source review required |
-| Plymouth animation | historical overlay | origin and rights review required |
+| Plymouth animation | working ECZOS prototype, reuse approved by project owner | formal license declaration required before public distribution |
 
 An asset must not enter a public image merely because it exists in the old
 overlay.

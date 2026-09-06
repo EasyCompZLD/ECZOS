@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ECZOS first-run desktop defaults
+Comment=Apply ECZOS appearance once for this user
+Exec=/usr/lib/eczos/apply-desktop-defaults
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-after=panel

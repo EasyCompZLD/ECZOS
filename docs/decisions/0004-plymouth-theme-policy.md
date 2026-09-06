@@ -14,8 +14,10 @@ The future ECZOS image profile will select the theme and enable the `splash`
 kernel argument. Development uses dedicated preview install/removal scripts
 which record and restore the previously selected theme.
 
-The theme uses Plymouth's standard `script` plugin and one existing ECZOS logo.
-It does not import the historical machine snapshot or its 52-image theme copy.
+The theme uses Plymouth's standard `two-step` plugin and the existing working
+ECZOS power-logo animation. Only its 30 top-level runtime PNG files are imported;
+editor swap files, thumbnails, GIF/WebM previews, PSD files and the unused car
+source-frame directory remain excluded.
 
 ## Consequences
 
