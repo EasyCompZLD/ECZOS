@@ -1,0 +1,19 @@
+Source: eczos-sddm-theme
+Section: x11
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-sddm-theme
+Architecture: all
+Depends:
+ ${misc:Depends},
+ eczos-branding (>= 0.1.0~dev1),
+ sddm,
+ sddm-theme-breeze (>= 4:6.3.6)
+Description: ECZOS login theme for SDDM
+ Activates the ECZOS login presentation while reusing the version-matched KDE
+ Breeze SDDM implementation supplied by Debian.

@@ -22,7 +22,7 @@
 **/debian/debhelper-build-stamp
 **/debian/files
 /packages/*/debian/*-tmp/
-/packages/eczos-branding/debian/eczos-branding/
+/packages/*/debian/eczos-*/
 
 # live-build output and caches
 /image/.build/

@@ -1,0 +1,15 @@
+[SddmGreeterTheme]
+Name=ECZOS
+Description=ECZOS login experience
+Author=EasyComp Zeeland
+Copyright=2026 EasyComp Zeeland
+License=Proprietary
+Type=sddm-theme
+Version=0.1
+Website=https://easycompzeeland.nl/
+Screenshot=preview.png
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=eczos
+Theme-API=2.0
+QtVersion=6

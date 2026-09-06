@@ -1,0 +1,3 @@
+config/90-eczos-theme.conf etc/sddm.conf.d/
+theme/metadata.desktop usr/share/sddm/themes/eczos/
+theme/theme.conf usr/share/sddm/themes/eczos/

@@ -1,0 +1,6 @@
+eczos-sddm-theme (0.1.0~dev1) UNRELEASED; urgency=medium
+
+  * Package the existing EasyComp SDDM presentation as an ECZOS-owned theme.
+  * Reuse the Debian Breeze QML implementation through package dependencies.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 00:00:00 +0200

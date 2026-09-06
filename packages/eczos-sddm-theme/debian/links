@@ -1,0 +1,8 @@
+usr/share/sddm/themes/breeze/Background.qml usr/share/sddm/themes/eczos/Background.qml
+usr/share/sddm/themes/breeze/KeyboardButton.qml usr/share/sddm/themes/eczos/KeyboardButton.qml
+usr/share/sddm/themes/breeze/Login.qml usr/share/sddm/themes/eczos/Login.qml
+usr/share/sddm/themes/breeze/Main.qml usr/share/sddm/themes/eczos/Main.qml
+usr/share/sddm/themes/breeze/SessionButton.qml usr/share/sddm/themes/eczos/SessionButton.qml
+usr/share/sddm/themes/breeze/default-logo.svg usr/share/sddm/themes/eczos/default-logo.svg
+usr/share/sddm/themes/breeze/faces/.face.icon usr/share/sddm/themes/eczos/faces/.face.icon
+usr/share/eczos/branding/login/login-bg.png usr/share/sddm/themes/eczos/preview.png
