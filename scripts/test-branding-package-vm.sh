@@ -23,6 +23,18 @@ ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 PACKAGE_DIR="$ROOT_DIR/packages/eczos-branding"
 OUTPUT_DIR="$ROOT_DIR/packages"
 
+# The source tree currently originates on an SMB share that presents regular
+# files as executable. Normalize Debian metadata and static assets before
+# debhelper interprets their modes. Git still records the canonical modes.
+chmod 0644 \
+    "$PACKAGE_DIR/debian/changelog" \
+    "$PACKAGE_DIR/debian/control" \
+    "$PACKAGE_DIR/debian/copyright" \
+    "$PACKAGE_DIR/debian/install" \
+    "$PACKAGE_DIR/debian/source/format"
+chmod 0755 "$PACKAGE_DIR/debian/rules"
+find "$PACKAGE_DIR/assets" -type f -exec chmod 0644 {} +
+
 cd "$PACKAGE_DIR"
 dpkg-buildpackage -us -uc -b
 
