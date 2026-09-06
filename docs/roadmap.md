@@ -11,7 +11,10 @@
 
 ## Phase 1 — reproducible desktop prototype
 
-- ECZOS branding, SDDM and Plymouth packages
+- [x] ECZOS branding package lifecycle
+- [x] ECZOS SDDM package lifecycle
+- [ ] visual SDDM login-screen test
+- [ ] Plymouth package and boot-splash test
 - Plasma defaults and Windows-style layout
 - first-run state mechanism
 - reproducible live-build configuration

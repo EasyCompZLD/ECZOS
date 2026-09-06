@@ -13,15 +13,17 @@ This repository is the clean-source replacement for an earlier collection of
 machine snapshots and experimental ISO builds. The historical material remains
 on the share for reference, but is intentionally excluded from Git.
 
-The first component is `eczos-branding`, a deliberately low-risk package that
-installs only EasyComp-owned branding assets below `/usr/share/eczos/branding`.
-It does not change GRUB, Plymouth, SDDM, APT, `/etc/os-release` or user settings.
+The first components are `eczos-branding`, which installs EasyComp-owned assets
+below `/usr/share/eczos/branding`, and `eczos-sddm-theme`, which selects an
+ECZOS login theme while inheriting Debian's packaged Breeze implementation.
+Neither package replaces files owned by Debian packages.
 
 ## Layout
 
 ```text
 docs/                       Architecture, decisions, security and roadmap
 packages/eczos-branding/    First Debian source package
+packages/eczos-sddm-theme/  ECZOS login theme and SDDM configuration
 scripts/                    Source-tree developer checks
 tests/                      Automated source and package tests
 image/                      Future reproducible live-build configuration
@@ -39,11 +41,11 @@ Run the source checks on any Unix-like development machine:
 ./scripts/verify-source.sh
 ```
 
-Build the package inside a clean Debian 13 VM or container:
+Run the package lifecycle tests on the dedicated Debian 13 test host:
 
 ```sh
-cd packages/eczos-branding
-dpkg-buildpackage -us -uc -b
+sudo ./scripts/test-branding-package-vm.sh
+sudo ./scripts/test-sddm-theme-package-vm.sh
 ```
 
 No production image should include the historical remote-support package. See

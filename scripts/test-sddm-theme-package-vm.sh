@@ -18,6 +18,7 @@ BRANDING_DIR="$ROOT_DIR/packages/eczos-branding"
 THEME_DIR="$ROOT_DIR/packages/eczos-sddm-theme"
 OUTPUT_DIR="$ROOT_DIR/packages"
 TEMP_DIR=$(mktemp -d /tmp/eczos-sddm-test.XXXXXX)
+chmod 0755 "$TEMP_DIR"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
 normalize_package_modes() {
