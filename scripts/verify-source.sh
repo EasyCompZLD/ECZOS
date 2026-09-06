@@ -19,7 +19,10 @@ for required in \
     packages/eczos-plymouth-theme/debian/control \
     packages/eczos-plymouth-theme/theme/eczos.plymouth \
     packages/eczos-desktop-defaults/debian/control \
-    packages/eczos-desktop-defaults/lib/apply-desktop-defaults; do
+    packages/eczos-desktop-defaults/lib/apply-desktop-defaults \
+    packages/eczos-release/debian/control \
+    packages/eczos-release/release/eczos-release \
+    packages/eczos-desktop/debian/control; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
 

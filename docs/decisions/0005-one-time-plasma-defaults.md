@@ -8,8 +8,9 @@ Accepted on 2026-09-06.
 
 ECZOS desktop defaults run once from KDE autostart and create a versioned marker
 below the user's XDG state directory only after successful application. Later
-logins do not reapply the defaults. A user can deliberately select `auto`,
-`light` or `dark` with `eczos-theme-switch`, or cycle them with
+logins do not reapply the same version. The primary blue wallpaper is the
+`default` mode. A user can deliberately select `auto`, `light` or `dark` with
+`eczos-theme-switch`, or cycle the alternate modes with
 `eczos-theme-toggle`.
 
 The first version keeps Plasma's standard bottom panel. Plasma 6 already exposes

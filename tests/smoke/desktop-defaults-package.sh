@@ -16,7 +16,10 @@ for file in \
 done
 test -s /etc/xdg/autostart/eczos-desktop-first-run.desktop
 grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
-for wallpaper in eczoswallpaper-light.png eczoswallpaper-dark.png; do
+for wallpaper in \
+    eczoswallpaper.png \
+    eczoswallpaper-light.png \
+    eczoswallpaper-dark.png; do
     test -r "/usr/share/eczos/branding/wallpapers/$wallpaper"
 done
 dpkg --audit

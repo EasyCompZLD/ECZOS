@@ -68,6 +68,10 @@ installs the current Plymouth and desktop-default packages, runs both installed
 package smoke tests, activates the Plymouth preview and leaves the batch ready
 for one reboot. It does not purge the already working SDDM or branding packages.
 
+`stage-platform-batch-vm.sh` builds and installs the corrected desktop defaults,
+ECZOS release identity and the aggregate desktop metapackage in one run. Its
+smoke tests also confirm that Debian remains the underlying compatibility ID.
+
 ## Required gates for image work
 
 - source checks pass;

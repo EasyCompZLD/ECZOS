@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+RELEASE_FILE=/usr/lib/eczos/release/eczos-release
+if [[ ! -r "$RELEASE_FILE" ]]; then
+    printf 'ECZOS release metadata is unavailable.\n' >&2
+    exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$RELEASE_FILE"
+# shellcheck disable=SC1091
+source /etc/os-release
+
+printf '%s\n' "$ECZOS_PRETTY_NAME"
+printf 'Vendor: %s\n' "$ECZOS_VENDOR"
+printf 'Channel: %s\n' "$ECZOS_CHANNEL"
+printf 'Base: %s %s (%s)\n' "$NAME" "$VERSION_ID" "$VERSION_CODENAME"

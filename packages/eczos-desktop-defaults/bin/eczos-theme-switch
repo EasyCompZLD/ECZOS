@@ -7,12 +7,12 @@ REQUESTED_MODE=${1:-}
 
 if [[ -n "$REQUESTED_MODE" ]]; then
     case "$REQUESTED_MODE" in
-        auto|light|dark)
+        default|auto|light|dark)
             mkdir -p "$(dirname "$MODE_FILE")"
             printf '%s\n' "$REQUESTED_MODE" > "$MODE_FILE"
             ;;
         *)
-            printf 'Usage: eczos-theme-switch [auto|light|dark]\n' >&2
+            printf 'Usage: eczos-theme-switch [default|auto|light|dark]\n' >&2
             exit 2
             ;;
     esac
@@ -24,6 +24,9 @@ if [[ -s "$MODE_FILE" ]]; then
 fi
 
 case "$MODE" in
+    default)
+        ACTIVE_MODE=default
+        ;;
     auto)
         HOUR=$(date +%H)
         if ((10#$HOUR >= 8 && 10#$HOUR < 19)); then
@@ -41,7 +44,11 @@ case "$MODE" in
         ;;
 esac
 
-if [[ "$ACTIVE_MODE" = light ]]; then
+if [[ "$ACTIVE_MODE" = default ]]; then
+    LOOK_AND_FEEL=org.kde.breeze.desktop
+    COLOR_SCHEME=BreezeLight
+    WALLPAPER=/usr/share/eczos/branding/wallpapers/eczoswallpaper.png
+elif [[ "$ACTIVE_MODE" = light ]]; then
     LOOK_AND_FEEL=org.kde.breeze.desktop
     COLOR_SCHEME=BreezeLight
     WALLPAPER=/usr/share/eczos/branding/wallpapers/eczoswallpaper-light.png

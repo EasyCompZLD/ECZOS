@@ -27,6 +27,8 @@ packages/eczos-branding/    First Debian source package
 packages/eczos-sddm-theme/  ECZOS login theme and SDDM configuration
 packages/eczos-plymouth-theme/ ECZOS boot-splash theme
 packages/eczos-desktop-defaults/ One-time Plasma appearance defaults
+packages/eczos-release/       Product identity without masking Debian
+packages/eczos-desktop/       Complete desktop product-layer metapackage
 scripts/                    Source-tree developer checks
 tests/                      Automated source and package tests
 image/                      Future reproducible live-build configuration

@@ -15,7 +15,7 @@
 - [x] ECZOS SDDM package lifecycle
 - [x] visual SDDM login-screen test
 - [x] ECZOS Plymouth package lifecycle
-- [ ] visual Plymouth boot-splash test
+- [x] visual Plymouth boot-splash test
 - [ ] Plasma defaults and Windows-style layout
 - [ ] first-run state mechanism
 - reproducible live-build configuration

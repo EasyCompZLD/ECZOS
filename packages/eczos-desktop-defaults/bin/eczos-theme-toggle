@@ -10,6 +10,7 @@ if [[ -s "$MODE_FILE" ]]; then
 fi
 
 case "$CURRENT_MODE" in
+    default) NEXT_MODE=light ;;
     auto) NEXT_MODE=light ;;
     light) NEXT_MODE=dark ;;
     dark) NEXT_MODE=auto ;;

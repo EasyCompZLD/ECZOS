@@ -20,3 +20,9 @@ Verified operations:
 The lifecycle test intentionally did not rebuild the initramfs or change GRUB.
 Those boot-affecting operations are isolated in the preview installer and have
 a matching rollback script.
+
+A subsequent physical reboot confirmed that Plymouth activation, initramfs
+integration and the ECZOS boot presentation work on the legacy-BIOS test host.
+The initial static pulse artwork was then replaced by the project owner's
+original animated ECZOS runtime assets; that animation also passed the physical
+boot test.
