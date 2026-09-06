@@ -2,11 +2,12 @@
 
 ## Phase 0 — source foundation
 
-- Git history and repository policy
-- Debian 13 architecture decision
-- inventory and threat model
-- first low-risk Debian package
-- clean Debian 13 build/test environment
+- [x] Git history and repository policy
+- [x] Debian 13 architecture decision
+- [x] inventory and threat model
+- [x] first low-risk Debian package
+- [x] Debian 13 build/test host
+- [x] `eczos-branding` build, install and purge lifecycle
 
 ## Phase 1 — reproducible desktop prototype
 

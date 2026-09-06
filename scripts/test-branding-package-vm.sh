@@ -46,8 +46,12 @@ if [[ -z "$PACKAGE_FILE" ]]; then
     exit 1
 fi
 
-lintian "$PACKAGE_FILE" || true
-apt-get install -y "$PACKAGE_FILE"
+INSTALL_PACKAGE=$(mktemp /tmp/eczos-branding.XXXXXX.deb)
+trap 'rm -f "$INSTALL_PACKAGE"' EXIT
+install -m 0644 "$PACKAGE_FILE" "$INSTALL_PACKAGE"
+
+lintian "$INSTALL_PACKAGE" || true
+apt-get install -y "$INSTALL_PACKAGE"
 "$ROOT_DIR/tests/smoke/branding-package.sh"
 
 apt-get purge -y eczos-branding
