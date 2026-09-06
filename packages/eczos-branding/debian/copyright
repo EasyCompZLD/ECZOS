@@ -1,0 +1,12 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ECZOS Branding
+Source: internal EasyComp Zeeland project assets
+Comment:
+ Asset provenance and redistribution rights must be confirmed before any public
+ distribution. This development package is for internal evaluation only.
+
+Files: *
+Copyright: 2026 EasyComp Zeeland
+License: All-rights-reserved
+ These files may not be redistributed outside EasyComp Zeeland until a formal
+ project and asset license has been approved.

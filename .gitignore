@@ -1,0 +1,36 @@
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Historical/generated images and third-party binary packages
+/Build/
+/Assets/
+/easycomp-desktop/
+
+# Debian package build output
+*.build
+*.buildinfo
+*.changes
+*.deb
+*.dsc
+*.tar.xz
+*.tar.gz
+*.udeb
+*.substvars
+*.debhelper.log
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+/packages/*/debian/*-tmp/
+/packages/eczos-branding/debian/eczos-branding/
+
+# live-build output and caches
+/image/.build/
+/image/cache/
+/image/chroot/
+/image/binary/
+/image/*.iso
+/image/*.img
+
+# Test output
+/.test-results/

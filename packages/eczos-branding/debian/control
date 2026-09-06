@@ -1,0 +1,15 @@
+Source: eczos-branding
+Section: x11
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-branding
+Architecture: all
+Depends: ${misc:Depends}
+Description: ECZOS visual identity assets
+ Installs the shared ECZOS logo, login artwork and wallpapers below the
+ ECZOS-owned data namespace. It does not activate desktop or boot themes.
