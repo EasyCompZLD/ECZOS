@@ -1,0 +1,53 @@
+Source: eczos-desktop-apps
+Section: metapackages
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-desktop-apps
+Architecture: amd64
+Depends:
+ ${misc:Depends},
+ ark,
+ cups,
+ dolphin-plugins,
+ eczos-gaming-core (>= 0.1.0~dev2),
+ eczos-platform-tools (>= 0.1.0~dev2),
+ filelight,
+ firefox-esr,
+ flatpak,
+ fonts-crosextra-caladea,
+ fonts-crosextra-carlito,
+ fonts-liberation,
+ fwupd,
+ gamemode,
+ gwenview,
+ kde-spectacle,
+ kdeconnect,
+ kio-admin,
+ kio-extras,
+ kup-backup,
+ mangohud,
+ okular,
+ packagekit,
+ partitionmanager,
+ plasma-discover,
+ plasma-discover-backend-flatpak,
+ plasma-discover-backend-fwupd,
+ printer-driver-all,
+ skanpage,
+ steam-devices,
+ steam-installer,
+ system-config-printer,
+ thunderbird,
+ vlc
+Conflicts:
+ libreoffice-common
+Description: complete native application set for ECZOS Desktop
+ Installs the familiar browser, mail, media, PDF, archive, backup, phone,
+ firmware, printer, scanner and graphical application-management experience.
+ Office is deliberately left unfulfilled until FreeOffice redistribution is
+ approved by its vendor.

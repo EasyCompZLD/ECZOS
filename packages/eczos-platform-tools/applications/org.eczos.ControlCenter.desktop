@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ECZOS Instellingen
+Comment=Beheer apps, apparaten, back-ups, herstel en ondersteuning
+Exec=eczos-control-center
+Icon=preferences-system
+Terminal=false
+Categories=Settings;
+Keywords=ECZOS;instellingen;apps;backup;herstel;ondersteuning;

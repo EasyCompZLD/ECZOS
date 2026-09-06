@@ -24,6 +24,9 @@ PACKAGES=(
     eczos-desktop-defaults
     eczos-release
     eczos-windows-core
+    eczos-gaming-core
+    eczos-platform-tools
+    eczos-desktop-apps
     eczos-desktop
 )
 
@@ -45,7 +48,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets config release theme xdg; do
+    for data_dir in applications assets config product release runtime-definitions theme xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi

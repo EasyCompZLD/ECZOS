@@ -1,0 +1,25 @@
+Source: eczos-platform-tools
+Section: admin
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-platform-tools
+Architecture: all
+Depends:
+ ${misc:Depends},
+ coreutils,
+ jq,
+ kdialog,
+ pciutils,
+ procps,
+ rsync,
+ util-linux,
+ xdg-user-dirs,
+ xdg-utils
+Description: consumer-facing management and recovery tools for ECZOS
+ Provides one ECZOS settings entry point, understandable system diagnostics,
+ a privacy-conscious support report and a safe user-file migration assistant.

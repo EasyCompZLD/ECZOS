@@ -29,6 +29,9 @@ packages/eczos-plymouth-theme/ ECZOS boot-splash theme
 packages/eczos-desktop-defaults/ One-time Plasma appearance defaults
 packages/eczos-release/       Product identity without masking Debian
 packages/eczos-windows-core/  Managed EXE/MSI compatibility MVP
+packages/eczos-gaming-core/   Vulkan and UMU/Proton readiness gate
+packages/eczos-platform-tools/ Control center, migration and diagnostics
+packages/eczos-desktop-apps/  Supported native application metapackage
 packages/eczos-desktop/       Complete desktop product-layer metapackage
 scripts/                    Source-tree developer checks
 tests/                      Automated source and package tests

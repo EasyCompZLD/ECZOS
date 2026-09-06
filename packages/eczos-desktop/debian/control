@@ -13,11 +13,12 @@ Depends:
  ${misc:Depends},
  eczos-branding (>= 0.1.0~dev3),
  eczos-desktop-defaults (>= 0.1.0~dev4),
+ eczos-desktop-apps (>= 0.1.0~dev1),
  eczos-plymouth-theme (>= 0.1.0~dev2),
  eczos-release (>= 0.1.0~dev2),
  eczos-sddm-theme (>= 0.1.0~dev1),
- eczos-windows-core (>= 0.1.0~dev8)
+ eczos-windows-core (>= 0.1.0~dev9)
 Description: complete ECZOS desktop product layer
  Keeps the ECZOS release identity, branding, login theme, boot theme and Plasma
  defaults installed as one supported desktop set, including managed Windows
- application compatibility.
+ application compatibility, consumer tools and the supported native app set.

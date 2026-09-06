@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+# ECZOS deliberately does not ship LibreOffice. FreeOffice remains a vendor
+# permission gate and is not silently replaced by another office suite.
+installed=$(dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\n' 'libreoffice*' 2>/dev/null \
+    | awk '$2 == "ii" {print $1}' || true)
+if [ -n "$installed" ]; then
+    # shellcheck disable=SC2086
+    apt-get purge -y $installed
+fi
+
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak remote-add --system --if-not-exists flathub \
+        https://flathub.org/repo/flathub.flatpakrepo
+fi

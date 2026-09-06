@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Overstappen vanaf Windows
+Comment=Neem persoonlijke bestanden veilig over uit een Windows-profiel
+Exec=eczos-migrate
+Icon=folder-sync
+Terminal=false
+Categories=Utility;
+Keywords=Windows;migratie;documenten;overzetten;

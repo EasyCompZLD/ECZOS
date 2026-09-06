@@ -1,4 +1,4 @@
-eczos-windows-core (0.1.0~dev8) UNRELEASED; urgency=medium
+eczos-windows-core (0.1.0~dev9) UNRELEASED; urgency=medium
 
   * Run installers from the isolated Windows C: drive.
   * Add a visible ECZ Windows application manager and failed-install retry.
@@ -11,6 +11,7 @@ eczos-windows-core (0.1.0~dev8) UNRELEASED; urgency=medium
   * Keep Wine background processes from inheriting the installation lock.
   * Launch Start Menu shortcuts through their internal C: path without Z:.
   * Resolve verified executable targets from Windows shortcut metadata.
+  * Add explicit per-application Windows drive mappings without restoring Z:.
 
  -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 18:15:00 +0200
 

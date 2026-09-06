@@ -11,6 +11,7 @@ fail() {
 
 for required in \
     README.md \
+    config/debian-extra-components.list \
     docs/architecture.md \
     docs/security.md \
     packages/eczos-branding/debian/control \
@@ -31,9 +32,20 @@ for required in \
     packages/eczos-gaming-core/bin/eczos-gaming \
     packages/eczos-gaming-core/lib/runtime-umu \
     packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json \
+    packages/eczos-platform-tools/debian/control \
+    packages/eczos-platform-tools/bin/eczos-control-center \
+    packages/eczos-platform-tools/bin/eczos-doctor \
+    packages/eczos-platform-tools/bin/eczos-migrate \
+    packages/eczos-platform-tools/bin/eczos-support-report \
+    packages/eczos-platform-tools/product/default-apps.json \
+    packages/eczos-desktop-apps/debian/control \
     packages/eczos-desktop/debian/control; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
+
+while IFS= read -r hook; do
+    sh -n "$hook" || fail "invalid image hook syntax: ${hook#"$ROOT_DIR/"}"
+done < <(find "$ROOT_DIR/image/config/hooks" -type f -name '*.hook.chroot' -print)
 
 if [[ $(find "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images" -maxdepth 1 \
     -type f -name 'animation-*.png' | wc -l | tr -d ' ') -ne 12 ]]; then

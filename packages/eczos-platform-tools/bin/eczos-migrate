@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ $(id -u) -eq 0 ]]; then
+    printf 'Voer de migratie uit als de ingelogde gebruiker, niet als root.\n' >&2
+    exit 2
+fi
+
+mode=dry-run
+source_profile=''
+while (( $# )); do
+    case $1 in
+        --dry-run) mode=dry-run ;;
+        --apply) mode=apply ;;
+        --source) shift; source_profile=${1:-} ;;
+        -h|--help) printf 'Gebruik: eczos-migrate [--dry-run|--apply] [--source WINDOWS-PROFIEL]\n'; exit 0 ;;
+        *) printf 'Onbekende optie: %s\n' "$1" >&2; exit 2 ;;
+    esac
+    shift
+done
+
+if [[ -z "$source_profile" && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+    source_profile=$(kdialog --getexistingdirectory "$HOME" --title 'Kies de Windows-gebruikersmap' || true)
+fi
+[[ -n "$source_profile" ]] || { printf 'Geen Windows-profiel gekozen.\n' >&2; exit 2; }
+source_profile=$(realpath -e -- "$source_profile")
+[[ -d "$source_profile" && "$source_profile" != / && "$source_profile" != "$HOME" ]] || {
+    printf 'Ongeldige bronmap.\n' >&2; exit 2;
+}
+
+folders=(Desktop Documents Downloads Music Pictures Videos Favorites)
+found=false
+for folder in "${folders[@]}"; do [[ -d "$source_profile/$folder" ]] && found=true; done
+[[ $found == true ]] || { printf 'In deze map zijn geen bekende Windows-gebruikersmappen gevonden.\n' >&2; exit 1; }
+
+state_dir=${XDG_STATE_HOME:-"$HOME/.local/state"}/eczos/migration
+mkdir -p "$state_dir"
+log="$state_dir/$(date +%Y%m%d-%H%M%S).log"
+rsync_options=(-a --safe-links --ignore-existing --exclude=desktop.ini --exclude=Thumbs.db)
+[[ $mode == dry-run ]] && rsync_options+=(--dry-run --itemize-changes)
+
+if [[ $mode == apply && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+    kdialog --yesno "Bestaande bestanden worden niet overschreven. Bestanden overzetten uit:\n$source_profile?" || exit 0
+fi
+
+for folder in "${folders[@]}"; do
+    [[ -d "$source_profile/$folder" ]] || continue
+    case $folder in
+        Desktop) destination=$(xdg-user-dir DESKTOP) ;;
+        Documents|Favorites) destination=$(xdg-user-dir DOCUMENTS) ;;
+        Downloads) destination=$(xdg-user-dir DOWNLOAD) ;;
+        Music) destination=$(xdg-user-dir MUSIC) ;;
+        Pictures) destination=$(xdg-user-dir PICTURES) ;;
+        Videos) destination=$(xdg-user-dir VIDEOS) ;;
+    esac
+    [[ -n "$destination" ]] || destination="$HOME/$folder"
+    [[ $folder == Favorites ]] && destination="$destination/Windows-favorieten"
+    mkdir -p "$destination"
+    rsync "${rsync_options[@]}" "$source_profile/$folder/" "$destination/" | tee -a "$log"
+done
+
+if [[ $mode == dry-run ]]; then
+    message="Voorbeeld voltooid; er is nog niets gekopieerd. Log: $log"
+else
+    message="Overzetten voltooid. Bestaande bestanden zijn behouden. Log: $log"
+fi
+printf '%s\n' "$message"
+if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then kdialog --msgbox "$message" --title 'Overstappen vanaf Windows'; fi

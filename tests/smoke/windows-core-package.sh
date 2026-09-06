@@ -31,6 +31,10 @@ grep -F 'windows_shortcut="C:\\' /usr/lib/eczos/windows/runtime-wine-system
 grep -F "grep -aoP '(?i)[a-z]:" /usr/bin/eczos-windows
 grep -F 'rescan_app' /usr/bin/eczos-windows
 grep -F '{app_lock_fd}>&-' /usr/bin/eczos-windows
+grep -F 'apply_drive_mappings "$manifest" "$prefix"' /usr/bin/eczos-windows
+grep -F 'map-drive [--yes] APP-ID LETTER DIRECTORY' /usr/bin/eczos-windows
+grep -F '.drives[$letter]=$directory' /usr/bin/eczos-windows
+grep -F "drives 'Stations beheren'" /usr/bin/eczos-windows
 
 if /usr/bin/eczos-windows list >/dev/null 2>&1; then
     printf 'ECZ Windows unexpectedly allowed a root-owned application session.\n' >&2

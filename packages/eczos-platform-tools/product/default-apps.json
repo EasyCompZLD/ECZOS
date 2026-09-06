@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "profile": "desktop",
+  "browser": "firefox-esr",
+  "mail": "thunderbird",
+  "media": "vlc",
+  "pdf": "okular",
+  "office": {
+    "product": "SoftMaker FreeOffice 2024",
+    "package": null,
+    "status": "waiting-for-vendor-permission",
+    "redistributed": false,
+    "vendorUrl": "https://www.freeoffice.com/"
+  }
+}

@@ -1,0 +1,6 @@
+eczos-desktop-apps (0.1.0~dev1) UNRELEASED; urgency=medium
+
+  * Define the ECZOS native desktop, app-store, backup, phone and device set.
+  * Exclude LibreOffice while FreeOffice redistribution remains under review.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 20:00:00 +0200

@@ -1,4 +1,4 @@
-eczos-desktop (0.1.0~dev10) UNRELEASED; urgency=medium
+eczos-desktop (0.1.0~dev12) UNRELEASED; urgency=medium
 
   * Require the contrasting shell logo and corrected ECZ Windows installer.
   * Require the ECZ Windows runtime preflight.
@@ -7,6 +7,8 @@ eczos-desktop (0.1.0~dev10) UNRELEASED; urgency=medium
   * Require corrected per-application install locking.
   * Require C:-native Windows shortcut launching.
   * Require verified executable discovery from Windows shortcuts.
+  * Require the ECZOS native app set, control center and gaming foundation.
+  * Require explicit ECZ Windows drive mappings.
 
  -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 18:15:00 +0200
 

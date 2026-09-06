@@ -1,0 +1,3 @@
+applications/*.desktop usr/share/applications/
+bin/* usr/bin/
+product/default-apps.json usr/share/eczos/product/

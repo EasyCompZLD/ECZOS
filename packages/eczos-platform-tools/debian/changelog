@@ -1,0 +1,7 @@
+eczos-platform-tools (0.1.0~dev2) UNRELEASED; urgency=medium
+
+  * Add the first ECZOS control center, diagnostics and support report.
+  * Add a safe Windows user-file migration assistant MVP.
+  * Keep the ECZOS menu entries in one primary category.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 06 Sep 2026 20:00:00 +0200

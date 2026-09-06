@@ -16,8 +16,8 @@
 - [x] visual SDDM login-screen test
 - [x] ECZOS Plymouth package lifecycle
 - [x] visual Plymouth boot-splash test
-- [ ] Plasma defaults and Windows-style layout
-- [ ] first-run state mechanism
+- [x] Plasma defaults and Windows-style layout
+- [x] first-run state mechanism
 - [x] versioned Debian 13 KDE live-build configuration
 - [ ] first ECZOS ISO build and boot test (blocked until desktop and ECZ Windows MVP gates pass)
 - UEFI VM boot, install, upgrade and removal tests
@@ -34,18 +34,20 @@
 ## Phase 3 — ECZ Gaming
 
 - [x] Vulkan and 32-bit graphics diagnostics
-- Steam integration
+- [x] Steam bootstrap and controller integration (positive launch test pending)
 - [x] reviewed UMU adapter for non-Steam games (positive GPU test pending)
 - per-game DXVK/VKD3D and runtime profiles
 - [x] explicit Gaming Mode through GameMode adapter
 
 ## Phase 4 — broader product experience
 
-- migration assistant
-- unified application discovery
-- hardware guidance
-- backup and recovery
-- optional device, cloud and support services
+- [x] migration assistant MVP for personal folders
+- [x] unified native/Flatpak application discovery foundation
+- [x] hardware and system diagnostics foundation
+- [x] backup application and recovery entry points
+- [x] phone integration and privacy-conscious support-report foundation
+- [ ] FreeOffice inclusion (blocked on written redistribution permission)
+- [ ] optional cloud and enrolled remote-support services
 
 ## Phase 5 — distribution
 

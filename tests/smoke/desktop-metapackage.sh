@@ -13,7 +13,10 @@ for package in \
     eczos-desktop-defaults \
     eczos-plymouth-theme \
     eczos-sddm-theme \
-    eczos-windows-core; do
+    eczos-windows-core \
+    eczos-gaming-core \
+    eczos-platform-tools \
+    eczos-desktop-apps; do
     dpkg-query -W -f='${Status}\n' "$package" | grep -Fx 'install ok installed'
 done
 dpkg --audit

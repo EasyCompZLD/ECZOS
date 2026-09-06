@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+[[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] || { printf 'Een grafische sessie is vereist.\n' >&2; exit 1; }
+
+choice=$(kdialog --title 'ECZOS Instellingen' --menu 'Wat wil je beheren?' \
+    apps 'Apps installeren en bijwerken' \
+    windows 'Windows-apps' \
+    gaming 'Gaming' \
+    devices 'Apparaten en systeeminstellingen' \
+    backup 'Back-up' \
+    phone 'Telefoon koppelen' \
+    migration 'Overstappen vanaf Windows' \
+    diagnostics 'Diagnose' \
+    support 'Supportrapport maken' \
+    about 'Over deze computer' || true)
+
+launch() { setsid -f "$@" >/dev/null 2>&1; }
+case $choice in
+    apps) launch plasma-discover ;;
+    windows) launch eczos-windows manage ;;
+    gaming) launch eczos-gaming manage ;;
+    devices) launch systemsettings ;;
+    backup) launch kcmshell6 kcm_kup ;;
+    phone) launch kdeconnect-app ;;
+    migration) launch eczos-migrate ;;
+    diagnostics) launch eczos-doctor --gui ;;
+    support) launch eczos-support-report ;;
+    about) launch kinfocenter ;;
+    '') exit 0 ;;
+esac

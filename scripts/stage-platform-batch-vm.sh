@@ -25,7 +25,7 @@ TEMP_DIR=$(mktemp -d /tmp/eczos-platform-batch.XXXXXX)
 chmod 0755 "$TEMP_DIR"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-PACKAGES=(eczos-branding eczos-desktop-defaults eczos-release eczos-windows-core eczos-desktop)
+PACKAGES=(eczos-branding eczos-sddm-theme eczos-plymouth-theme eczos-desktop-defaults eczos-release eczos-windows-core eczos-gaming-core eczos-platform-tools eczos-desktop-apps eczos-desktop)
 INSTALL_FILES=()
 
 for package in "${PACKAGES[@]}"; do
@@ -43,7 +43,7 @@ for package in "${PACKAGES[@]}"; do
     if [[ -d "$package_dir/lib" ]]; then
         find "$package_dir/lib" -type f -exec chmod 0755 {} +
     fi
-    for data_dir in applications assets config release xdg; do
+    for data_dir in applications assets config product release runtime-definitions theme xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi
@@ -64,9 +64,14 @@ done
 lintian "${INSTALL_FILES[@]}" || true
 apt-get install -y "${INSTALL_FILES[@]}"
 "$ROOT_DIR/tests/smoke/branding-package.sh"
+"$ROOT_DIR/tests/smoke/sddm-theme-package.sh"
+"$ROOT_DIR/tests/smoke/plymouth-theme-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-defaults-package.sh"
 "$ROOT_DIR/tests/smoke/release-package.sh"
 "$ROOT_DIR/tests/smoke/windows-core-package.sh"
+"$ROOT_DIR/tests/smoke/gaming-core-package.sh"
+"$ROOT_DIR/tests/smoke/platform-tools-package.sh"
+"$ROOT_DIR/tests/smoke/desktop-apps-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-metapackage.sh"
 update-grub
 

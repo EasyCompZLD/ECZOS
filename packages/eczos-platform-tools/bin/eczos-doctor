@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+json=false
+gui=false
+case ${1:-} in
+    --json) json=true ;;
+    --gui) gui=true ;;
+    '') ;;
+    *) printf 'Gebruik: eczos-doctor [--json|--gui]\n' >&2; exit 2 ;;
+esac
+
+package_ok() { dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -Fxq 'install ok installed'; }
+yesno() { [[ $1 == true ]] && printf ja || printf nee; }
+
+windows=false
+if command -v eczos-windows >/dev/null 2>&1 && \
+    /usr/lib/eczos/windows/runtime-wine-system check >/dev/null 2>&1; then
+    windows=true
+fi
+gaming_json='{"verdict":"not-installed"}'
+if command -v eczos-gaming >/dev/null 2>&1; then
+    gaming_json=$(eczos-gaming doctor --json 2>/dev/null || printf '{"verdict":"error"}')
+fi
+gaming_verdict=$(jq -r '.verdict // "error"' <<<"$gaming_json")
+apps=false; package_ok plasma-discover && apps=true
+flatpak=false; package_ok plasma-discover-backend-flatpak && flatpak=true
+backup=false; package_ok kup-backup && backup=true
+phone=false; package_ok kdeconnect && phone=true
+firmware=false; package_ok fwupd && firmware=true
+printer=false; package_ok cups && printer=true
+scanner=false; package_ok skanpage && scanner=true
+office=waiting-for-vendor-permission
+failed_units=$(systemctl --failed --no-legend 2>/dev/null | wc -l | tr -d ' ')
+
+if [[ $json == true ]]; then
+    jq -n --argjson windows "$windows" --arg gaming "$gaming_verdict" \
+        --argjson apps "$apps" --argjson flatpak "$flatpak" --argjson backup "$backup" \
+        --argjson phone "$phone" --argjson firmware "$firmware" \
+        --argjson printer "$printer" --argjson scanner "$scanner" --arg office "$office" \
+        --argjson failedUnits "$failed_units" \
+        '{schemaVersion:1, windows:$windows, gaming:$gaming, applications:{discover:$apps,flatpak:$flatpak},backup:$backup,phone:$phone,devices:{firmware:$firmware,printer:$printer,scanner:$scanner},office:$office,failedUnits:$failedUnits}'
+    exit 0
+fi
+
+report=$(cat <<EOF
+ECZOS Diagnose
+
+Windows-apps: $(yesno "$windows")
+Gaming: $gaming_verdict
+ECZ Apps: $(yesno "$apps")
+Flatpak-koppeling: $(yesno "$flatpak")
+Back-up: $(yesno "$backup")
+Telefoonkoppeling: $(yesno "$phone")
+Firmware-updates: $(yesno "$firmware")
+Printers: $(yesno "$printer")
+Scanners: $(yesno "$scanner")
+Office: wacht op toestemming voor FreeOffice-voorinstallatie
+Mislukte systeemdiensten: $failed_units
+EOF
+)
+
+if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+    kdialog --title 'ECZOS Diagnose' --msgbox "$report"
+else
+    printf '%s\n' "$report"
+fi
