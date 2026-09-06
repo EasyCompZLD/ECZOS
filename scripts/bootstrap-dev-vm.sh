@@ -27,9 +27,20 @@ apt-get install -y --no-install-recommends \
     ca-certificates \
     debhelper \
     devscripts \
+    dosfstools \
     git \
+    grub-efi-amd64-bin \
+    grub-pc-bin \
+    intel-microcode \
+    isolinux \
+    live-build \
     lintian \
+    mtools \
     rsync \
-    shellcheck
+    shellcheck \
+    squashfs-tools \
+    syslinux-common \
+    xorriso
 
-printf 'ECZOS Debian 13 package-development environment is ready.\n'
+printf 'ECZOS Debian 13 package and image development environment is ready.\n'
+printf 'Reboot the host if intel-microcode was newly installed.\n'
