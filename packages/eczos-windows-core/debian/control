@@ -18,7 +18,6 @@ Depends:
  jq,
  kdialog,
  libglib2.0-bin,
- util-linux,
  wine (>= 10.0~repack-6),
  wine64 (>= 10.0~repack-6),
  xdg-utils

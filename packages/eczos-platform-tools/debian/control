@@ -11,13 +11,11 @@ Package: eczos-platform-tools
 Architecture: all
 Depends:
  ${misc:Depends},
- coreutils,
  jq,
  kdialog,
  pciutils,
  procps,
  rsync,
- util-linux,
  xdg-user-dirs,
  xdg-utils
 Description: consumer-facing management and recovery tools for ECZOS

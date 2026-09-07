@@ -37,6 +37,10 @@ done
 "$ROOT_DIR/scripts/verify-source.sh"
 mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 
+# Rebuild and restage the local ECZOS packages before retrying the chroot.
+# This also refreshes the pinned FreeOffice package without deleting caches.
+"$ROOT_DIR/scripts/prepare-image-packages-vm.sh"
+
 if [[ ! -d "$IMAGE_DIR/cache/bootstrap" ]]; then
     printf 'Bootstrap cache is missing; run the normal hardware-image build first.\n' >&2
     exit 1
