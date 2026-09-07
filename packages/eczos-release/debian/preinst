@@ -4,13 +4,33 @@ set -e
 case "$1" in
     install|upgrade)
         for path in os-release issue issue.net motd; do
-            if [ "$(dpkg-divert --listpackage "/etc/$path")" != eczos-release ]; then
+            target="/etc/$path"
+            diversion_owner=$(dpkg-divert --listpackage "$target" || true)
+
+            # live-build/debootstrap temporarily diverts /etc/os-release while
+            # constructing the chroot. Adopt that path before installing the
+            # persistent ECZOS package diversion; live-build performs the same
+            # no-rename removal later for images without this package.
+            if [ "$path" = os-release ] && \
+               [ "$diversion_owner" = LOCAL ] && \
+               [ "$(dpkg-divert --truename "$target")" = /etc/os-release.debootstrap ]; then
+                dpkg-divert --quiet --local --remove --no-rename "$target"
+                diversion_owner=
+            fi
+
+            if [ -n "$diversion_owner" ] && [ "$diversion_owner" != eczos-release ]; then
+                printf 'Cannot install eczos-release: %s is diverted by %s.\n' \
+                    "$target" "$diversion_owner" >&2
+                exit 1
+            fi
+
+            if [ "$diversion_owner" != eczos-release ]; then
                 dpkg-divert \
                     --package eczos-release \
                     --add \
                     --rename \
-                    --divert "/etc/$path.debian" \
-                    "/etc/$path"
+                    --divert "$target.debian" \
+                    "$target"
             fi
         done
         ;;
