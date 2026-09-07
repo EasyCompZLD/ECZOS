@@ -83,8 +83,9 @@ fi
 freeoffice_deb="$TEMP_DIR/${FREEOFFICE_PACKAGE}_${FREEOFFICE_VERSION}_amd64.deb"
 test -f "$freeoffice_deb"
 printf '%s  %s\n' "$FREEOFFICE_SHA256" "$freeoffice_deb" | sha256sum --check --status
-dpkg-deb -f "$freeoffice_deb" Package Version Architecture | \
-    diff -u <(printf '%s\n%s\namd64\n' "$FREEOFFICE_PACKAGE" "$FREEOFFICE_VERSION") -
+test "$(dpkg-deb -f "$freeoffice_deb" Package)" = "$FREEOFFICE_PACKAGE"
+test "$(dpkg-deb -f "$freeoffice_deb" Version)" = "$FREEOFFICE_VERSION"
+test "$(dpkg-deb -f "$freeoffice_deb" Architecture)" = amd64
 install -m 0644 "$freeoffice_deb" "$STAGING_DIR/"
 
 lintian "$STAGING_DIR"/*.deb || true
