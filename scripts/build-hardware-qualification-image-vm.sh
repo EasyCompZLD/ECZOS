@@ -31,6 +31,7 @@ for command_name in lb dpkg-buildpackage dpkg-parsechangelog lintian sha256sum x
     }
 done
 
+"$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
 "$ROOT_DIR/scripts/verify-source.sh"
 "$ROOT_DIR/scripts/configure-freeoffice-repository-vm.sh"
 

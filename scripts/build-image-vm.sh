@@ -34,6 +34,7 @@ for command_name in lb dpkg-buildpackage dpkg-parsechangelog lintian sha256sum x
     }
 done
 
+"$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
 "$ROOT_DIR/scripts/verify-source.sh"
 
 cd "$IMAGE_DIR"

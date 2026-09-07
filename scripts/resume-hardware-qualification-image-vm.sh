@@ -27,8 +27,8 @@ ISO_NAME="ECZOS-hardware-qualification-amd64-${BUILD_ID}.iso"
 
 if [[ ! -d "$IMAGE_DIR/chroot" || \
       ! -f "$BUILD_DIR/chroot_package-lists.install" || \
-      -f "$BUILD_DIR/chroot_hooks" ]]; then
-    printf 'No resumable pre-hook live-build state was found.\n' >&2
+      -f "$BUILD_DIR/binary_rootfs" ]]; then
+    printf 'No resumable pre-filesystem live-build state was found.\n' >&2
     exit 2
 fi
 
@@ -39,6 +39,7 @@ for command_name in lb dpkg-buildpackage dpkg-deb dpkg-parsechangelog sha256sum;
     }
 done
 
+"$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
 "$ROOT_DIR/scripts/verify-source.sh"
 mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 
@@ -59,7 +60,7 @@ if [[ ! -f "$BUILD_DIR/chroot_install-packages.install" ]]; then
     # package and the previously unpacked dependencies when the build resumes.
     chroot "$IMAGE_DIR/chroot" dpkg --unpack "/tmp/$release_deb"
     rm -f "$IMAGE_DIR/chroot/tmp/$release_deb"
-else
+elif [[ ! -f "$BUILD_DIR/chroot_hooks" ]]; then
     # A failed install can restore live-build's bootstrap cache while retaining
     # its completed install marker. Reinstall the newest staged version of each
     # local package before resuming the hook stage.
@@ -104,6 +105,24 @@ else
     find "$recovery_dir" -maxdepth 1 -type f -name '*.deb' -delete
     rmdir "$recovery_dir"
 fi
+
+for package in \
+    eczos-branding eczos-sddm-theme eczos-plymouth-theme \
+    eczos-desktop-defaults eczos-release eczos-windows-core \
+    eczos-gaming-core eczos-platform-tools eczos-desktop-apps \
+    eczos-desktop softmaker-freeoffice-2024; do
+    chroot "$IMAGE_DIR/chroot" dpkg-query -W -f='${Status}\n' "$package" \
+        | grep -Fx 'install ok installed'
+done
+test -s "$IMAGE_DIR/chroot/usr/share/plymouth/themes/eczos/eczos.plymouth"
+
+# chroot_archives runs APT as _apt during its removal phase. Runtime keyrings
+# copied from SMB-hosted sources must therefore not retain owner-only modes.
+chmod 0644 \
+    "$IMAGE_DIR/chroot/usr/share/keyrings/softmaker-archive-keyring.asc" \
+    "$IMAGE_DIR/chroot/etc/apt/sources.list.d/softmaker.list"
+chroot "$IMAGE_DIR/chroot" runuser -u _apt -- \
+    test -r /usr/share/keyrings/softmaker-archive-keyring.asc
 
 export MKSQUASHFS_OPTIONS="-processors $(nproc)"
 if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
