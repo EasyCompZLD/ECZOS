@@ -41,6 +41,13 @@ mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 # This also refreshes the pinned FreeOffice package without deleting caches.
 "$ROOT_DIR/scripts/prepare-image-packages-vm.sh"
 
+# Refresh live-build's generated configuration so the security target-release
+# option above is applied even when recovering an already configured tree.
+(cd "$IMAGE_DIR" && \
+    ECZOS_ISO_VOLUME=ECZOS_HWQUAL_AMD64 \
+    ECZOS_ISO_APPLICATION='ECZOS Hardware Qualification' \
+    ./auto/config)
+
 if [[ ! -d "$IMAGE_DIR/cache/bootstrap" ]]; then
     printf 'Bootstrap cache is missing; run the normal hardware-image build first.\n' >&2
     exit 1
