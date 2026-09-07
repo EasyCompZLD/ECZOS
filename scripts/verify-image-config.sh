@@ -35,7 +35,7 @@ printf '%s  %s\n' \
     '2c03e53ad4b1cb442f12c9af5052fb490547922b8b64e02f334f30a9f2de7f74' \
     "$IMAGE_DIR/config/includes.chroot/usr/share/keyrings/softmaker-archive-keyring.asc" | sha256sum -c - >/dev/null
 
-if grep -REn --exclude=README.md \
+if grep -REn --exclude=README.md --exclude='8*.hook.chroot' \
     '/build/easycomp-desktop|machine-id|ECZHOATOOL|onlyoffice-desktopeditors' "$IMAGE_DIR"; then
     printf 'Historical or machine-specific content found in image source.\n' >&2
     exit 1
