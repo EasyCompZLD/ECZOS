@@ -19,16 +19,16 @@
 - [x] Plasma defaults and Windows-style layout
 - [x] first-run state mechanism
 - [x] versioned Debian 13 KDE live-build configuration
-- [ ] first ECZOS ISO build and boot test (blocked until desktop and ECZ Windows MVP gates pass)
+- [ ] first ECZOS ISO build and boot test (blocked by remaining image release gates)
 - UEFI VM boot, install, upgrade and removal tests
 
 ## Phase 2 — ECZ Windows MVP
 
-- [ ] safe `.exe` and `.msi` handler (`.exe` physical test passed; MSI pending)
+- [x] safe `.exe` and `.msi` handler (physical lifecycle tests passed)
 - [x] isolated prefixes and versioned application records
 - [x] 32-bit/64-bit system Wine runtime adapter
-- [ ] launcher/icon/menu integration (launcher passed; real icon extraction pending)
-- [ ] install logs, repair and recoverable removal (implemented; test pending)
+- [x] launcher/icon/menu integration (physical icon extraction test passed)
+- [x] install logs, repair and recoverable removal (physical test passed)
 - [x] constrained default file mappings without a Linux-root `Z:` drive
 
 ## Phase 3 — ECZ Gaming
@@ -46,7 +46,8 @@
 - [x] hardware and system diagnostics foundation
 - [x] backup application and recovery entry points
 - [x] phone integration and privacy-conscious support-report foundation
-- [ ] FreeOffice inclusion (host integration prepared; physical and image tests pending)
+- [x] FreeOffice host inclusion and physical install test
+- [ ] FreeOffice release artifact pinning and ISO integration
 - [ ] optional cloud and enrolled remote-support services
 
 ## Phase 5 — distribution
