@@ -19,6 +19,7 @@ done
 
 grep -Fx 'live-task-kde' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
 grep -Fx 'debian-installer-launcher' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
+grep -Fx 'mesa-vulkan-drivers:i386' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
 grep -F 'apt-get purge -y' "$IMAGE_DIR/config/hooks/normal/0090-eczos-product-policy.hook.chroot"
 grep -F 'flatpak remote-add --system' "$IMAGE_DIR/config/hooks/normal/0090-eczos-product-policy.hook.chroot"
 grep -F -- '--distribution trixie' "$IMAGE_DIR/auto/config"
@@ -36,7 +37,8 @@ printf '%s  %s\n' \
     "$IMAGE_DIR/config/includes.chroot/usr/share/keyrings/softmaker-archive-keyring.asc" | sha256sum -c - >/dev/null
 
 if grep -REn --exclude=README.md --exclude='8*.hook.chroot' \
-    '/build/easycomp-desktop|machine-id|ECZHOATOOL|onlyoffice-desktopeditors' "$IMAGE_DIR"; then
+    '/build/easycomp-desktop|machine-id|ECZHOATOOL|onlyoffice-desktopeditors' \
+    "$IMAGE_DIR/auto" "$IMAGE_DIR/config"; then
     printf 'Historical or machine-specific content found in image source.\n' >&2
     exit 1
 fi

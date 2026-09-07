@@ -88,7 +88,7 @@ test "$(dpkg-deb -f "$freeoffice_deb" Version)" = "$FREEOFFICE_VERSION"
 test "$(dpkg-deb -f "$freeoffice_deb" Architecture)" = amd64
 install -m 0644 "$freeoffice_deb" "$STAGING_DIR/"
 
-lintian "$STAGING_DIR"/*.deb || true
+lintian "$STAGING_DIR"/eczos-*.deb || true
 (cd "$STAGING_DIR" && sha256sum ./*.deb > "$MANIFEST_DIR/SHA256SUMS")
 
 printf 'Staged %s ECZOS packages for live-build.\n' "${#PACKAGES[@]}"

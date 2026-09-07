@@ -31,7 +31,6 @@ for command_name in lb dpkg-buildpackage dpkg-parsechangelog lintian sha256sum x
     }
 done
 
-mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 "$ROOT_DIR/scripts/verify-source.sh"
 "$ROOT_DIR/scripts/configure-freeoffice-repository-vm.sh"
 
@@ -39,6 +38,7 @@ cd "$IMAGE_DIR"
 ./auto/clean
 ECZOS_ISO_VOLUME=ECZOS_HWQUAL_AMD64 \
 ECZOS_ISO_APPLICATION='ECZOS Hardware Qualification' ./auto/config
+mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 "$ROOT_DIR/scripts/prepare-image-packages-vm.sh"
 
 export MKSQUASHFS_OPTIONS="-processors $(nproc)"

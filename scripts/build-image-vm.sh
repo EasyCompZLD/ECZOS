@@ -34,12 +34,12 @@ for command_name in lb dpkg-buildpackage dpkg-parsechangelog lintian sha256sum x
     }
 done
 
-mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 "$ROOT_DIR/scripts/verify-source.sh"
 
 cd "$IMAGE_DIR"
 ./auto/clean
 ./auto/config
+mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 "$ROOT_DIR/scripts/prepare-image-packages-vm.sh"
 
 export MKSQUASHFS_OPTIONS="-processors $(nproc)"

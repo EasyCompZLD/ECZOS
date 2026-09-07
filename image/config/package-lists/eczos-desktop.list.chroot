@@ -4,4 +4,5 @@ live-task-localisation-desktop
 debian-installer-launcher
 network-manager
 plymouth
+mesa-vulkan-drivers:i386
 sudo
