@@ -67,14 +67,32 @@ chmod 0644 "$MSI_FILE"
 run_as_user() {
     runuser -u "$TEST_USER" -- env \
         HOME="$TEST_HOME" USER="$TEST_USER" LOGNAME="$TEST_USER" \
-        PATH=/usr/local/bin:/usr/bin:/bin "$@"
+        PATH=/usr/local/bin:/usr/bin:/bin \
+        bash -c 'cd "$HOME"; exec "$@"' bash "$@"
 }
 
-install_output=$(run_as_user xvfb-run -a eczos-windows install --yes "$MSI_FILE")
-printf '%s\n' "$install_output"
-app_id=$(sed -n 's/^ECZ Windows application ID: //p' <<<"$install_output" | tail -n1)
-[[ -n "$app_id" ]] || { printf 'The MSI test did not return an application ID.\n' >&2; exit 1; }
+checksum=$(sha256sum "$MSI_FILE" | awk '{print $1}')
+app_id="eczos-msi-test-${checksum:0:8}"
 manifest="$TEST_HOME/.local/share/eczos/windows/apps/$app_id/manifest.json"
+if [[ -f "$manifest" ]]; then
+    kind=$(run_as_user jq -r '.kind' "$manifest")
+    status=$(run_as_user jq -r '.status' "$manifest")
+    [[ "$kind" = msi-installer ]] || {
+        printf 'Existing ECZ Windows test record has an unexpected type.\n' >&2
+        exit 1
+    }
+    if [[ "$status" = installed-needs-entrypoint ]]; then
+        printf 'Resuming the previously installed MSI test record: %s\n' "$app_id"
+        run_as_user eczos-windows rescan "$app_id"
+    elif [[ "$status" != installed ]]; then
+        run_as_user eczos-windows remove --yes "$app_id"
+        install_output=$(run_as_user xvfb-run -a eczos-windows install --yes "$MSI_FILE")
+        printf '%s\n' "$install_output"
+    fi
+else
+    install_output=$(run_as_user xvfb-run -a eczos-windows install --yes "$MSI_FILE")
+    printf '%s\n' "$install_output"
+fi
 run_as_user jq -e \
     '.kind == "msi-installer" and .status == "installed" and (.entrypoint | endswith("/ECZOSMsiTest.exe")) and (.icon | endswith("/application.png"))' \
     "$manifest" >/dev/null

@@ -1,3 +1,11 @@
+eczos-release (0.1.0~dev3) UNRELEASED; urgency=medium
+
+  * Present ECZOS on local and remote console login banners.
+  * Preserve and restore Debian's original issue and motd files with diversions.
+  * Select the dark ECZOS wallpaper for the generated GRUB menu.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 07 Sep 2026 12:15:00 +0200
+
 eczos-release (0.1.0~dev2) UNRELEASED; urgency=medium
 
   * Present ECZOS in os-release display fields while preserving ID=debian.

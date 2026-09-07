@@ -43,7 +43,8 @@ for required in \
     scripts/configure-freeoffice-repository-vm.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \
-    scripts/install-next-product-batch-vm.sh; do
+    scripts/install-next-product-batch-vm.sh \
+    scripts/resume-windows-gates-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
 

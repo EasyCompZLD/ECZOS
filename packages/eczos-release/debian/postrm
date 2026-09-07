@@ -3,15 +3,18 @@ set -e
 
 case "$1" in
     remove|abort-install)
-        if [ "$(dpkg-divert --listpackage /etc/os-release)" = eczos-release ]; then
-            rm -f /etc/os-release /etc/.os-release.eczos-new
-            dpkg-divert \
-                --package eczos-release \
-                --remove \
-                --rename \
-                --divert /etc/os-release.debian \
-                /etc/os-release
-        fi
+        rm -f /etc/.os-release.eczos-new
+        for path in os-release issue issue.net motd; do
+            if [ "$(dpkg-divert --listpackage "/etc/$path")" = eczos-release ]; then
+                rm -f "/etc/$path"
+                dpkg-divert \
+                    --package eczos-release \
+                    --remove \
+                    --rename \
+                    --divert "/etc/$path.debian" \
+                    "/etc/$path"
+            fi
+        done
         ;;
     purge)
         rm -f /etc/.os-release.eczos-new

@@ -7,7 +7,7 @@ if [[ $(id -u) -ne 0 ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-grep -Fq '0.1.0~dev10' "$ROOT_DIR/packages/eczos-windows-core/debian/changelog" || {
+head -n1 "$ROOT_DIR/packages/eczos-windows-core/debian/changelog" | grep -Fq '0.1.0~dev11' || {
     printf 'This is not the current ECZOS source batch. Synchronize /srv/eczos first.\n' >&2
     exit 1
 }

@@ -2,3 +2,6 @@ bin/eczos-info usr/bin/
 config/80-eczos-release.cfg etc/default/grub.d/
 lib/update-os-release usr/lib/eczos/
 release/eczos-release usr/lib/eczos/release/
+release/issue usr/lib/eczos/release/
+release/issue.net usr/lib/eczos/release/
+release/motd usr/lib/eczos/release/

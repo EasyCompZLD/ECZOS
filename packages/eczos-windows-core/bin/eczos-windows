@@ -232,7 +232,10 @@ discover_entrypoint() {
     if [[ ${#candidate_roots[@]} -gt 0 ]]; then
         mapfile -d '' candidates < <(find "${candidate_roots[@]}" -type f -iname '*.exe' \
             ! -iname 'unins*.exe' ! -iname 'uninstall*.exe' \
-            ! -iname 'setup*.exe' ! -iname 'update*.exe' -print0 2>/dev/null)
+            ! -iname 'setup*.exe' ! -iname 'update*.exe' \
+            ! -path '*/Common Files/*' ! -path '*/Internet Explorer/*' \
+            ! -path '*/Windows Media Player/*' ! -path '*/Windows NT/*' \
+            -print0 2>/dev/null)
     fi
     if [[ ${#candidates[@]} -eq 1 ]]; then
         DISCOVERED_ENTRYPOINT=${candidates[0]}

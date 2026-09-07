@@ -1,3 +1,15 @@
+eczos-desktop (0.1.0~dev15) UNRELEASED; urgency=medium
+
+  * Require ECZOS console and GRUB product presentation.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 07 Sep 2026 12:15:00 +0200
+
+eczos-desktop (0.1.0~dev14) UNRELEASED; urgency=medium
+
+  * Require corrected MSI application discovery.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 07 Sep 2026 12:15:00 +0200
+
 eczos-desktop (0.1.0~dev13) UNRELEASED; urgency=medium
 
   * Require FreeOffice integration and ECZ Windows icon extraction.

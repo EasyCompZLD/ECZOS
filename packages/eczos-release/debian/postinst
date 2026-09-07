@@ -3,6 +3,9 @@ set -e
 
 if [ "$1" = configure ]; then
     /usr/lib/eczos/update-os-release
+    install -m 0644 /usr/lib/eczos/release/issue /etc/issue
+    install -m 0644 /usr/lib/eczos/release/issue.net /etc/issue.net
+    install -m 0644 /usr/lib/eczos/release/motd /etc/motd
 fi
 
 #DEBHELPER#

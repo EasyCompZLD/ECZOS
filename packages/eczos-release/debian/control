@@ -9,7 +9,9 @@ Homepage: https://easycompzeeland.nl/
 
 Package: eczos-release
 Architecture: all
-Depends: ${misc:Depends}
+Depends:
+ ${misc:Depends},
+ eczos-branding (>= 0.1.0~dev3)
 Description: ECZOS product release identity
  Provides machine-readable ECZOS product metadata and the eczos-info command
  without replacing Debian compatibility identity files.

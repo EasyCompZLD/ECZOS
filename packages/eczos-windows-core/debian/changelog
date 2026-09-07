@@ -1,3 +1,10 @@
+eczos-windows-core (0.1.0~dev11) UNRELEASED; urgency=medium
+
+  * Exclude Wine's built-in Program Files applications from installed-program
+    discovery so an MSI payload without a Start Menu shortcut is unambiguous.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 07 Sep 2026 12:15:00 +0200
+
 eczos-windows-core (0.1.0~dev10) UNRELEASED; urgency=medium
 
   * Extract a real application icon from installed Windows executables when
