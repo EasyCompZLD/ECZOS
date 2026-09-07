@@ -43,6 +43,11 @@ done
 "$ROOT_DIR/scripts/verify-source.sh"
 mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 
+SYSTEM_ROOT="$IMAGE_DIR/chroot"
+if [[ -d "$SYSTEM_ROOT/chroot" ]]; then
+    SYSTEM_ROOT="$SYSTEM_ROOT/chroot"
+fi
+
 if [[ ! -f "$BUILD_DIR/chroot_install-packages.install" ]]; then
     find "$RELEASE_DIR/debian" -type f -exec chmod 0644 {} +
     chmod 0755 "$RELEASE_DIR/debian/rules" "$RELEASE_DIR/debian/preinst" \
@@ -54,17 +59,17 @@ if [[ ! -f "$BUILD_DIR/chroot_install-packages.install" ]]; then
     built_release="$ROOT_DIR/packages/$release_deb"
     test -f "$built_release"
     install -m 0644 "$built_release" "$IMAGE_DIR/config/packages.chroot/$release_deb"
-    install -m 0644 "$built_release" "$IMAGE_DIR/chroot/tmp/$release_deb"
+    install -m 0644 "$built_release" "$SYSTEM_ROOT/tmp/$release_deb"
 
     # Unpack only: the preserved live-build APT stage will configure this
     # package and the previously unpacked dependencies when the build resumes.
-    chroot "$IMAGE_DIR/chroot" dpkg --unpack "/tmp/$release_deb"
-    rm -f "$IMAGE_DIR/chroot/tmp/$release_deb"
+    chroot "$SYSTEM_ROOT" dpkg --unpack "/tmp/$release_deb"
+    rm -f "$SYSTEM_ROOT/tmp/$release_deb"
 elif [[ ! -f "$BUILD_DIR/chroot_hooks" ]]; then
     # A failed install can restore live-build's bootstrap cache while retaining
     # its completed install marker. Reinstall the newest staged version of each
     # local package before resuming the hook stage.
-    recovery_dir="$IMAGE_DIR/chroot/tmp/eczos-image-recovery"
+    recovery_dir="$SYSTEM_ROOT/tmp/eczos-image-recovery"
     install -d -m 0755 "$recovery_dir"
     find "$recovery_dir" -maxdepth 1 -type f -name '*.deb' -delete
 
@@ -92,16 +97,16 @@ elif [[ ! -f "$BUILD_DIR/chroot_hooks" ]]; then
         exit 1
     }
 
-    chroot "$IMAGE_DIR/chroot" apt-get install -y "${recovery_packages[@]}"
+    chroot "$SYSTEM_ROOT" apt-get install -y "${recovery_packages[@]}"
     for package in \
         eczos-branding eczos-sddm-theme eczos-plymouth-theme \
         eczos-desktop-defaults eczos-release eczos-windows-core \
         eczos-gaming-core eczos-platform-tools eczos-desktop-apps \
         eczos-desktop softmaker-freeoffice-2024; do
-        chroot "$IMAGE_DIR/chroot" dpkg-query -W -f='${Status}\n' "$package" \
+        chroot "$SYSTEM_ROOT" dpkg-query -W -f='${Status}\n' "$package" \
             | grep -Fx 'install ok installed'
     done
-    test -s "$IMAGE_DIR/chroot/usr/share/plymouth/themes/eczos/eczos.plymouth"
+    test -s "$SYSTEM_ROOT/usr/share/plymouth/themes/eczos/eczos.plymouth"
     find "$recovery_dir" -maxdepth 1 -type f -name '*.deb' -delete
     rmdir "$recovery_dir"
 fi
@@ -111,17 +116,17 @@ for package in \
     eczos-desktop-defaults eczos-release eczos-windows-core \
     eczos-gaming-core eczos-platform-tools eczos-desktop-apps \
     eczos-desktop softmaker-freeoffice-2024; do
-    chroot "$IMAGE_DIR/chroot" dpkg-query -W -f='${Status}\n' "$package" \
+    chroot "$SYSTEM_ROOT" dpkg-query -W -f='${Status}\n' "$package" \
         | grep -Fx 'install ok installed'
 done
-test -s "$IMAGE_DIR/chroot/usr/share/plymouth/themes/eczos/eczos.plymouth"
+test -s "$SYSTEM_ROOT/usr/share/plymouth/themes/eczos/eczos.plymouth"
 
 # chroot_archives runs APT as _apt during its removal phase. Runtime keyrings
 # copied from SMB-hosted sources must therefore not retain owner-only modes.
 chmod 0644 \
-    "$IMAGE_DIR/chroot/usr/share/keyrings/softmaker-archive-keyring.asc" \
-    "$IMAGE_DIR/chroot/etc/apt/sources.list.d/softmaker.list"
-chroot "$IMAGE_DIR/chroot" runuser -u _apt -- \
+    "$SYSTEM_ROOT/usr/share/keyrings/softmaker-archive-keyring.asc" \
+    "$SYSTEM_ROOT/etc/apt/sources.list.d/softmaker.list"
+chroot "$SYSTEM_ROOT" runuser -u _apt -- \
     test -r /usr/share/keyrings/softmaker-archive-keyring.asc
 
 if [[ -f "$BUILD_DIR/binary_rootfs" ]]; then
@@ -141,18 +146,27 @@ if [[ -f "$BUILD_DIR/binary_rootfs" ]]; then
     cd "$IMAGE_DIR"
     lb chroot_prep install 'devpts proc selinuxfs sysfs'
     mounts_active=1
-    chroot "$IMAGE_DIR/chroot" apt-get install -y linux-image-amd64
-    compgen -G "$IMAGE_DIR/chroot/boot/vmlinuz-*" >/dev/null
-    compgen -G "$IMAGE_DIR/chroot/boot/initrd.img-*" >/dev/null
+    chroot "$SYSTEM_ROOT" apt-get install -y linux-image-amd64
+    compgen -G "$SYSTEM_ROOT/boot/vmlinuz-*" >/dev/null
+    compgen -G "$SYSTEM_ROOT/boot/initrd.img-*" >/dev/null
     lb chroot_prep remove 'devpts proc selinuxfs sysfs'
     mounts_active=0
     trap - EXIT
 
     rm -f \
+        "$BUILD_DIR/binary_chroot" \
         "$BUILD_DIR/binary_rootfs" \
         "$BUILD_DIR/binary_dm-verity" \
         "$BUILD_DIR/binary_manifest" \
         "$BUILD_DIR/binary_package-lists"
+fi
+
+# If an earlier recovery already invalidated rootfs but left binary_chroot
+# marked complete, recreate the topology before compression is attempted.
+if [[ ! -f "$BUILD_DIR/binary_rootfs" && \
+      -f "$BUILD_DIR/binary_chroot" && \
+      ! -d "$IMAGE_DIR/chroot/chroot" ]]; then
+    rm -f "$BUILD_DIR/binary_chroot"
 fi
 
 export MKSQUASHFS_OPTIONS="-processors $(nproc)"
