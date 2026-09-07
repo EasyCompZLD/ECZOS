@@ -47,7 +47,8 @@ for required in \
     scripts/normalize-image-source-permissions-vm.sh \
     scripts/resume-windows-gates-vm.sh \
     scripts/resume-hardware-qualification-image-vm.sh \
-    scripts/build-hardware-qualification-image-vm.sh; do
+    scripts/build-hardware-qualification-image-vm.sh \
+    scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
 
