@@ -11,7 +11,9 @@ for required in \
     config/package-lists/eczos-desktop.list.chroot \
     config/hooks/normal/0090-eczos-product-policy.hook.chroot \
     config/hooks/normal/0100-eczos-image-policy.hook.chroot \
-    config/includes.chroot/etc/default/grub.d/90-eczos-plymouth.cfg; do
+    config/includes.chroot/etc/default/grub.d/90-eczos-plymouth.cfg \
+    config/includes.chroot/etc/apt/sources.list.d/softmaker.list \
+    config/includes.chroot/usr/share/keyrings/softmaker-archive-keyring.asc; do
     test -s "$IMAGE_DIR/$required"
 done
 
@@ -25,6 +27,13 @@ grep -F -- '--debian-installer live' "$IMAGE_DIR/auto/config"
 grep -F -- 'quiet splash' "$IMAGE_DIR/auto/config"
 grep -Fx 'plymouth-set-default-theme eczos' \
     "$IMAGE_DIR/config/hooks/normal/0100-eczos-image-policy.hook.chroot"
+grep -F 'softmaker-archive-keyring.asc' \
+    "$IMAGE_DIR/config/includes.chroot/etc/apt/sources.list.d/softmaker.list"
+grep -F 'BEGIN PGP PUBLIC KEY BLOCK' \
+    "$IMAGE_DIR/config/includes.chroot/usr/share/keyrings/softmaker-archive-keyring.asc"
+printf '%s  %s\n' \
+    '2c03e53ad4b1cb442f12c9af5052fb490547922b8b64e02f334f30a9f2de7f74' \
+    "$IMAGE_DIR/config/includes.chroot/usr/share/keyrings/softmaker-archive-keyring.asc" | sha256sum -c - >/dev/null
 
 if grep -REn --exclude=README.md \
     '/build/easycomp-desktop|machine-id|ECZHOATOOL|onlyoffice-desktopeditors' "$IMAGE_DIR"; then

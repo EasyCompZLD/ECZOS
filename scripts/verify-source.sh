@@ -44,7 +44,8 @@ for required in \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \
     scripts/install-next-product-batch-vm.sh \
-    scripts/resume-windows-gates-vm.sh; do
+    scripts/resume-windows-gates-vm.sh \
+    scripts/build-hardware-qualification-image-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
 

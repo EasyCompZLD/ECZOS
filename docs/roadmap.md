@@ -20,6 +20,7 @@
 - [x] first-run state mechanism
 - [x] versioned Debian 13 KDE live-build configuration
 - [ ] first ECZOS ISO build and boot test (blocked by remaining image release gates)
+- [ ] hardware-qualification ISO boot and install on the Vulkan-capable game PC
 - UEFI VM boot, install, upgrade and removal tests
 
 ## Phase 2 — ECZ Windows MVP

@@ -16,6 +16,11 @@ is removed in a reviewed commit, the entry point will be:
 sudo ./scripts/build-image-vm.sh
 ```
 
+Before the public-release gates pass, use only
+`build-hardware-qualification-image-vm.sh` with its explicit environment flag
+for a test ISO on a capable game PC. It embeds a checksum-pinned FreeOffice 2024
+package and is not a public release.
+
 The script will build every ECZOS package, stage the resulting `.deb` files in
 `config/packages.chroot`, configures live-build, produces the ISO and writes a
 SHA-256 checksum below `image/.build/artifacts/`.

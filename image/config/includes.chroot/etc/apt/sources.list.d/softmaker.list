@@ -1,0 +1,1 @@
+deb [arch=amd64 signed-by=/usr/share/keyrings/softmaker-archive-keyring.asc] https://shop.softmaker.com/repo/apt stable non-free

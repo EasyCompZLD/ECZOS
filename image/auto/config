@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+ISO_APPLICATION=${ECZOS_ISO_APPLICATION:-ECZOS Development}
+ISO_VOLUME=${ECZOS_ISO_VOLUME:-ECZOS_DEV_AMD64}
+
 lb config noauto \
     --mode debian \
     --system live \
@@ -13,8 +16,8 @@ lb config noauto \
     --debian-installer-distribution trixie \
     --debian-installer-gui true \
     --bootappend-live "boot=live components quiet splash" \
-    --iso-application "ECZOS Development" \
+    --iso-application "$ISO_APPLICATION" \
     --iso-preparer "EasyComp Zeeland" \
     --iso-publisher "EasyComp Zeeland" \
-    --iso-volume "ECZOS_DEV_AMD64" \
+    --iso-volume "$ISO_VOLUME" \
     "${@}"

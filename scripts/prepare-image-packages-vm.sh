@@ -29,6 +29,11 @@ PACKAGES=(
     eczos-desktop-apps
     eczos-desktop
 )
+FREEOFFICE_PACKAGE=softmaker-freeoffice-2024
+FREEOFFICE_VERSION=3702
+FREEOFFICE_SHA256=d518ce8058cfae4314f828b3885236aeb964551f3589f2b83d74ef02d80c1e23
+TEMP_DIR=$(mktemp -d /tmp/eczos-image-packages.XXXXXX)
+trap 'rm -rf "$TEMP_DIR"' EXIT
 
 mkdir -p "$STAGING_DIR" "$MANIFEST_DIR"
 find "$STAGING_DIR" -maxdepth 1 -type f -name 'eczos-*.deb' -delete
@@ -68,6 +73,19 @@ for package in "${PACKAGES[@]}"; do
     dpkg-deb --info "$built" >/dev/null
     install -m 0644 "$built" "$STAGING_DIR/"
 done
+
+if ! apt-cache show "${FREEOFFICE_PACKAGE}=${FREEOFFICE_VERSION}" >/dev/null 2>&1; then
+    printf 'FreeOffice %s is unavailable. Run configure-freeoffice-repository-vm.sh first.\n' \
+        "$FREEOFFICE_VERSION" >&2
+    exit 1
+fi
+(cd "$TEMP_DIR" && apt-get download "${FREEOFFICE_PACKAGE}=${FREEOFFICE_VERSION}")
+freeoffice_deb="$TEMP_DIR/${FREEOFFICE_PACKAGE}_${FREEOFFICE_VERSION}_amd64.deb"
+test -f "$freeoffice_deb"
+printf '%s  %s\n' "$FREEOFFICE_SHA256" "$freeoffice_deb" | sha256sum --check --status
+dpkg-deb -f "$freeoffice_deb" Package Version Architecture | \
+    diff -u <(printf '%s\n%s\namd64\n' "$FREEOFFICE_PACKAGE" "$FREEOFFICE_VERSION") -
+install -m 0644 "$freeoffice_deb" "$STAGING_DIR/"
 
 lintian "$STAGING_DIR"/*.deb || true
 (cd "$STAGING_DIR" && sha256sum ./*.deb > "$MANIFEST_DIR/SHA256SUMS")
