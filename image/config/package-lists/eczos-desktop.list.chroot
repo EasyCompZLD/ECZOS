@@ -2,6 +2,7 @@ live-task-kde
 live-task-localisation
 live-task-localisation-desktop
 debian-installer-launcher
+linux-image-amd64
 network-manager
 plymouth
 mesa-vulkan-drivers:i386

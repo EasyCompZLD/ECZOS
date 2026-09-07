@@ -19,6 +19,7 @@ done
 
 grep -Fx 'live-task-kde' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
 grep -Fx 'debian-installer-launcher' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
+grep -Fx 'linux-image-amd64' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
 grep -Fx 'mesa-vulkan-drivers:i386' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
 grep -F 'apt-get purge -y' "$IMAGE_DIR/config/hooks/normal/0090-eczos-product-policy.hook.chroot"
 grep -F 'flatpak remote-add --system' "$IMAGE_DIR/config/hooks/normal/0090-eczos-product-policy.hook.chroot"

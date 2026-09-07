@@ -27,8 +27,8 @@ ISO_NAME="ECZOS-hardware-qualification-amd64-${BUILD_ID}.iso"
 
 if [[ ! -d "$IMAGE_DIR/chroot" || \
       ! -f "$BUILD_DIR/chroot_package-lists.install" || \
-      -f "$BUILD_DIR/binary_rootfs" ]]; then
-    printf 'No resumable pre-filesystem live-build state was found.\n' >&2
+      -f "$BUILD_DIR/binary_linux-image" ]]; then
+    printf 'No resumable pre-kernel-copy live-build state was found.\n' >&2
     exit 2
 fi
 
@@ -123,6 +123,37 @@ chmod 0644 \
     "$IMAGE_DIR/chroot/etc/apt/sources.list.d/softmaker.list"
 chroot "$IMAGE_DIR/chroot" runuser -u _apt -- \
     test -r /usr/share/keyrings/softmaker-archive-keyring.asc
+
+if [[ -f "$BUILD_DIR/binary_rootfs" ]]; then
+    # A bootstrap-cache restore can leave chroot_linux-image marked complete
+    # even though its installed kernel disappeared. Restore the kernel with the
+    # required virtual filesystems mounted, then invalidate only binary outputs
+    # that were created from the kernel-less chroot.
+    mounts_active=0
+    cleanup_mounts() {
+        if [[ $mounts_active -eq 1 ]]; then
+            (cd "$IMAGE_DIR" && \
+                lb chroot_prep remove 'devpts proc selinuxfs sysfs') || true
+        fi
+    }
+    trap cleanup_mounts EXIT
+
+    cd "$IMAGE_DIR"
+    lb chroot_prep install 'devpts proc selinuxfs sysfs'
+    mounts_active=1
+    chroot "$IMAGE_DIR/chroot" apt-get install -y linux-image-amd64
+    compgen -G "$IMAGE_DIR/chroot/boot/vmlinuz-*" >/dev/null
+    compgen -G "$IMAGE_DIR/chroot/boot/initrd.img-*" >/dev/null
+    lb chroot_prep remove 'devpts proc selinuxfs sysfs'
+    mounts_active=0
+    trap - EXIT
+
+    rm -f \
+        "$BUILD_DIR/binary_rootfs" \
+        "$BUILD_DIR/binary_dm-verity" \
+        "$BUILD_DIR/binary_manifest" \
+        "$BUILD_DIR/binary_package-lists"
+fi
 
 export MKSQUASHFS_OPTIONS="-processors $(nproc)"
 if git -C "$ROOT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
