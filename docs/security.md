@@ -19,12 +19,19 @@ an automatic binary-format handler that silently executes downloads.
 Each managed Windows application receives a separate prefix and application
 identity. Default drive mappings expose only the prefix and explicitly approved
 locations. The Linux root and complete user home are not mapped by default.
+PE icon extraction invokes the native resource parsers inside a Bubblewrap
+sandbox without network or access to the user's files. Failure falls back to a
+generic icon and must never block installation or launch.
 
 ## Runtime supply chain
 
 Runtime downloads must use HTTPS, pinned versions, recorded checksums and a
 verifiable publisher. Runtime rollback must be possible. Proton-GE and UMU are
 never fetched through an unreviewed `curl | shell` workflow.
+
+FreeOffice is obtained from SoftMaker's HTTPS APT repository with a repository-
+scoped signing key. ECZOS pins the reviewed key bytes and limits that repository
+to the FreeOffice package so it cannot replace Debian packages unexpectedly.
 
 ## Privilege boundary
 

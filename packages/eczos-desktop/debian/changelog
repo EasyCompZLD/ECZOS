@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev13) UNRELEASED; urgency=medium
+
+  * Require FreeOffice integration and ECZ Windows icon extraction.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 07 Sep 2026 10:00:00 +0200
+
 eczos-desktop (0.1.0~dev12) UNRELEASED; urgency=medium
 
   * Require the contrasting shell logo and corrected ECZ Windows installer.

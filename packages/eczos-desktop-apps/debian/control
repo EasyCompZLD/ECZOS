@@ -39,6 +39,7 @@ Depends:
  plasma-discover-backend-fwupd,
  printer-driver-all,
  skanpage,
+ softmaker-freeoffice-2024,
  steam-devices,
  steam-installer,
  system-config-printer,
@@ -49,5 +50,5 @@ Conflicts:
 Description: complete native application set for ECZOS Desktop
  Installs the familiar browser, mail, media, PDF, archive, backup, phone,
  firmware, printer, scanner and graphical application-management experience.
- Office is deliberately left unfulfilled until FreeOffice redistribution is
- approved by its vendor.
+ SoftMaker FreeOffice supplies the supported office applications through the
+ vendor-maintained APT repository configured by ECZOS deployment tooling.

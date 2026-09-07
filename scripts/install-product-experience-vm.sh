@@ -13,6 +13,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+"$ROOT_DIR/scripts/configure-freeoffice-repository-vm.sh"
 install -m 0644 "$ROOT_DIR/config/debian-extra-components.list" \
     /etc/apt/sources.list.d/eczos-extra-components.list
 mapfile -t libreoffice_packages < <(dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\n' 'libreoffice*' 2>/dev/null \
@@ -38,4 +39,4 @@ flatpak remote-add --system --if-not-exists flathub \
 "$ROOT_DIR/scripts/stage-platform-batch-vm.sh"
 
 printf '\nECZOS product experience installed. Log out and back in once.\n'
-printf 'FreeOffice is not installed pending written redistribution permission.\n'
+printf 'FreeOffice is installed and updated through the signed SoftMaker repository.\n'

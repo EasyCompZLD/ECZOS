@@ -11,8 +11,10 @@ Package: eczos-windows-core
 Architecture: amd64
 Depends:
  ${misc:Depends},
+ bubblewrap,
  desktop-file-utils,
  file,
+ icoutils,
  jq,
  kdialog,
  libglib2.0-bin,

@@ -116,16 +116,55 @@ inspect_file() {
     printf 'SHA-256: %s\n' "$(sha256sum "$resolved" | awk '{print $1}')"
 }
 
+extract_launcher_icon() {
+    local app_dir=$1 executable=$2 icon_dir resource ico_file extracted_dir candidate
+    local -a icon_sandbox
+    EXTRACTED_ICON=application-x-executable
+    command -v bwrap >/dev/null 2>&1 || return 0
+    command -v wrestool >/dev/null 2>&1 || return 0
+    command -v icotool >/dev/null 2>&1 || return 0
+    [[ -f "$executable" ]] || return 0
+
+    icon_dir="$app_dir/icon"
+    extracted_dir="$icon_dir/extracted"
+    mkdir -p "$extracted_dir"
+    icon_sandbox=(bwrap --unshare-all --die-with-parent --new-session
+        --ro-bind /usr /usr --ro-bind-try /lib /lib --ro-bind-try /lib64 /lib64
+        --dir /etc --ro-bind-try /etc/ld.so.cache /etc/ld.so.cache
+        --proc /proc --dev /dev --tmpfs /tmp)
+    resource=$("${icon_sandbox[@]}" --ro-bind "$executable" /input.exe \
+        wrestool -l -t 14 /input.exe 2>/dev/null |
+        sed -n 's/.*--name=\("[^"]*"\|[^ ]*\).*/\1/p' | head -n1 || true)
+    [[ -n "$resource" ]] || return 0
+    resource=${resource#\"}
+    resource=${resource%\"}
+    ico_file="$icon_dir/application.ico"
+    if ! "${icon_sandbox[@]}" --ro-bind "$executable" /input.exe \
+        wrestool -x -t 14 -n "$resource" /input.exe >"$ico_file" 2>/dev/null; then
+        return 0
+    fi
+    if ! "${icon_sandbox[@]}" --ro-bind "$ico_file" /input.ico \
+        --bind "$extracted_dir" /output icotool -x -o /output /input.ico >/dev/null 2>&1; then
+        return 0
+    fi
+    candidate=$(find "$extracted_dir" -maxdepth 1 -type f -name '*.png' \
+        -printf '%s\t%p\n' 2>/dev/null | sort -nr | head -n1 | cut -f2- || true)
+    [[ -n "$candidate" && -s "$candidate" ]] || return 0
+    install -m 0600 "$candidate" "$icon_dir/application.png"
+    EXTRACTED_ICON="$icon_dir/application.png"
+}
+
 write_launcher() {
     local app_id=$1
     local display_name=$2
+    local icon=${3:-application-x-executable}
     mkdir -p "$LAUNCHERS_DIR"
     cat > "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=$display_name
 Exec=eczos-windows run $app_id
-Icon=application-x-executable
+Icon=$icon
 Terminal=false
 Categories=Utility;
 EOF
@@ -214,7 +253,7 @@ install_file() {
     local input=$1
     local resolved extension kind checksum base lower_base display_name slug app_id app_dir
     local source_dir copied prefix runtime_dir runtime_payload runtime_windows_path
-    local install_log result entrypoint entrypoint_type temp_manifest existing_status failed_dir
+    local install_log result entrypoint entrypoint_type launcher_icon temp_manifest existing_status failed_dir
     local initialization_log initialization_result detected_name retry_existing=false
     [[ -f "$input" ]] || { printf 'Not a regular file: %s\n' "$input" >&2; exit 2; }
     resolved=$(realpath "$input")
@@ -346,8 +385,15 @@ install_file() {
     chmod 0600 "$temp_manifest"
     mv -f "$temp_manifest" "$app_dir/manifest.json"
 
+    launcher_icon=application-x-executable
     if ((result == 0)) && [[ "$entrypoint" != null ]]; then
-        write_launcher "$app_id" "$detected_name"
+        extract_launcher_icon "$app_dir" "$entrypoint"
+        launcher_icon=$EXTRACTED_ICON
+        temp_manifest="$app_dir/manifest.json.new"
+        jq --arg icon "$launcher_icon" '.icon=$icon' "$app_dir/manifest.json" >"$temp_manifest"
+        chmod 0600 "$temp_manifest"
+        mv -f "$temp_manifest" "$app_dir/manifest.json"
+        write_launcher "$app_id" "$detected_name" "$launcher_icon"
     fi
     printf 'ECZ Windows application ID: %s\n' "$app_id"
     printf 'Installer exit status: %s\n' "$result"
@@ -532,7 +578,7 @@ run_app() {
 
 rescan_app() {
     require_unprivileged
-    local app_id=$1 app_dir manifest prefix kind name payload temp_manifest
+    local app_id=$1 app_dir manifest prefix kind name payload launcher_icon temp_manifest
     app_dir=$(app_dir_for "$app_id")
     manifest=$(read_manifest "$app_id")
     prefix=$(jq -er '.prefix' "$manifest")
@@ -555,14 +601,17 @@ rescan_app() {
         exit 1
     }
     temp_manifest="$app_dir/manifest.json.new"
+    extract_launcher_icon "$app_dir" "$DISCOVERED_ENTRYPOINT"
+    launcher_icon=$EXTRACTED_ICON
     jq --arg entrypoint "$DISCOVERED_ENTRYPOINT" \
         --arg entrypointType "$DISCOVERED_ENTRYPOINT_TYPE" \
-        --arg name "$DISCOVERED_NAME" --arg rescanned "$(date --iso-8601=seconds)" \
-        '.status="installed" | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name | .rescanned=$rescanned' \
+        --arg name "$DISCOVERED_NAME" --arg icon "$launcher_icon" \
+        --arg rescanned "$(date --iso-8601=seconds)" \
+        '.status="installed" | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name | .icon=$icon | .rescanned=$rescanned' \
         "$manifest" >"$temp_manifest"
     chmod 0600 "$temp_manifest"
     mv -f "$temp_manifest" "$manifest"
-    write_launcher "$app_id" "$DISCOVERED_NAME"
+    write_launcher "$app_id" "$DISCOVERED_NAME" "$launcher_icon"
     printf 'Registered installed application: %s\n' "$DISCOVERED_NAME"
 }
 

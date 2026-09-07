@@ -6,7 +6,7 @@ following product gates must be completed first:
 - run the complete product-experience installation and removal checks;
 - complete the MSI, Windows icon and guided-repair tests;
 - perform a positive Proton/DXVK test on a hardware Vulkan GPU;
-- resolve the FreeOffice redistribution-permission gate;
+- archive the FreeOffice permission scope and pin its image-build artifact;
 - review of remaining visible Debian and KDE product strings;
 - image package upgrade and rollback tests.
 

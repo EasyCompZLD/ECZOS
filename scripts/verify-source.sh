@@ -39,7 +39,11 @@ for required in \
     packages/eczos-platform-tools/bin/eczos-support-report \
     packages/eczos-platform-tools/product/default-apps.json \
     packages/eczos-desktop-apps/debian/control \
-    packages/eczos-desktop/debian/control; do
+    packages/eczos-desktop/debian/control \
+    scripts/configure-freeoffice-repository-vm.sh \
+    scripts/test-windows-msi-lifecycle-vm.sh \
+    scripts/audit-visible-branding-vm.sh \
+    scripts/install-next-product-batch-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
 

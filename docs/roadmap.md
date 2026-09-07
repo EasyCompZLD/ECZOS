@@ -46,7 +46,7 @@
 - [x] hardware and system diagnostics foundation
 - [x] backup application and recovery entry points
 - [x] phone integration and privacy-conscious support-report foundation
-- [ ] FreeOffice inclusion (blocked on written redistribution permission)
+- [ ] FreeOffice inclusion (host integration prepared; physical and image tests pending)
 - [ ] optional cloud and enrolled remote-support services
 
 ## Phase 5 — distribution

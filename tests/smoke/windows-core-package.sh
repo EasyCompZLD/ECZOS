@@ -32,6 +32,9 @@ grep -F "grep -aoP '(?i)[a-z]:" /usr/bin/eczos-windows
 grep -F 'rescan_app' /usr/bin/eczos-windows
 grep -F '{app_lock_fd}>&-' /usr/bin/eczos-windows
 grep -F 'apply_drive_mappings "$manifest" "$prefix"' /usr/bin/eczos-windows
+grep -F 'extract_launcher_icon' /usr/bin/eczos-windows
+grep -F 'wrestool -x -t 14' /usr/bin/eczos-windows
+grep -F 'bwrap --unshare-all' /usr/bin/eczos-windows
 grep -F 'map-drive [--yes] APP-ID LETTER DIRECTORY' /usr/bin/eczos-windows
 grep -F '.drives[$letter]=$directory' /usr/bin/eczos-windows
 grep -F "drives 'Stations beheren'" /usr/bin/eczos-windows

@@ -16,5 +16,9 @@ The first version uses Debian's system Wine through an ECZ runtime adapter.
 Both the 64-bit and i386 Wine runtimes are required because many Windows
 installers remain 32-bit. The dedicated host helper enables Debian multiarch and
 installs that i386 runtime before compatibility testing.
-Versioned runtime downloads, advanced installer discovery, real icon extraction,
-DXVK and Proton are later gates.
+Application launchers use an icon extracted from the installed PE executable
+when one is available and otherwise retain the generic executable icon. Native
+icon parsers run in a Bubblewrap sandbox without network or home-directory
+access because their input is untrusted.
+Versioned runtime downloads and more advanced installer discovery remain later
+gates. DXVK and Proton belong to the separate ECZ Gaming layer.

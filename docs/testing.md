@@ -72,6 +72,14 @@ for one reboot. It does not purge the already working SDDM or branding packages.
 ECZOS release identity and the aggregate desktop metapackage in one run. Its
 smoke tests also confirm that Debian remains the underlying compatibility ID.
 
+After synchronizing the current source to the test host,
+`install-next-product-batch-vm.sh` configures SoftMaker's signed APT repository,
+installs FreeOffice, stages the complete ECZOS package set, builds a harmless
+local MSI fixture, and exercises MSI installation, PE icon extraction, repair
+and recoverable removal as the desktop user. It finishes with a read-only audit
+of remaining visible Debian and KDE strings. Set `ECZOS_TEST_USER` only when the
+host contains more than one ordinary account.
+
 ## Development image
 
 `build-image-vm.sh` is the single entry point for a full image build. It verifies

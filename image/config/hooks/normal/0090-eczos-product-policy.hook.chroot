@@ -1,8 +1,9 @@
 #!/bin/sh
 set -eu
 
-# ECZOS deliberately does not ship LibreOffice. FreeOffice remains a vendor
-# permission gate and is not silently replaced by another office suite.
+# ECZOS deliberately does not ship LibreOffice. FreeOffice image inclusion is
+# handled separately because its signed vendor repository must be pinned for a
+# reproducible public image.
 installed=$(dpkg-query -W -f='${binary:Package} ${db:Status-Abbrev}\n' 'libreoffice*' 2>/dev/null \
     | awk '$2 == "ii" {print $1}' || true)
 if [ -n "$installed" ]; then

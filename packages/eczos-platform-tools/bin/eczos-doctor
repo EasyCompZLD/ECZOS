@@ -30,7 +30,12 @@ phone=false; package_ok kdeconnect && phone=true
 firmware=false; package_ok fwupd && firmware=true
 printer=false; package_ok cups && printer=true
 scanner=false; package_ok skanpage && scanner=true
-office=waiting-for-vendor-permission
+office=missing
+office_label='niet geïnstalleerd'
+if package_ok softmaker-freeoffice-2024; then
+    office=installed
+    office_label=geïnstalleerd
+fi
 failed_units=$(systemctl --failed --no-legend 2>/dev/null | wc -l | tr -d ' ')
 
 if [[ $json == true ]]; then
@@ -55,7 +60,7 @@ Telefoonkoppeling: $(yesno "$phone")
 Firmware-updates: $(yesno "$firmware")
 Printers: $(yesno "$printer")
 Scanners: $(yesno "$scanner")
-Office: wacht op toestemming voor FreeOffice-voorinstallatie
+Office: $office_label
 Mislukte systeemdiensten: $failed_units
 EOF
 )

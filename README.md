@@ -59,6 +59,16 @@ sudo ./scripts/test-plymouth-theme-package-vm.sh
 sudo ./scripts/test-desktop-defaults-package-vm.sh
 ```
 
+The current combined product gate is run on that host with:
+
+```sh
+sudo ./scripts/install-next-product-batch-vm.sh
+```
+
+It installs FreeOffice from the signed SoftMaker repository and tests the ECZ
+Windows MSI, extracted-icon, repair and removal lifecycle before producing a
+visible-branding audit.
+
 No production image should include the historical remote-support package. See
 `docs/security.md`.
 

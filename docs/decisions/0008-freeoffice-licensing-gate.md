@@ -1,12 +1,12 @@
-# 0008 — FreeOffice is selected but not yet redistributed
+# 0008 — FreeOffice uses the vendor-maintained repository
 
 ## Decision
 
 SoftMaker FreeOffice 2024 is the intended familiar office suite for ECZOS
-Desktop. LibreOffice is removed from the product profile. ECZOS will not embed,
-mirror or preinstall FreeOffice in a redistributable ISO until EasyComp Zeeland
-has written permission from SoftMaker covering OS-image redistribution and
-automatic updates.
+Desktop. LibreOffice is removed from the product profile. EasyComp Zeeland
+reported receiving vendor permission on 6 September 2026. The development host
+therefore installs FreeOffice from SoftMaker's signed APT repository. ECZOS does
+not commit or silently mirror the proprietary package in its source repository.
 
 ## Reason
 
@@ -17,8 +17,8 @@ also bypass the project's pinned-input and reproducibility requirements.
 
 ## Consequence
 
-The desired office product and its blocked state are recorded in
-`/usr/share/eczos/product/default-apps.json`. The image remains temporarily
-without a bundled office suite. Once permission is received, ECZOS will package
-or stage the vendor-approved artifact with a reviewed version, checksum,
-license record, upgrade path and removal test.
+The product and vendor update source are recorded in
+`/usr/share/eczos/product/default-apps.json`. Before a public image is released,
+the written permission must be archived outside the public source tree and its
+scope recorded, including ISO redistribution and automatic updates. The image
+pipeline must then pin or snapshot the exact vendor package used for a release.

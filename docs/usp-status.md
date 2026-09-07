@@ -4,7 +4,7 @@ Status date: 2026-09-06.
 
 | USP | Current implementation | Remaining release gate |
 | --- | --- | --- |
-| Windows apps without Wine complexity | EXE/MSI handler, confirmation, isolated prefix, launcher and manager | MSI, icon extraction and broader app matrix |
+| Windows apps without Wine complexity | EXE/MSI handler, confirmation, isolated prefix, launcher, icon extraction and manager | Physical MSI batch and broader app matrix |
 | Per-app isolation | Implemented and physically tested | Upgrade/rollback matrix |
 | Wine/Proton selection | Wine adapter plus UMU gaming adapter | Automatic game classification and positive Vulkan-PC test |
 | Built-in Gaming Mode | Vulkan doctor, GameMode/UMU adapter and Debian Steam bootstrap | Per-game profiles and positive DXVK/VKD3D test |
@@ -23,6 +23,6 @@ firmware management, printers, scanning, disk tools and Microsoft-compatible
 metric fonts. Debian's Steam bootstrap and controller rules are included.
 LibreOffice is explicitly excluded.
 
-SoftMaker FreeOffice 2024 is the selected office direction. ECZOS does not
-download or redistribute it until EasyComp Zeeland receives written permission
-from SoftMaker to preinstall it in a redistributable operating-system image.
+SoftMaker FreeOffice 2024 is the selected office suite. The next host batch
+installs it from SoftMaker's signed APT repository. Before public ISO release,
+the received permission scope and a pinned release artifact must be recorded.
