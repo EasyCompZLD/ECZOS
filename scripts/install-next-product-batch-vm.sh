@@ -13,7 +13,7 @@ grep -Fq '0.1.0~dev10' "$ROOT_DIR/packages/eczos-windows-core/debian/changelog" 
 }
 
 "$ROOT_DIR/scripts/configure-freeoffice-repository-vm.sh"
-apt-get install -y bubblewrap icoutils msitools xvfb xauth
+apt-get install -y bubblewrap icoutils wixl xvfb xauth
 "$ROOT_DIR/scripts/stage-platform-batch-vm.sh"
 "$ROOT_DIR/scripts/test-windows-msi-lifecycle-vm.sh"
 "$ROOT_DIR/scripts/audit-visible-branding-vm.sh"

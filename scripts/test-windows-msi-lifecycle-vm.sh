@@ -28,7 +28,7 @@ TEST_HOME=$(getent passwd "$TEST_USER" | awk -F: '{print $6}')
     exit 2
 }
 
-apt-get install -y bubblewrap icoutils msitools wine xvfb xauth
+apt-get install -y bubblewrap icoutils wine wixl xvfb xauth
 PE_SOURCE=$(find /usr/lib -type f -iname notepad.exe -print -quit 2>/dev/null || true)
 [[ -n "$PE_SOURCE" ]] || {
     printf 'Could not find Wine notepad.exe for the harmless MSI fixture.\n' >&2
