@@ -1,0 +1,23 @@
+.TH ECZOS-RECOVERY-MEDIA 1 "September 2026" "ECZOS" "Gebruikersopdrachten"
+.SH NAAM
+eczos-recovery-media \- maak een ECZOS-herstelmedium
+.SH GEBRUIK
+.B eczos-recovery-media
+.br
+.B eczos-recovery-media --self-test
+.SH BESCHRIJVING
+Opent een grafische wizard om een lokale ECZOS ISO- of IMG-kopie te schrijven
+naar een USB-stick of SD-kaart. Een opstartbare ISO kan ook naar cd, dvd of
+blu-ray worden gebrand. Een ingestelde HTTPS-catalogus biedt keuze uit actuele
+en oudere ECZOS-versies met SHA-256-controle.
+.PP
+Het gekozen medium wordt volledig gewist. De bevoorrechte schrijver weigert
+de systeemschijf en accepteert voor schijfkopieën alleen verwisselbare USB- of
+SD-apparaten.
+.SH BESTANDEN
+.I /etc/eczos/recovery-media.conf
+.br
+.I /var/lib/eczos-recovery-media/images
+.SH ZIE OOK
+.BR dd (1),
+.BR xorriso (1)

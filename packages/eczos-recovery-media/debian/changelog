@@ -1,0 +1,7 @@
+eczos-recovery-media (0.1.0~dev1) UNRELEASED; urgency=medium
+
+  * Add the first ECZOS recovery media creator.
+  * Support local images and an HTTPS catalog with SHA-256 checksums.
+  * Protect mounted and system disks in the privileged writer.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Tue, 08 Sep 2026 23:30:00 +0200

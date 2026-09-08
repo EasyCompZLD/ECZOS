@@ -16,6 +16,7 @@ Depends:
  dolphin-plugins,
  eczos-gaming-core (>= 0.1.0~dev2),
  eczos-platform-tools (>= 0.1.0~dev2),
+ eczos-recovery-media (>= 0.1.0~dev1),
  filelight,
  firefox-esr,
  flatpak,

@@ -1,0 +1,23 @@
+Source: eczos-recovery-media
+Section: utils
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-recovery-media
+Architecture: all
+Depends:
+ ${misc:Depends},
+ curl,
+ jq,
+ kdialog,
+ konsole,
+ pkexec,
+ xorriso
+Description: create ECZOS recovery media safely
+ Provides a graphical recovery-media creator for verified ECZOS images and a
+ privileged writer with system-disk protection. USB drives, SD cards and
+ optical media are supported.

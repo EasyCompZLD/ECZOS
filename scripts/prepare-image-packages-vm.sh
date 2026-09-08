@@ -26,6 +26,7 @@ PACKAGES=(
     eczos-windows-core
     eczos-gaming-core
     eczos-platform-tools
+    eczos-recovery-media
     eczos-desktop-apps
     eczos-desktop
 )

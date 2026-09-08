@@ -9,6 +9,7 @@ choice=$(kdialog --title 'ECZOS Instellingen' --menu 'Wat wil je beheren?' \
     gaming 'Gaming' \
     devices 'Apparaten en systeeminstellingen' \
     backup 'Back-up' \
+    recovery 'Herstelmedium maken' \
     phone 'Telefoon koppelen' \
     migration 'Overstappen vanaf Windows' \
     diagnostics 'Diagnose' \
@@ -22,6 +23,7 @@ case $choice in
     gaming) launch eczos-gaming manage ;;
     devices) launch systemsettings ;;
     backup) launch kcmshell6 kcm_kup ;;
+    recovery) launch eczos-recovery-media ;;
     phone) launch kdeconnect-app ;;
     migration) launch eczos-migrate ;;
     diagnostics) launch eczos-doctor --gui ;;

@@ -1,3 +1,9 @@
+eczos-platform-tools (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Add the recovery media creator to ECZOS Settings.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Tue, 08 Sep 2026 23:30:00 +0200
+
 eczos-platform-tools (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Report the installed state of the approved FreeOffice package.

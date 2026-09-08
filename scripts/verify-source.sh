@@ -38,6 +38,10 @@ for required in \
     packages/eczos-platform-tools/bin/eczos-migrate \
     packages/eczos-platform-tools/bin/eczos-support-report \
     packages/eczos-platform-tools/product/default-apps.json \
+    packages/eczos-recovery-media/debian/control \
+    packages/eczos-recovery-media/bin/eczos-recovery-media \
+    packages/eczos-recovery-media/lib/write-media \
+    packages/eczos-recovery-media/polkit/org.eczos.recoverymedia.policy \
     packages/eczos-desktop-apps/debian/control \
     packages/eczos-desktop/debian/control \
     scripts/configure-freeoffice-repository-vm.sh \

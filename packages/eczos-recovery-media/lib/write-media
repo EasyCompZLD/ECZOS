@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+die() { printf 'FOUT: %s\n' "$*" >&2; exit 1; }
+[[ $(id -u) -eq 0 ]] || die 'de schrijver moet via systeemauthenticatie als root draaien'
+[[ $# -eq 3 || ($# -eq 4 && $4 == --validate-only) ]] || die 'ongeldige aanroep'
+mode=$1
+image=$(realpath -e -- "$2")
+target=$(readlink -f -- "$3")
+validate_only=false
+[[ ${4:-} == --validate-only ]] && validate_only=true
+[[ -f $image && -r $image ]] || die 'de installatiekopie is niet leesbaar'
+[[ $target == /dev/* && -b $target ]] || die 'het doel is geen blokapparaat'
+
+top_disk() {
+    local node parent
+    node=$(readlink -f -- "$1")
+    while parent=$(lsblk -dnro PKNAME -- "$node" 2>/dev/null) && [[ -n $parent ]]; do
+        node=/dev/$parent
+    done
+    printf '%s\n' "$node"
+}
+
+root_source=$(findmnt -nro SOURCE /)
+root_disk=$(top_disk "$root_source")
+target_disk=$(top_disk "$target")
+[[ $target_disk != "$root_disk" ]] || die 'de systeemschijf wordt nooit overschreven'
+
+source_mount=$(findmnt -nro SOURCE --target "$image" 2>/dev/null || true)
+if [[ -n $source_mount && $source_mount == /dev/* ]]; then
+    [[ $(top_disk "$source_mount") != "$target_disk" ]] || \
+        die 'de installatiekopie staat op het gekozen doelmedium'
+fi
+
+case $mode in
+    disk)
+        [[ $(lsblk -dnro TYPE -- "$target") == disk ]] || die 'kies de volledige USB-schijf of SD-kaart'
+        removable=$(lsblk -dnro RM -- "$target")
+        transport=$(lsblk -dnro TRAN -- "$target" 2>/dev/null || true)
+        [[ $removable == 1 || $transport == usb || $transport == mmc || $target == /dev/mmcblk* ]] || \
+            die 'alleen een verwisselbare USB-schijf of SD-kaart is toegestaan'
+        image_size=$(stat -c %s -- "$image")
+        target_size=$(blockdev --getsize64 "$target")
+        (( target_size >= image_size )) || die 'het doelmedium is kleiner dan de installatiekopie'
+        if $validate_only; then
+            printf 'Validatie geslaagd: %s kan naar %s worden geschreven.\n' "$image" "$target"
+            exit 0
+        fi
+        while IFS= read -r child; do
+            if findmnt -rn -S "$child" >/dev/null 2>&1; then
+                umount -- "$child" || die "kan $child niet ontkoppelen"
+            fi
+        done < <(lsblk -lnpo NAME -- "$target")
+        printf 'Schrijven naar %s. Dit kan enige tijd duren...\n' "$target"
+        dd if="$image" of="$target" bs=4M iflag=fullblock conv=fsync status=progress
+        sync
+        blockdev --rereadpt "$target" 2>/dev/null || true
+        ;;
+    dvd)
+        [[ $(lsblk -dnro TYPE -- "$target") == rom ]] || die 'het doel is geen optisch station'
+        if $validate_only; then
+            printf 'Validatie geslaagd: %s kan naar %s worden gebrand.\n' "$image" "$target"
+            exit 0
+        fi
+        printf 'Branden naar %s. Dit kan enige tijd duren...\n' "$target"
+        xorriso -as cdrecord -v dev="$target" blank=as_needed -eject "$image"
+        ;;
+    *) die 'onbekend mediatype' ;;
+esac
+printf '\nKlaar. Het ECZOS-herstelmedium is geschreven en kan veilig worden verwijderd.\n'

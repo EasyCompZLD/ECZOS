@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ECZOS Herstelmedium maken
+Comment=Schrijf een ECZOS-installatiekopie naar USB, SD-kaart of dvd
+Exec=eczos-recovery-media
+Icon=drive-removable-media
+Terminal=false
+Categories=System;
+Keywords=ECZOS;herstel;recovery;USB;SD;dvd;ISO;

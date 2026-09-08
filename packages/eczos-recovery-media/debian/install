@@ -1,0 +1,5 @@
+applications/*.desktop usr/share/applications/
+bin/* usr/bin/
+config/* etc/eczos/
+lib/* usr/lib/eczos-recovery-media/
+polkit/* usr/share/polkit-1/actions/

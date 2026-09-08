@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod 0644 debian/eczos-recovery-media/etc/eczos/recovery-media.conf
+	chmod 0644 debian/eczos-recovery-media/usr/share/polkit-1/actions/org.eczos.recoverymedia.policy

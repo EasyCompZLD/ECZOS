@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+APP_TITLE='ECZOS Herstelmedium maken'
+CONFIG=/etc/eczos/recovery-media.conf
+WRITER=/usr/lib/eczos-recovery-media/write-media
+IMAGE_LIBRARY=/var/lib/eczos-recovery-media/images
+CACHE_DIR=${XDG_CACHE_HOME:-"$HOME/.cache"}/eczos/recovery-media
+mkdir -p "$CACHE_DIR"
+die_gui() { kdialog --error "$*" --title "$APP_TITLE" 2>/dev/null || printf 'FOUT: %s\n' "$*" >&2; exit 1; }
+
+if [[ ${1:-} == --self-test ]]; then
+    for command_name in curl jq kdialog konsole lsblk sha256sum xorriso pkexec; do
+        command -v "$command_name" >/dev/null || { echo "missing: $command_name"; exit 1; }
+    done
+    [[ -x $WRITER ]] || { echo "missing: $WRITER"; exit 1; }
+    echo 'ECZOS recovery media self-test passed'
+    exit 0
+fi
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    printf 'Gebruik: eczos-recovery-media [--self-test]\n'
+    exit 0
+fi
+[[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] || { echo 'Een grafische sessie is vereist.' >&2; exit 1; }
+[[ $(id -u) -ne 0 ]] || die_gui 'Start deze app als de ingelogde gebruiker, niet als root.'
+
+catalog_url=''
+if [[ -r $CONFIG ]]; then
+    catalog_url=$(awk -F= '$1 == "CatalogURL" {sub(/^[^=]*=/, ""); print; exit}' "$CONFIG")
+fi
+
+pick_local_image() {
+    local start_dir=$HOME
+    compgen -G "$IMAGE_LIBRARY/*" >/dev/null && start_dir=$IMAGE_LIBRARY
+    kdialog --getopenfilename "$start_dir" '*.iso *.img|Installatiekopieën (*.iso *.img)' --title "$APP_TITLE" || true
+}
+
+download_release() {
+    local catalog choice release_json version url expected safe_version output
+    [[ $catalog_url == https://* ]] || die_gui 'De ECZOS-downloadcatalogus is nog niet ingesteld. Kies voorlopig een lokale ISO.'
+    catalog="$CACHE_DIR/releases.json"
+    curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+        --output "$catalog.tmp" "$catalog_url" || die_gui 'De ECZOS-downloadcatalogus kon niet worden opgehaald.'
+    jq -e '.schema == 1 and (.releases | type == "array")' "$catalog.tmp" >/dev/null || \
+        die_gui 'De downloadcatalogus heeft een ongeldig formaat.'
+    mv "$catalog.tmp" "$catalog"
+    mapfile -t menu < <(jq -r '.releases | sort_by(.published // "") | reverse | .[] | select(.url|startswith("https://")) |
+        [.version, (.version + " — " + (.channel // "release") + " — " + (.published // "datum onbekend"))] | @tsv' "$catalog")
+    ((${#menu[@]})) || die_gui 'De downloadcatalogus bevat geen bruikbare versies.'
+    args=()
+    for row in "${menu[@]}"; do args+=("${row%%$'\t'*}" "${row#*$'\t'}"); done
+    choice=$(kdialog --menu 'Kies de gewenste ECZOS-versie:' "${args[@]}" --title "$APP_TITLE" || true)
+    [[ -n $choice ]] || exit 0
+    release_json=$(jq -cer --arg version "$choice" '.releases[] | select(.version == $version)' "$catalog" | head -n1)
+    version=$(jq -r .version <<<"$release_json")
+    url=$(jq -r .url <<<"$release_json")
+    expected=$(jq -r .sha256 <<<"$release_json")
+    [[ $url == https://* && $expected =~ ^[0-9a-fA-F]{64}$ ]] || die_gui 'Deze catalogusvermelding is niet veilig bruikbaar.'
+    safe_version=$(tr -cd 'A-Za-z0-9._-' <<<"$version")
+    [[ -n $safe_version ]] || die_gui 'Ongeldige versienaam in de catalogus.'
+    output="$CACHE_DIR/ECZOS-${safe_version}.iso"
+    if [[ ! -f $output ]] || ! printf '%s  %s\n' "$expected" "$output" | sha256sum -c --status; then
+        kdialog --passivepopup "ECZOS $version wordt gedownload…" 8 --title "$APP_TITLE" || true
+        curl --fail --location --proto '=https' --tlsv1.2 --output "$output.part" "$url" || {
+            rm -f "$output.part"; die_gui 'Downloaden van de installatiekopie is mislukt.'; }
+        printf '%s  %s\n' "$expected" "$output.part" | sha256sum -c --status || {
+            rm -f "$output.part"; die_gui 'De SHA-256-controle van de download is mislukt.'; }
+        mv "$output.part" "$output"
+    fi
+    printf '%s\n' "$output"
+}
+
+source_choice=$(kdialog --menu 'Welke installatiekopie wil je gebruiken?' \
+    local 'Lokale ISO kiezen' \
+    download 'Meest recente of oudere ECZOS-versie downloaden' \
+    --title "$APP_TITLE" || true)
+case $source_choice in
+    local) image=$(pick_local_image) ;;
+    download) image=$(download_release) ;;
+    *) exit 0 ;;
+esac
+[[ -n ${image:-} ]] || exit 0
+image=$(realpath -e -- "$image")
+[[ -f $image && -r $image && ($image == *.iso || $image == *.img) ]] || \
+    die_gui 'Kies een leesbaar ISO- of IMG-bestand.'
+
+media_type=$(kdialog --menu 'Naar welk soort medium wil je schrijven?' \
+    disk 'USB-stick of SD-kaart' dvd 'Cd, dvd of blu-ray' --title "$APP_TITLE" || true)
+[[ -n $media_type ]] || exit 0
+if [[ $media_type == dvd ]]; then
+    [[ $image == *.iso ]] || die_gui 'Een dvd kan alleen vanuit een ISO-bestand worden gebrand.'
+    xorriso -indev "$image" -report_el_torito plain >/dev/null 2>&1 || \
+        die_gui 'Dit bestand is geen bruikbare opstartbare ISO.'
+elif [[ $image == *.iso ]]; then
+    xorriso -indev "$image" -report_el_torito plain >/dev/null 2>&1 || \
+        die_gui 'Dit bestand is geen bruikbare opstartbare ISO.'
+fi
+
+mapfile -t device_rows < <(lsblk -Jpo NAME,TYPE,SIZE,MODEL,TRAN,RM | jq -r --arg mode "$media_type" '
+    .blockdevices[] |
+    select(
+        ($mode == "disk" and .type == "disk" and
+            (.rm == true or .rm == 1 or .tran == "usb" or .tran == "mmc" or (.name | startswith("/dev/mmcblk")))) or
+        ($mode == "dvd" and .type == "rom")
+    ) |
+    [
+        .name,
+        (((.model // (if $mode == "dvd" then "Optisch station" else "Onbekend apparaat" end)) |
+            gsub("[\\t\\r\\n]"; " ")) + " — " + (.size // "onbekende grootte") + " — " + .name)
+    ] | @tsv')
+((${#device_rows[@]})) || die_gui 'Geen geschikt verwisselbaar medium gevonden. Sluit het medium aan en probeer opnieuw.'
+args=()
+for row in "${device_rows[@]}"; do args+=("${row%%$'\t'*}" "${row#*$'\t'}"); done
+target=$(kdialog --menu 'Kies het doelmedium:' "${args[@]}" --title "$APP_TITLE" || true)
+[[ -n $target ]] || exit 0
+description=$(lsblk -dnro MODEL,SIZE -- "$target" | xargs)
+kdialog --warningyesno "ALLE GEGEVENS OP HET GEKOZEN MEDIUM WORDEN GEWIST.\n\nDoel: $target\nApparaat: $description\nBron: $image\n\nWil je doorgaan?" \
+    --yes-label 'Wissen en schrijven' --no-label 'Annuleren' --title "$APP_TITLE" || exit 0
+
+setsid -f konsole --hold -e pkexec "$WRITER" "$media_type" "$image" "$target" >/dev/null 2>&1
+kdialog --msgbox 'Het schrijfvenster is geopend. Sluit het pas nadat de melding “Klaar” verschijnt.' --title "$APP_TITLE"
