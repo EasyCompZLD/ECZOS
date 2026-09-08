@@ -11,7 +11,7 @@ lb config noauto \
     --architectures amd64 \
     --linux-flavours amd64 \
     --archive-areas "main contrib non-free non-free-firmware" \
-    --apt-options "-o APT::Get::Assume-Yes=true -o APT::Default-Release=trixie-security" \
+    --apt-options "-o APT::Get::Assume-Yes=true" \
     --binary-images iso-hybrid \
     --debian-installer live \
     --debian-installer-distribution trixie \
