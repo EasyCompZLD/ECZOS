@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for the development prototype on 2026-09-06.
+Superseded by ADR 0009 after the first hardware installation.
 
 ## Decision
 

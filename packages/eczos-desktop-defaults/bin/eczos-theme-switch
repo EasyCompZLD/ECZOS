@@ -64,6 +64,8 @@ fi
 lookandfeeltool -a "$LOOK_AND_FEEL"
 plasma-apply-colorscheme "$COLOR_SCHEME"
 plasma-apply-wallpaperimage --fill-mode preserveAspectCrop "$WALLPAPER"
+kwriteconfig6 --file ksplashrc --group KSplash --key Engine KSplashQML
+kwriteconfig6 --file ksplashrc --group KSplash --key Theme org.eczos.desktop
 
 WALLPAPER_URL="file://$WALLPAPER"
 kwriteconfig6 --file kscreenlockerrc \

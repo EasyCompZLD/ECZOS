@@ -1,0 +1,38 @@
+---
+componentName: eczos
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 980px,680px
+windowPlacement: center
+
+strings:
+    productName: EasyComp Zeeland Operating System
+    shortProductName: ECZOS
+    version: Development
+    shortVersion: Dev
+    versionedName: ECZOS Development
+    shortVersionedName: ECZOS Dev
+    bootloaderEntryName: ECZOS
+    productUrl: https://easycompzeeland.nl/
+    supportUrl: https://easycompzeeland.nl/
+    knownIssuesUrl: https://easycompzeeland.nl/
+    releaseNotesUrl: https://easycompzeeland.nl/
+
+sidebar: widget
+navigation: widget
+
+images:
+    productLogo: eczos-logo.png
+    productIcon: eczos-logo.png
+    productWelcome: eczos-welcome.png
+
+slideshow: show.qml
+
+style:
+    SidebarBackground: "#071829"
+    SidebarText: "#d7e9f8"
+    SidebarTextCurrent: "#ffffff"
+    SidebarBackgroundCurrent: "#0f69a8"
+
+slideshowAPI: 2

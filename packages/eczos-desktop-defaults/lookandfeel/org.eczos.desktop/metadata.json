@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Id": "org.eczos.desktop",
+        "Name": "ECZOS",
+        "Description": "EasyComp Zeeland Operating System startup experience",
+        "Version": "0.1.0",
+        "License": "Proprietary",
+        "Authors": [
+            {
+                "Name": "EasyComp Zeeland",
+                "Email": "support@easycompzeeland.nl"
+            }
+        ]
+    }
+}

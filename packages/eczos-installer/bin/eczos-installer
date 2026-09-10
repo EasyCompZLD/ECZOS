@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+if [ ! -e /run/live/medium ]; then
+    printf 'ECZOS installeren is alleen beschikbaar vanuit het live-systeem.\n' >&2
+    exit 1
+fi
+
+if [ "${1:-}" = --auto ] && ! grep -qw eczos-installer /proc/cmdline; then
+    exit 0
+fi
+
+FSTAB_MOVED=false
+cleanup() {
+    xhost -si:localuser:root >/dev/null 2>&1 || true
+    if $FSTAB_MOVED && [ -e /etc/fstab.orig.eczos-installer ]; then
+        sudo mv /etc/fstab.orig.eczos-installer /etc/fstab
+    fi
+}
+trap cleanup EXIT HUP INT TERM
+
+if [ -e /etc/fstab ]; then
+    sudo mv /etc/fstab /etc/fstab.orig.eczos-installer
+    FSTAB_MOVED=true
+fi
+
+export QT_AUTO_SCREEN_SCALE_FACTOR=1
+xhost +si:localuser:root >/dev/null
+pkexec calamares

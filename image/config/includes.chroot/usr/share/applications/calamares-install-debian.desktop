@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Debian installer (verborgen)
+Exec=/bin/true
+Hidden=true
+NoDisplay=true

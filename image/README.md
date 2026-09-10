@@ -5,8 +5,12 @@ ECZOS development image. It is generated from Debian 13 (Trixie), the official
 KDE live task and the ECZOS Debian packages in this repository. Nothing is
 copied from the historical workstation overlay.
 
-The prototype uses Debian Installer in live mode plus its desktop launcher.
-Calamares remains a separate future decision.
+The hardware-qualification image uses Debian's Calamares engine with ECZOS-owned
+branding, launchers and configuration. Both GRUB choices enter the same live
+filesystem: `ECZOS proberen` opens the desktop, while `ECZOS installeren`
+automatically starts Calamares. Debian Installer is not embedded. Calamares
+creates the installed user in the `sudo` group and removes live-only installer
+packages from the target.
 
 The build pipeline is prepared but intentionally blocked by `BUILD_BLOCKED.md`
 until the desktop branding and first ECZ Windows MVP gates pass. After that file

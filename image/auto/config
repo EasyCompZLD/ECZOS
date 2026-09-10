@@ -13,9 +13,7 @@ lb config noauto \
     --archive-areas "main contrib non-free non-free-firmware" \
     --apt-options "-o APT::Get::Assume-Yes=true" \
     --binary-images iso-hybrid \
-    --debian-installer live \
-    --debian-installer-distribution trixie \
-    --debian-installer-gui true \
+    --debian-installer none \
     --bootappend-live "boot=live components quiet splash username=eczos user-fullname=ECZOS hostname=eczos-live" \
     --iso-application "$ISO_APPLICATION" \
     --iso-preparer "EasyComp Zeeland" \

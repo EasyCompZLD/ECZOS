@@ -1,0 +1,26 @@
+Source: eczos-oobe
+Section: kde
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-oobe
+Architecture: all
+Depends:
+ ${misc:Depends},
+ eczos-branding,
+ eczos-desktop-defaults,
+ eczos-platform-tools,
+ python3-pyside6.qtcore,
+ python3-pyside6.qtgui,
+ python3-pyside6.qtqml,
+ qml6-module-qtmultimedia,
+ qml6-module-qtquick,
+ qml6-module-qtquick-controls,
+ qml6-module-qtquick-layouts
+Description: ECZOS first-boot welcome and setup experience
+ Guides a new user through appearance, migration, privacy and the primary
+ ECZOS features. Intro music starts enabled and can be muted immediately.

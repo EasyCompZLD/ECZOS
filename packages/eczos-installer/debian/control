@@ -1,0 +1,23 @@
+Source: eczos-installer
+Section: admin
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-installer
+Architecture: all
+Depends:
+ ${misc:Depends},
+ calamares,
+ calamares-settings-debian,
+ eczos-branding,
+ policykit-1,
+ x11-xserver-utils,
+ xdg-user-dirs
+Description: ECZOS live-system installer presentation
+ Provides the ECZOS launcher, branding and live-session integration around the
+ Debian-supported Calamares installation engine. This package is present only
+ in installation media and removes itself from the installed target.

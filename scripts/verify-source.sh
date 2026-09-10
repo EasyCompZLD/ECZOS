@@ -45,10 +45,20 @@ for required in \
     packages/eczos-recovery-media/polkit/org.eczos.recoverymedia.policy \
     packages/eczos-desktop-apps/debian/control \
     packages/eczos-desktop/debian/control \
+    packages/eczos-installer/debian/control \
+    packages/eczos-installer/bin/eczos-installer \
+    packages/eczos-installer/branding/eczos/branding.desc \
+    packages/eczos-oobe/debian/control \
+    packages/eczos-oobe/bin/eczos-oobe \
+    packages/eczos-oobe/qml/Main.qml \
+    packages/eczos-oobe/assets/ambient-loop.mp4 \
+    packages/eczos-oobe/assets/new-dawn.m4a \
+    packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/Splash.qml \
+    packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/eczos-startup.mp4 \
     image/config/bootloaders/grub-pc/grub.cfg \
     image/config/bootloaders/grub-pc/live-theme/theme.txt \
     image/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session \
-    image/config/includes.chroot/usr/share/applications/debian-installer-launcher.desktop \
+    image/config/includes.chroot/etc/calamares/settings.conf \
     scripts/configure-freeoffice-repository-vm.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \
@@ -58,6 +68,7 @@ for required in \
     scripts/resume-hardware-qualification-image-vm.sh \
     scripts/build-hardware-qualification-image-vm.sh \
     scripts/build-isolated-hardware-image-vm.sh \
+    scripts/stage-prebuild-experience-vm.sh \
     scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
@@ -68,6 +79,13 @@ done < <(find "$ROOT_DIR/image/config/hooks" -type f -name '*.hook.chroot' -prin
 
 sh -n "$ROOT_DIR/image/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session" || \
     fail 'invalid ECZOS live-session configuration script'
+
+python3 - "$ROOT_DIR/packages/eczos-oobe/bin/eczos-oobe" <<'PY' || \
+    fail 'invalid ECZOS OOBE Python source'
+import pathlib
+import sys
+compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
+PY
 
 if [[ $(find "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images" -maxdepth 1 \
     -type f -name 'animation-*.png' | wc -l | tr -d ' ') -ne 12 ]]; then
@@ -86,6 +104,9 @@ for asset in \
 done
 
 while IFS= read -r script; do
+    if head -n 1 "$script" | grep -q 'python3'; then
+        continue
+    fi
     bash -n "$script" || fail "invalid shell syntax: ${script#"$ROOT_DIR/"}"
 done < <(find "$ROOT_DIR/scripts" "$ROOT_DIR/tests" "$ROOT_DIR/packages" \
     -type f \( -name '*.sh' -o -path '*/bin/*' -o -path '*/lib/*' \) -print)

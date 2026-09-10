@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=ECZOS automatische installerstart
+Exec=eczos-installer --auto
+NoDisplay=true
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=2

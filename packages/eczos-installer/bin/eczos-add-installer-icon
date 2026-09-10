@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+[ -e /run/live/medium ] || exit 0
+DESKTOP=$(xdg-user-dir DESKTOP)
+mkdir -p "$DESKTOP"
+install -m 0755 /usr/share/applications/org.eczos.Installer.desktop \
+    "$DESKTOP/ECZOS-installeren.desktop"

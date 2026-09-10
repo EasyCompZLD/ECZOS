@@ -1,0 +1,5 @@
+eczos-oobe (0.1.0~dev1) UNRELEASED; urgency=medium
+
+  * Add the first native ECZOS OOBE with video and optional mute control.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Thu, 10 Sep 2026 18:00:00 +0200

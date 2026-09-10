@@ -23,9 +23,10 @@
 - [x] hardware-qualification ISO boot and installation on the Vulkan-capable game PC
 - [ ] qualify the explicit `eczos` / `live` live identity and live-only no-lock policy on a new ISO
 - [ ] qualify the ECZOS GRUB live menu and existing dark wallpaper on BIOS and UEFI
-- [ ] replace Debian Installer internal product names, artwork and visible Debian-specific copy
-- [ ] add the ECZOS Plasma startup splash from approved animation assets
-- [ ] implement the ECZOS first-boot OOBE, including reviewed intro audio
+- [ ] qualify the ECZOS-branded Calamares installation path and USP slideshow
+- [ ] qualify the ECZOS Plasma startup splash from the approved animation asset
+- [ ] qualify the ECZOS first-boot OOBE with default-on, user-mutable intro audio
+- [ ] qualify Calamares-created users as password-authenticated sudo members
 - UEFI VM boot, install, upgrade and removal tests
 
 ## Phase 2 — ECZ Windows MVP

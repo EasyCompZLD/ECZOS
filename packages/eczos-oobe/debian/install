@@ -1,0 +1,6 @@
+bin/eczos-oobe usr/bin/
+qml/Main.qml usr/share/eczos/oobe/
+assets/ambient-loop.mp4 usr/share/eczos/oobe/assets/
+assets/new-dawn.m4a usr/share/eczos/oobe/assets/
+applications/org.eczos.Oobe.desktop usr/share/applications/
+xdg/org.eczos.OobeFirstRun.desktop etc/xdg/autostart/

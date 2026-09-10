@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ECZOS eerste configuratie
+Exec=eczos-oobe --autostart
+Icon=eczos-start
+Terminal=false
+NoDisplay=true
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=2

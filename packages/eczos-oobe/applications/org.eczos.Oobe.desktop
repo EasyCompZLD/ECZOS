@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Welkom bij ECZOS
+GenericName=ECZOS welkomstassistent
+Comment=Ontdek en configureer de belangrijkste ECZOS-functies
+Exec=eczos-oobe
+Icon=eczos-start
+Terminal=false
+Categories=Settings;System;
+StartupNotify=true

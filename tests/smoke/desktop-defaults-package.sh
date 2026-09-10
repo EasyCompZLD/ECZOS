@@ -19,6 +19,10 @@ grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
 grep -F 'START_ICON=eczos-start-dark' /usr/bin/eczos-theme-switch
 grep -F 'START_ICON=eczos-start-light' /usr/bin/eczos-theme-switch
 grep -F 'kscreenlockerrc' /usr/bin/eczos-theme-switch
+grep -F 'org.eczos.desktop' /usr/bin/eczos-theme-switch
+test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/metadata.json
+test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/Splash.qml
+test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/eczos-startup.mp4
 for wallpaper in \
     eczoswallpaper.png \
     eczoswallpaper-light.png \

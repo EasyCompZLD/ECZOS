@@ -1,7 +1,8 @@
 live-task-kde
 live-task-localisation
 live-task-localisation-desktop
-debian-installer-launcher
+calamares
+calamares-settings-debian
 linux-image-amd64
 network-manager
 plymouth

@@ -12,26 +12,33 @@ for required in \
     config/hooks/normal/0090-eczos-product-policy.hook.chroot \
     config/hooks/normal/0100-eczos-image-policy.hook.chroot \
     config/bootloaders/grub-pc/grub.cfg \
-    config/bootloaders/grub-pc/install_gui.cfg \
-    config/bootloaders/grub-pc/install_start_gui.cfg \
     config/bootloaders/grub-pc/live-theme/theme.txt \
+    config/includes.chroot/etc/calamares/settings.conf \
+    config/includes.chroot/etc/calamares/modules/users.conf \
+    config/includes.chroot/etc/calamares/modules/packages.conf \
+    config/includes.chroot/etc/calamares/modules/bootloader.conf \
     config/includes.chroot/etc/default/grub.d/90-eczos-plymouth.cfg \
     config/includes.chroot/usr/lib/live/config/1095-eczos-live-session \
-    config/includes.chroot/usr/share/applications/debian-installer-launcher.desktop \
+    config/includes.chroot/usr/share/applications/calamares-install-debian.desktop \
     config/includes.chroot/etc/apt/sources.list.d/softmaker.list \
     config/includes.chroot/usr/share/keyrings/softmaker-archive-keyring.asc; do
     test -s "$IMAGE_DIR/$required"
 done
 
 grep -Fx 'live-task-kde' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
-grep -Fx 'debian-installer-launcher' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
+grep -Fx 'calamares' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
+grep -Fx 'calamares-settings-debian' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
+if grep -Fx 'debian-installer-launcher' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"; then
+    printf 'Debian Installer launcher must not be present in the ECZOS image.\n' >&2
+    exit 1
+fi
 grep -Fx 'linux-image-amd64' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
 grep -Fx 'mesa-vulkan-drivers:i386' "$IMAGE_DIR/config/package-lists/eczos-desktop.list.chroot"
 grep -F 'apt-get purge -y' "$IMAGE_DIR/config/hooks/normal/0090-eczos-product-policy.hook.chroot"
 grep -F 'flatpak remote-add --system' "$IMAGE_DIR/config/hooks/normal/0090-eczos-product-policy.hook.chroot"
 grep -F -- '--distribution trixie' "$IMAGE_DIR/auto/config"
 grep -F -- '--archive-areas "main contrib non-free non-free-firmware"' "$IMAGE_DIR/auto/config"
-grep -F -- '--debian-installer live' "$IMAGE_DIR/auto/config"
+grep -F -- '--debian-installer none' "$IMAGE_DIR/auto/config"
 grep -F -- 'quiet splash' "$IMAGE_DIR/auto/config"
 grep -F -- 'username=eczos user-fullname=ECZOS hostname=eczos-live' \
     "$IMAGE_DIR/auto/config"
@@ -41,8 +48,14 @@ grep -F 'menuentry "ECZOS proberen"' \
     "$IMAGE_DIR/config/bootloaders/grub-pc/grub.cfg"
 grep -F 'menuentry "ECZOS installeren"' \
     "$IMAGE_DIR/config/bootloaders/grub-pc/grub.cfg"
-grep -Fx 'Name=ECZOS installeren' \
-    "$IMAGE_DIR/config/includes.chroot/usr/share/applications/debian-installer-launcher.desktop"
+grep -Fx 'branding: eczos' \
+    "$IMAGE_DIR/config/includes.chroot/etc/calamares/settings.conf"
+grep -Fx '  - sudo' \
+    "$IMAGE_DIR/config/includes.chroot/etc/calamares/modules/users.conf"
+grep -Fx 'efiBootloaderId: ECZOS' \
+    "$IMAGE_DIR/config/includes.chroot/etc/calamares/modules/bootloader.conf"
+grep -Fx '      - eczos-installer' \
+    "$IMAGE_DIR/config/includes.chroot/etc/calamares/modules/packages.conf"
 grep -Fx 'plymouth-set-default-theme eczos' \
     "$IMAGE_DIR/config/hooks/normal/0100-eczos-image-policy.hook.chroot"
 grep -F 'softmaker-archive-keyring.asc' \

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Uitgeschakelde Debian installer-snelkoppeling
+Exec=/bin/true
+Hidden=true
+NoDisplay=true

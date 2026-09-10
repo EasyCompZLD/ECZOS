@@ -2,3 +2,4 @@ bin/eczos-theme-switch usr/bin/
 bin/eczos-theme-toggle usr/bin/
 lib/apply-desktop-defaults usr/lib/eczos/
 xdg/eczos-desktop-first-run.desktop etc/xdg/autostart/
+lookandfeel/org.eczos.desktop usr/share/plasma/look-and-feel/

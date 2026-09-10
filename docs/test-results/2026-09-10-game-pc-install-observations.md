@@ -46,7 +46,20 @@ host and must not enter the ECZOS desktop image.
 - Build a native ECZOS first-boot OOBE instead of relying on scattered first-run
   defaults.
 - Review and integrate the OOBE intro audio/video assets under `Assets/Oobe/`.
-  Playback must remain optional and respect mute/accessibility choices.
+  Music starts enabled and must expose an immediate mute control.
+
+## Pre-build experience batch
+
+Source now replaces the embedded Debian Installer path with Debian Trixie's
+Calamares engine and ECZOS-owned branding and launchers. `ECZOS installeren` in
+GRUB boots the regular live system with an automatic installer flag. Calamares
+shows rotating ECZOS USP slides during installation, creates the installed user
+in the `sudo` group and removes itself plus live-only packages from the target.
+
+The approved refined animation is packaged as the Plasma startup splash. The
+first-boot OOBE uses the approved ambient loop and starts `New Dawn` audio by
+default; a clearly labelled mute control remains available throughout the OOBE.
+Hardware and fresh-user qualification remain pending.
 
 Assets currently present:
 

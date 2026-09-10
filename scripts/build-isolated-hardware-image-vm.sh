@@ -77,7 +77,8 @@ test -s live-image-amd64.hybrid.iso
 test -s binary/live/filesystem.squashfs
 compgen -G 'binary/live/vmlinuz*' >/dev/null
 compgen -G 'binary/live/initrd*' >/dev/null
-for package in eczos-desktop softmaker-freeoffice-2024 wine64; do
+for package in eczos-desktop eczos-oobe eczos-installer calamares \
+    softmaker-freeoffice-2024 wine64; do
     grep -q "^${package}[[:space:]:]" binary/live/filesystem.packages
 done
 xorriso -indev live-image-amd64.hybrid.iso -report_el_torito plain \

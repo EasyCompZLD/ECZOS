@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=ECZOS installer-snelkoppeling
+Exec=eczos-add-installer-icon
+NoDisplay=true
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=1

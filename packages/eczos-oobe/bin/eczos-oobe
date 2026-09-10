@@ -1,0 +1,55 @@
+#!/usr/bin/python3
+import os
+import sys
+from pathlib import Path
+
+from PySide6.QtCore import QObject, QProcess, QUrl, Slot
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtQml import QQmlApplicationEngine
+
+
+STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "eczos"
+MARKER = STATE_DIR / "oobe-complete-v1"
+AUTOSTART = "--autostart" in sys.argv
+
+
+if AUTOSTART and (MARKER.exists() or Path("/run/live/medium").exists()):
+    raise SystemExit(0)
+
+
+class OobeBridge(QObject):
+    @Slot(str)
+    def setTheme(self, mode):
+        if mode in {"auto", "light", "dark"}:
+            QProcess.startDetached("/usr/bin/eczos-theme-switch", [mode])
+
+    @Slot()
+    def openMigration(self):
+        QProcess.startDetached("/usr/bin/eczos-migrate", [])
+
+    @Slot()
+    def openControlCenter(self):
+        QProcess.startDetached("/usr/bin/eczos-control-center", [])
+
+    @Slot()
+    def finish(self):
+        STATE_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
+        MARKER.write_text("completed=true\n", encoding="utf-8")
+        MARKER.chmod(0o600)
+        QGuiApplication.quit()
+
+
+app = QGuiApplication(sys.argv)
+app.setOrganizationName("EasyComp Zeeland")
+app.setOrganizationDomain("easycompzeeland.nl")
+app.setApplicationName("ECZOS OOBE")
+
+engine = QQmlApplicationEngine()
+bridge = OobeBridge()
+engine.rootContext().setContextProperty("oobe", bridge)
+engine.load(QUrl.fromLocalFile("/usr/share/eczos/oobe/Main.qml"))
+
+if not engine.rootObjects():
+    raise SystemExit(1)
+
+raise SystemExit(app.exec())
