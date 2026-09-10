@@ -1,0 +1,31 @@
+#!/bin/sh
+set -eu
+
+MARKER=/var/lib/live/config/eczos-live-session
+[ -e "$MARKER" ] && exit 0
+
+LIVE_USERNAME=eczos
+for parameter in $(cat /proc/cmdline); do
+    case "$parameter" in
+        live-config.username=*|username=*)
+            LIVE_USERNAME=${parameter#*username=}
+            ;;
+    esac
+done
+
+HOME_DIR=$(getent passwd "$LIVE_USERNAME" | cut -d: -f6)
+[ -n "$HOME_DIR" ] || exit 0
+LIVE_GROUP=$(id -gn "$LIVE_USERNAME")
+
+install -d -m 0700 -o "$LIVE_USERNAME" -g "$LIVE_GROUP" "$HOME_DIR/.config"
+cat > "$HOME_DIR/.config/kscreenlockerrc" <<'EOF'
+[Daemon]
+Autolock=false
+LockOnResume=false
+Timeout=0
+EOF
+chown "$LIVE_USERNAME:$LIVE_GROUP" "$HOME_DIR/.config/kscreenlockerrc"
+chmod 0600 "$HOME_DIR/.config/kscreenlockerrc"
+
+install -d -m 0755 /var/lib/live/config
+touch "$MARKER"

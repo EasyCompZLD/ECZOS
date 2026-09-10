@@ -45,6 +45,10 @@ for required in \
     packages/eczos-recovery-media/polkit/org.eczos.recoverymedia.policy \
     packages/eczos-desktop-apps/debian/control \
     packages/eczos-desktop/debian/control \
+    image/config/bootloaders/grub-pc/grub.cfg \
+    image/config/bootloaders/grub-pc/live-theme/theme.txt \
+    image/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session \
+    image/config/includes.chroot/usr/share/applications/debian-installer-launcher.desktop \
     scripts/configure-freeoffice-repository-vm.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \
@@ -61,6 +65,9 @@ done
 while IFS= read -r hook; do
     sh -n "$hook" || fail "invalid image hook syntax: ${hook#"$ROOT_DIR/"}"
 done < <(find "$ROOT_DIR/image/config/hooks" -type f -name '*.hook.chroot' -print)
+
+sh -n "$ROOT_DIR/image/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session" || \
+    fail 'invalid ECZOS live-session configuration script'
 
 if [[ $(find "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images" -maxdepth 1 \
     -type f -name 'animation-*.png' | wc -l | tr -d ' ') -ne 12 ]]; then

@@ -1,0 +1,48 @@
+desktop-image: "../splash.png"
+title-color: "#ffffff"
+title-font: "Unifont Regular 18"
+title-text: "EasyComp Zeeland Operating System"
+message-font: "Unifont Regular 16"
+terminal-font: "Unifont Regular 16"
+
++ label {
+    top = 100%-48
+    left = 0
+    width = 100%
+    height = 20
+    text = "@KEYMAP_SHORT@"
+    align = "center"
+    color = "#ffffff"
+    font = "Unifont Regular 16"
+}
+
++ boot_menu {
+    left = 10%
+    width = 80%
+    top = 52%
+    height = 48%-80
+    item_color = "#c7d2e0"
+    item_font = "Unifont Regular 16"
+    selected_item_color = "#ffffff"
+    selected_item_font = "Unifont Regular 16"
+    item_height = 18
+    item_padding = 2
+    item_spacing = 5
+    icon_width = 0
+    icon_height = 0
+    item_icon_space = 0
+}
+
++ progress_bar {
+    id = "__timeout__"
+    left = 15%
+    top = 100%-76
+    height = 16
+    width = 70%
+    font = "Unifont Regular 16"
+    text_color = "#ffffff"
+    fg_color = "#2787d9"
+    bg_color = "#263746"
+    border_color = "#ffffff"
+    text = "@TIMEOUT_NOTIFICATION_LONG@"
+}

@@ -17,6 +17,12 @@ system. Windows integration tests were reported successful after installation.
 - The next image must explicitly define the live identity and disable automatic
   screen locking for the live installation session. Installed-user lock policy
   must remain a separate setting.
+- Source now defines the live account as `eczos` with the standard live password
+  `live`, creates a live-account-only Plasma no-lock configuration, brands the
+  live GRUB menu with the existing ECZOS dark wallpaper and replaces the
+  desktop installer launcher's Debian-facing name and icon. A new ISO must still
+  qualify these changes; the installer engine's internal screens remain a
+  separate branding task.
 - The installed image retained only the SoftMaker repository. Debian base,
   updates and security sources had to be restored manually. `eczos-release`
   dev5 now owns an `eczos-debian.sources` file for subsequent images.

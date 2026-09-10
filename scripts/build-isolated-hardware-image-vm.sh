@@ -40,9 +40,12 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Explicit input allowlist: no generated config/common, .build, chroot, binary,
 # bootstrap tree, APT indexes, or installer cache can enter the new run.
-for input in includes.chroot package-lists hooks; do
+for input in includes.chroot package-lists hooks bootloaders; do
     rsync -a --exclude='8*.hook.chroot' "$ROOT_DIR/image/config/$input" "$WORK_DIR/config/"
 done
+install -m 0644 \
+    "$ROOT_DIR/packages/eczos-branding/assets/wallpapers/eczoswallpaper-dark.png" \
+    "$WORK_DIR/config/bootloaders/grub-pc/splash.png"
 install -m 0755 "$ROOT_DIR/image/auto/config" "$RUN_DIR/configure-image"
 cd "$WORK_DIR"
 ECZOS_ISO_VOLUME=ECZOS_HWQUAL_AMD64 \

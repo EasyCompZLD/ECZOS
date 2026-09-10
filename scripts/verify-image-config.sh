@@ -11,7 +11,13 @@ for required in \
     config/package-lists/eczos-desktop.list.chroot \
     config/hooks/normal/0090-eczos-product-policy.hook.chroot \
     config/hooks/normal/0100-eczos-image-policy.hook.chroot \
+    config/bootloaders/grub-pc/grub.cfg \
+    config/bootloaders/grub-pc/install_gui.cfg \
+    config/bootloaders/grub-pc/install_start_gui.cfg \
+    config/bootloaders/grub-pc/live-theme/theme.txt \
     config/includes.chroot/etc/default/grub.d/90-eczos-plymouth.cfg \
+    config/includes.chroot/usr/lib/live/config/1095-eczos-live-session \
+    config/includes.chroot/usr/share/applications/debian-installer-launcher.desktop \
     config/includes.chroot/etc/apt/sources.list.d/softmaker.list \
     config/includes.chroot/usr/share/keyrings/softmaker-archive-keyring.asc; do
     test -s "$IMAGE_DIR/$required"
@@ -27,6 +33,16 @@ grep -F -- '--distribution trixie' "$IMAGE_DIR/auto/config"
 grep -F -- '--archive-areas "main contrib non-free non-free-firmware"' "$IMAGE_DIR/auto/config"
 grep -F -- '--debian-installer live' "$IMAGE_DIR/auto/config"
 grep -F -- 'quiet splash' "$IMAGE_DIR/auto/config"
+grep -F -- 'username=eczos user-fullname=ECZOS hostname=eczos-live' \
+    "$IMAGE_DIR/auto/config"
+grep -Fx 'Autolock=false' \
+    "$IMAGE_DIR/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session"
+grep -F 'menuentry "ECZOS proberen"' \
+    "$IMAGE_DIR/config/bootloaders/grub-pc/grub.cfg"
+grep -F 'menuentry "ECZOS installeren"' \
+    "$IMAGE_DIR/config/bootloaders/grub-pc/grub.cfg"
+grep -Fx 'Name=ECZOS installeren' \
+    "$IMAGE_DIR/config/includes.chroot/usr/share/applications/debian-installer-launcher.desktop"
 grep -Fx 'plymouth-set-default-theme eczos' \
     "$IMAGE_DIR/config/hooks/normal/0100-eczos-image-policy.hook.chroot"
 grep -F 'softmaker-archive-keyring.asc' \

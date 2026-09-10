@@ -8,6 +8,11 @@ IMAGE_DIR="$ROOT_DIR/image"
 # live-build inputs so copied runtime data remains readable inside the image.
 find "$IMAGE_DIR/config/includes.chroot" -type d -exec chmod 0755 {} +
 find "$IMAGE_DIR/config/includes.chroot" -type f -exec chmod 0644 {} +
+if [[ -f "$IMAGE_DIR/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session" ]]; then
+    chmod 0755 "$IMAGE_DIR/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session"
+fi
+find "$IMAGE_DIR/config/bootloaders" -type d -exec chmod 0755 {} +
+find "$IMAGE_DIR/config/bootloaders" -type f -exec chmod 0644 {} +
 find "$IMAGE_DIR/config/package-lists" -type d -exec chmod 0755 {} +
 find "$IMAGE_DIR/config/package-lists" -type f -exec chmod 0644 {} +
 find "$IMAGE_DIR/config/hooks" -type d -exec chmod 0755 {} +

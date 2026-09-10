@@ -16,7 +16,7 @@ lb config noauto \
     --debian-installer live \
     --debian-installer-distribution trixie \
     --debian-installer-gui true \
-    --bootappend-live "boot=live components quiet splash" \
+    --bootappend-live "boot=live components quiet splash username=eczos user-fullname=ECZOS hostname=eczos-live" \
     --iso-application "$ISO_APPLICATION" \
     --iso-preparer "EasyComp Zeeland" \
     --iso-publisher "EasyComp Zeeland" \

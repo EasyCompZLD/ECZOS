@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=ECZOS installeren
+Name[nl]=ECZOS installeren
+GenericName=Besturingssysteem installeren
+GenericName[nl]=Besturingssysteem installeren
+Comment=Installeer EasyComp Zeeland Operating System op deze computer
+Comment[nl]=Installeer EasyComp Zeeland Operating System op deze computer
+Exec=su-to-root -X -c /usr/sbin/debian-installer-launcher
+Icon=eczos-start
+Type=Application
+Categories=System;
+StartupNotify=true
+Terminal=true

@@ -21,9 +21,9 @@
 - [x] versioned Debian 13 KDE live-build configuration
 - [x] first isolated ECZOS hardware-qualification ISO build
 - [x] hardware-qualification ISO boot and installation on the Vulkan-capable game PC
-- [ ] define the ECZOS live username/password and prevent automatic locking during installation
-- [ ] replace the remaining default GRUB live-boot artwork
-- [ ] replace Debian Installer product names, artwork and visible Debian-specific copy
+- [ ] qualify the explicit `eczos` / `live` live identity and live-only no-lock policy on a new ISO
+- [ ] qualify the ECZOS GRUB live menu and existing dark wallpaper on BIOS and UEFI
+- [ ] replace Debian Installer internal product names, artwork and visible Debian-specific copy
 - [ ] add the ECZOS Plasma startup splash from approved animation assets
 - [ ] implement the ECZOS first-boot OOBE, including reviewed intro audio
 - UEFI VM boot, install, upgrade and removal tests
