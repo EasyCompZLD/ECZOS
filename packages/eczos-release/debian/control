@@ -11,6 +11,7 @@ Package: eczos-release
 Architecture: all
 Depends:
  ${misc:Depends},
+ debian-archive-keyring,
  eczos-branding (>= 0.1.0~dev3)
 Description: ECZOS product release identity
  Provides machine-readable ECZOS product metadata and the eczos-info command

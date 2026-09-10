@@ -22,6 +22,7 @@ for required in \
     packages/eczos-desktop-defaults/debian/control \
     packages/eczos-desktop-defaults/lib/apply-desktop-defaults \
     packages/eczos-release/debian/control \
+    packages/eczos-release/apt/eczos-debian.sources \
     packages/eczos-release/lib/update-os-release \
     packages/eczos-release/release/eczos-release \
     packages/eczos-windows-core/debian/control \
