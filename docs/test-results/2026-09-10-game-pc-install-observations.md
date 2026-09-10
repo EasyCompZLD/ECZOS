@@ -1,8 +1,9 @@
 # Game-PC installation observations — 2026-09-10
 
-The first isolated hardware-qualification ISO was written successfully and
-booted on the Vulkan-capable game PC. Installation was still in progress when
-these observations were recorded, so this is not an installation pass result.
+The first isolated hardware-qualification ISO was written successfully, booted
+and installed on the Vulkan-capable game PC. The installed host is named
+`ECZ-GamePC` and now serves as the faster physical development and qualification
+system. Windows integration tests were reported successful after installation.
 
 ## Observed release gaps
 
@@ -16,6 +17,19 @@ these observations were recorded, so this is not an installation pass result.
 - The next image must explicitly define the live identity and disable automatic
   screen locking for the live installation session. Installed-user lock policy
   must remain a separate setting.
+- The installed image retained only the SoftMaker repository. Debian base,
+  updates and security sources had to be restored manually. `eczos-release`
+  dev5 now owns an `eczos-debian.sources` file for subsequent images.
+- The installed user was not a member of the `sudo` group. This was repaired on
+  the development host and remains an installer qualification check.
+
+## Development-host compatibility exception
+
+The requested Synergy 1.10.1 USB package predates Debian 13 and depends on
+`libssl1.1`. The host uses Debian's archived Bullseye security build
+`libssl1.1 1.1.1w-0+deb11u8` alongside the current OpenSSL runtime. No Bullseye
+repository was permanently added. This exception is local to the development
+host and must not enter the ECZOS desktop image.
 
 ## Planned experience work after Windows integration tests
 

@@ -20,7 +20,7 @@
 - [x] first-run state mechanism
 - [x] versioned Debian 13 KDE live-build configuration
 - [x] first isolated ECZOS hardware-qualification ISO build
-- [ ] hardware-qualification ISO boot and install on the Vulkan-capable game PC (installation in progress)
+- [x] hardware-qualification ISO boot and installation on the Vulkan-capable game PC
 - [ ] define the ECZOS live username/password and prevent automatic locking during installation
 - [ ] replace the remaining default GRUB live-boot artwork
 - [ ] replace Debian Installer product names, artwork and visible Debian-specific copy
