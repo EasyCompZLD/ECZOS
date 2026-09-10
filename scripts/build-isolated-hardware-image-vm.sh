@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# `su` without a login shell can retain a user PATH without /usr/sbin.  Keep
+# host build tools such as debootstrap reachable throughout nested lb stages.
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 [[ $(id -u) == 0 ]] || { echo 'Run as root on the Debian build host.' >&2; exit 2; }
 source /etc/os-release

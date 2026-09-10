@@ -1,3 +1,7 @@
 # /etc/os-release is intentionally an unowned compatibility symlink supplied
 # by Debian. ECZOS diverts and restores that exact symlink so removal is safe.
-eczos-release: diversion-for-unknown-file etc/os-release [preinst:*]
+eczos-release: package-uses-local-diversion [preinst:*]
+
+# ECZOS deliberately owns the Debian base repositories used by installed
+# systems, instead of leaving the temporary live-build source configuration.
+eczos-release: package-installs-apt-sources [etc/apt/sources.list.d/eczos-debian.sources]
