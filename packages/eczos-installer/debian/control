@@ -14,7 +14,8 @@ Depends:
  calamares,
  calamares-settings-debian,
  eczos-branding,
- policykit-1,
+ pkexec,
+ polkitd,
  x11-xserver-utils,
  xdg-user-dirs
 Description: ECZOS live-system installer presentation

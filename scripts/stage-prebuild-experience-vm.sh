@@ -14,7 +14,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-desktop-defaults eczos-installer eczos-oobe eczos-desktop)
+PACKAGES=(eczos-release eczos-desktop-defaults eczos-installer eczos-oobe eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
 "$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
