@@ -24,6 +24,12 @@ LIBSSL_DEB=$(find "$SCRIPT_DIR" -maxdepth 1 -type f -name 'libssl1.1_*_amd64.deb
     exit 1
 }
 
+LIBSSL_SHA256=aadf8b4b197335645b230c2839b4517aa444fd2e8f434e5438c48a18857988f7
+printf '%s  %s\n' "$LIBSSL_SHA256" "$LIBSSL_DEB" | sha256sum --check --status || {
+    printf 'libssl1.1 checksum klopt niet; installatie afgebroken.\n' >&2
+    exit 1
+}
+
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y "$LIBSSL_DEB" "$SYNERGY_DEB"
