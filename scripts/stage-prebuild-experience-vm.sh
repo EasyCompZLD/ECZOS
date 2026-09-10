@@ -24,6 +24,11 @@ for package in "${PACKAGES[@]}"; do
     package_dir="$ROOT_DIR/packages/$package"
     find "$package_dir/debian" -type f -exec chmod 0644 {} +
     chmod 0755 "$package_dir/debian/rules"
+    for maintainer_script in preinst postinst prerm postrm config; do
+        if [[ -f "$package_dir/debian/$maintainer_script" ]]; then
+            chmod 0755 "$package_dir/debian/$maintainer_script"
+        fi
+    done
     for executable_dir in bin lib; do
         if [[ -d "$package_dir/$executable_dir" ]]; then
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
