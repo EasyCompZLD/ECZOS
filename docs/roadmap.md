@@ -19,8 +19,13 @@
 - [x] Plasma defaults and Windows-style layout
 - [x] first-run state mechanism
 - [x] versioned Debian 13 KDE live-build configuration
-- [ ] first ECZOS ISO build and boot test (blocked by remaining image release gates)
-- [ ] hardware-qualification ISO boot and install on the Vulkan-capable game PC
+- [x] first isolated ECZOS hardware-qualification ISO build
+- [ ] hardware-qualification ISO boot and install on the Vulkan-capable game PC (installation in progress)
+- [ ] define the ECZOS live username/password and prevent automatic locking during installation
+- [ ] replace the remaining default GRUB live-boot artwork
+- [ ] replace Debian Installer product names, artwork and visible Debian-specific copy
+- [ ] add the ECZOS Plasma startup splash from approved animation assets
+- [ ] implement the ECZOS first-boot OOBE, including reviewed intro audio
 - UEFI VM boot, install, upgrade and removal tests
 
 ## Phase 2 — ECZ Windows MVP
