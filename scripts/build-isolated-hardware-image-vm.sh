@@ -26,6 +26,11 @@ done
 # Keep output and stage state off the source share. Never reuse an old work tree.
 BUILD_BASE=/srv/eczos-builds
 mkdir -p "$BUILD_BASE"
+BUILD_ACCESS_GROUP=${ECZOS_BUILD_ACCESS_GROUP:-eczos-dev}
+if getent group "$BUILD_ACCESS_GROUP" >/dev/null; then
+    chgrp "$BUILD_ACCESS_GROUP" "$BUILD_BASE"
+    chmod 2775 "$BUILD_BASE"
+fi
 exec 9>"$BUILD_BASE/build.lock"
 flock -n 9 || { echo 'Another isolated ECZOS build is running.' >&2; exit 1; }
 AVAILABLE_KB=$(df -Pk "$BUILD_BASE" | awk 'END {print $4}')
@@ -35,6 +40,11 @@ AVAILABLE_KB=$(df -Pk "$BUILD_BASE" | awk 'END {print $4}')
 RUN_DIR=$(mktemp -d "$BUILD_BASE/run-$(date -u +%Y%m%d-%H%M%S)-XXXXXX")
 WORK_DIR="$RUN_DIR/image"
 mkdir -p "$WORK_DIR/config" "$RUN_DIR/artifacts"
+if getent group "$BUILD_ACCESS_GROUP" >/dev/null; then
+    chgrp "$BUILD_ACCESS_GROUP" "$RUN_DIR" "$WORK_DIR" "$RUN_DIR/artifacts"
+    chmod 2770 "$RUN_DIR"
+    chmod 2775 "$WORK_DIR" "$RUN_DIR/artifacts"
+fi
 exec > >(tee "$RUN_DIR/build.log") 2>&1
 trap 'rc=$?; printf "Build failed (%s). Preserve this directory for diagnosis: %s\n" "$rc" "$RUN_DIR" >&2; exit "$rc"' ERR
 echo "Build directory: $RUN_DIR"
