@@ -11,9 +11,10 @@ Package: eczos-oobe
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding,
- eczos-desktop-defaults,
+ eczos-branding (>= 0.1.0~dev4),
+ eczos-desktop-defaults (>= 0.1.0~dev6),
  eczos-platform-tools,
+ konqueror,
  python3,
  python3-pyside6.qtcore,
  python3-pyside6.qtgui,
@@ -21,7 +22,10 @@ Depends:
  qml6-module-qtmultimedia,
  qml6-module-qtquick,
  qml6-module-qtquick-controls,
- qml6-module-qtquick-layouts
+ qml6-module-qtquick-layouts,
+ xdg-utils
+Conflicts:
+ plasma-welcome
 Description: ECZOS first-boot welcome and setup experience
  Guides a new user through appearance, migration, privacy and the primary
  ECZOS features. Intro music starts enabled and can be muted immediately.

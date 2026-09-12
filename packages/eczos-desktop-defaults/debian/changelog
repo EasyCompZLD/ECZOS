@@ -1,3 +1,9 @@
+eczos-desktop-defaults (0.1.0~dev6) UNRELEASED; urgency=medium
+
+  * Select the ECZOS Plasma splash before the first user login.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 12 Sep 2026 20:30:00 +0200
+
 eczos-desktop-defaults (0.1.0~dev5) UNRELEASED; urgency=medium
 
   * Add the ECZOS animated Plasma startup splash from the approved asset.

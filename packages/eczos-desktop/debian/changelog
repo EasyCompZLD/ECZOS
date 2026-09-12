@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev17) UNRELEASED; urgency=medium
+
+  * Require first-boot branding and the expanded ECZOS OOBE.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 12 Sep 2026 20:30:00 +0200
+
 eczos-desktop (0.1.0~dev16) UNRELEASED; urgency=medium
 
   * Require the ECZOS startup splash and first-boot OOBE.

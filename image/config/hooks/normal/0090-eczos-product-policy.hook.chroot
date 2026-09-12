@@ -11,6 +11,13 @@ if [ -n "$installed" ]; then
     apt-get purge -y $installed
 fi
 
+# ECZOS supplies its own complete first-login experience. Plasma Welcome is a
+# recommendation rather than a desktop dependency, so removing it is safe and
+# prevents two welcome assistants from opening for a new user.
+if dpkg-query -W -f='${db:Status-Abbrev}\n' plasma-welcome 2>/dev/null | grep -q '^ii'; then
+    apt-get purge -y plasma-welcome
+fi
+
 if command -v flatpak >/dev/null 2>&1; then
     flatpak remote-add --system --if-not-exists flathub \
         https://flathub.org/repo/flathub.flatpakrepo

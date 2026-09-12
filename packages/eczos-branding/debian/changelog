@@ -1,3 +1,9 @@
+eczos-branding (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Apply the ECZOS background and identity to installed-system GRUB.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 12 Sep 2026 20:30:00 +0200
+
 eczos-branding (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Add contrasting light and dark application-launcher logo variants.

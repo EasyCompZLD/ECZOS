@@ -5,3 +5,4 @@ assets/logo/logo-dark.png usr/share/eczos/branding/logo/
 assets/wallpapers/eczoswallpaper.png usr/share/eczos/branding/wallpapers/
 assets/wallpapers/eczoswallpaper-dark.png usr/share/eczos/branding/wallpapers/
 assets/wallpapers/eczoswallpaper-light.png usr/share/eczos/branding/wallpapers/
+config/zz-eczos-grub.cfg etc/default/grub.d/

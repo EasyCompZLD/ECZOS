@@ -1,7 +1,7 @@
 desktop-image: "../splash.png"
 title-color: "#ffffff"
 title-font: "Unifont Regular 18"
-title-text: "EasyComp Zeeland Operating System"
+title-text: "ECZOS — proberen of installeren"
 message-font: "Unifont Regular 16"
 terminal-font: "Unifont Regular 16"
 

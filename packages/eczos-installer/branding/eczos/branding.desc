@@ -1,6 +1,6 @@
 ---
 componentName: eczos
-welcomeStyleCalamares: true
+welcomeStyleCalamares: false
 welcomeExpandingLogo: true
 windowExpanding: normal
 windowSize: 980px,680px
@@ -11,8 +11,8 @@ strings:
     shortProductName: ECZOS
     version: Development
     shortVersion: Dev
-    versionedName: ECZOS Development
-    shortVersionedName: ECZOS Dev
+    versionedName: EasyComp Zeeland Operating System
+    shortVersionedName: ECZOS
     bootloaderEntryName: ECZOS
     productUrl: https://easycompzeeland.nl/
     supportUrl: https://easycompzeeland.nl/

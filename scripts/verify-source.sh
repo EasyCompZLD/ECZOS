@@ -16,11 +16,13 @@ for required in \
     docs/security.md \
     packages/eczos-branding/debian/control \
     packages/eczos-branding/debian/install \
+    packages/eczos-branding/config/zz-eczos-grub.cfg \
     packages/eczos-sddm-theme/debian/control \
     packages/eczos-plymouth-theme/debian/control \
     packages/eczos-plymouth-theme/theme/eczos.plymouth \
     packages/eczos-desktop-defaults/debian/control \
     packages/eczos-desktop-defaults/lib/apply-desktop-defaults \
+    packages/eczos-desktop-defaults/config/ksplashrc \
     packages/eczos-release/debian/control \
     packages/eczos-release/apt/eczos-debian.sources \
     packages/eczos-release/lib/update-os-release \
@@ -86,6 +88,16 @@ import pathlib
 import sys
 compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
 PY
+
+grep -Fxq 'Theme=org.eczos.desktop' \
+    "$ROOT_DIR/packages/eczos-desktop-defaults/config/ksplashrc" || \
+    fail 'ECZOS splash is not selected system-wide'
+grep -Fxq 'welcomeStyleCalamares: false' \
+    "$ROOT_DIR/packages/eczos-installer/branding/eczos/branding.desc" || \
+    fail 'Calamares name is still enabled in the welcome heading'
+grep -Fq 'visibility: Window.FullScreen' \
+    "$ROOT_DIR/packages/eczos-oobe/qml/Main.qml" || \
+    fail 'ECZOS OOBE is not configured for full-screen display'
 
 if [[ $(find "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images" -maxdepth 1 \
     -type f -name 'animation-*.png' | wc -l | tr -d ' ') -ne 12 ]]; then

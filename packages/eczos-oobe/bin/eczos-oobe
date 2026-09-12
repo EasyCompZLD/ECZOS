@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -18,6 +20,19 @@ if AUTOSTART and (MARKER.exists() or Path("/run/live/medium").exists()):
 
 
 class OobeBridge(QObject):
+    @staticmethod
+    def _start(program, arguments=None):
+        arguments = arguments or []
+        executable = shutil.which(program)
+        if executable:
+            QProcess.startDetached(executable, arguments)
+            return True
+        return False
+
+    @staticmethod
+    def _open_url(url):
+        QProcess.startDetached("/usr/bin/xdg-open", [url])
+
     @Slot(str)
     def setTheme(self, mode):
         if mode in {"auto", "light", "dark"}:
@@ -32,9 +47,58 @@ class OobeBridge(QObject):
         QProcess.startDetached("/usr/bin/eczos-control-center", [])
 
     @Slot()
-    def finish(self):
+    def openNetworkSettings(self):
+        if not self._start("systemsettings", ["kcm_networkmanagement"]):
+            self._start("kcmshell6", ["kcm_networkmanagement"])
+
+    @Slot()
+    def openSystemSettings(self):
+        self._start("systemsettings")
+
+    @Slot()
+    def openDiscover(self):
+        self._start("plasma-discover")
+
+    @Slot()
+    def openPrivacySettings(self):
+        if not self._start("systemsettings", ["kcm_feedback"]):
+            self._start("systemsettings")
+
+    @Slot()
+    def openKdeInformation(self):
+        self._open_url("https://kde.org/plasma-desktop/")
+
+    def _set_default_browser(self, desktop_file):
+        try:
+            subprocess.run(
+                ["/usr/bin/xdg-settings", "set", "default-web-browser", desktop_file],
+                check=False,
+                timeout=15,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+
+    @Slot(str)
+    def finish(self, browser):
         STATE_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
+        browser = browser if browser in {"firefox", "chrome", "edge-windows", "konqueror"} else "firefox"
+        (STATE_DIR / "browser-choice").write_text(browser + "\n", encoding="utf-8")
+
+        if browser == "firefox":
+            self._set_default_browser("firefox-esr.desktop")
+        elif browser == "konqueror":
+            self._set_default_browser("org.kde.konqueror.desktop")
+        elif browser == "chrome":
+            if shutil.which("google-chrome"):
+                self._set_default_browser("google-chrome.desktop")
+            else:
+                self._open_url("https://www.google.com/chrome/")
+        elif browser == "edge-windows":
+            self._open_url("https://www.microsoft.com/edge/download")
+            self._start("eczos-windows", ["manage"])
+
         MARKER.write_text("completed=true\n", encoding="utf-8")
+        (STATE_DIR / "browser-choice").chmod(0o600)
         MARKER.chmod(0o600)
         QGuiApplication.quit()
 
@@ -51,5 +115,7 @@ engine.load(QUrl.fromLocalFile("/usr/share/eczos/oobe/Main.qml"))
 
 if not engine.rootObjects():
     raise SystemExit(1)
+
+engine.rootObjects()[0].showFullScreen()
 
 raise SystemExit(app.exec())

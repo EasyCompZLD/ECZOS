@@ -97,6 +97,21 @@ for package in eczos-desktop eczos-oobe eczos-installer calamares \
 done
 xorriso -indev live-image-amd64.hybrid.iso -report_el_torito plain \
     > "$RUN_DIR/boot-catalog.txt" 2>&1
+
+# Inspect the finished ISO itself. This catches stale USB/build confusion and
+# guarantees that both boot choices and the intended ECZOS artwork survived.
+ISO_INSPECTION_DIR="$RUN_DIR/iso-inspection"
+mkdir -p "$ISO_INSPECTION_DIR"
+xorriso -osirrox on -indev live-image-amd64.hybrid.iso \
+    -extract /boot/grub/grub.cfg "$ISO_INSPECTION_DIR/grub.cfg" \
+    -extract /boot/grub/splash.png "$ISO_INSPECTION_DIR/splash.png" \
+    > "$RUN_DIR/iso-inspection.log" 2>&1
+grep -Fq 'menuentry "ECZOS proberen"' "$ISO_INSPECTION_DIR/grub.cfg"
+grep -Fq 'menuentry "ECZOS installeren"' "$ISO_INSPECTION_DIR/grub.cfg"
+grep -Fq 'eczos-installer' "$ISO_INSPECTION_DIR/grub.cfg"
+cmp -s \
+    "$ROOT_DIR/packages/eczos-branding/assets/wallpapers/eczoswallpaper-dark.png" \
+    "$ISO_INSPECTION_DIR/splash.png"
 ISO_NAME="ECZOS-hardware-qualification-$(basename "$RUN_DIR").iso"
 cp --reflink=auto live-image-amd64.hybrid.iso "$RUN_DIR/artifacts/$ISO_NAME"
 (cd "$RUN_DIR/artifacts" && sha256sum "$ISO_NAME" > "$ISO_NAME.sha256")

@@ -28,6 +28,11 @@ for link in \
     test -e "$link"
 done
 
+test -s /etc/default/grub.d/zz-eczos-grub.cfg
+grep -Fx 'GRUB_DISTRIBUTOR="ECZOS"' /etc/default/grub.d/zz-eczos-grub.cfg
+grep -Fx 'GRUB_BACKGROUND="/usr/share/eczos/branding/wallpapers/eczoswallpaper-dark.png"' \
+    /etc/default/grub.d/zz-eczos-grub.cfg
+
 dpkg --audit
 apt-get check
 
