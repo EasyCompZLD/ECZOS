@@ -27,3 +27,11 @@ The first-session defaults service also exposed a Plasma D-Bus startup race.
 Dev8 bounds slow wallpaper and panel calls, records non-fatal warnings and uses
 direct launcher artwork. The image now removes live-build's duplicate legacy
 APT source list because `eczos-release` owns the equivalent deb822 sources.
+
+## Boot presentation follow-up
+
+The ECZOS Plymouth theme was physically requalified on the GamePC after its
+initramfs was rebuilt. Normal boot now shows only the existing ECZOS animation:
+there is no Debian fallback logo, duplicate secondary logo or normal-boot text.
+The package keeps Plymouth's global fallback transparent while installed and
+restores Debian's original fallback on package removal.

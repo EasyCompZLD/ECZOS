@@ -24,7 +24,7 @@
 - [x] qualify the explicit `eczos` / `live` live identity and live-only no-lock policy on a new ISO
 - [ ] qualify the ECZOS GRUB live menu and existing dark wallpaper on BIOS and UEFI
 - [x] qualify the ECZOS-branded Calamares installation path and USP slideshow
-- [ ] qualify the ECZOS Plasma startup splash from the approved animation asset
+- [x] qualify the ECZOS Plasma startup splash from the approved animation asset
 - [x] qualify the ECZOS first-boot OOBE with default-on, user-mutable intro audio
 - [x] qualify Calamares-created users as password-authenticated sudo members
 - UEFI VM boot, install, upgrade and removal tests
