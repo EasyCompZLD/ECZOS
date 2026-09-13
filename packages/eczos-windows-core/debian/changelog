@@ -1,3 +1,10 @@
+eczos-windows-core (0.1.0~dev12) UNRELEASED; urgency=medium
+
+  * Treat an optical installation disc as one application source.
+  * Follow autorun.inf, preserve companion files and use their working folder.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 10:15:00 +0200
+
 eczos-windows-core (0.1.0~dev11) UNRELEASED; urgency=medium
 
   * Exclude Wine's built-in Program Files applications from installed-program

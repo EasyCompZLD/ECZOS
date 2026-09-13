@@ -16,7 +16,9 @@ for file in \
 done
 test -s /etc/xdg/autostart/eczos-desktop-first-run.desktop
 test -s /etc/xdg/ksplashrc
+test -s /etc/skel/.config/ksplashrc
 grep -Fx 'Theme=org.eczos.desktop' /etc/xdg/ksplashrc
+grep -Fx 'Theme=org.eczos.desktop' /etc/skel/.config/ksplashrc
 grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
 grep -F 'START_ICON=eczos-start-dark' /usr/bin/eczos-theme-switch
 grep -F 'START_ICON=eczos-start-light' /usr/bin/eczos-theme-switch

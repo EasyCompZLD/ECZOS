@@ -21,8 +21,15 @@ grep -F 'restrict_prefix "$prefix"' /usr/bin/eczos-windows
 grep -F 'rm -f "$prefix/dosdevices/z:"' /usr/bin/eczos-windows
 grep -F 'gio trash "$app_dir"' /usr/bin/eczos-windows
 grep -F 'C:\\ECZOS-Install\\payload.$extension' /usr/bin/eczos-windows
+grep -F 'detect_installation_media' /usr/bin/eczos-windows
+grep -F 'Canonical autorun:' /usr/bin/eczos-windows
+grep -F 'autorun.inf' /usr/bin/eczos-windows
+grep -F 'cp -a -- "$media_root/." "$runtime_dir/media/"' /usr/bin/eczos-windows
+grep -F 'execute-from' /usr/bin/eczos-windows
 grep -F 'Name=ECZ Windows-apps' /usr/share/applications/org.eczos.Windows.Manager.desktop
 grep -F 'exec wine "$@"' /usr/lib/eczos/windows/runtime-wine-system
+grep -F 'canonical_working_directory=$(realpath -e -- "$working_directory")' \
+    /usr/lib/eczos/windows/runtime-wine-system
 grep -F 'wine32:i386' /usr/lib/eczos/windows/runtime-wine-system
 grep -F 'cd "$prefix/drive_c"' /usr/lib/eczos/windows/runtime-wine-system
 grep -F 'flock -n "$app_lock_fd"' /usr/bin/eczos-windows

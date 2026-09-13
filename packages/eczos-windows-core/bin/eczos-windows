@@ -111,9 +111,14 @@ inspect_file() {
         exit 2
     }
     resolved=$(realpath "$input")
+    detect_installation_media "$resolved"
     printf 'File: %s\n' "$resolved"
     printf 'Type: %s\n' "$(file -b "$resolved")"
     printf 'SHA-256: %s\n' "$(sha256sum "$resolved" | awk '{print $1}')"
+    if [[ -n "$INSTALL_MEDIA_ROOT" ]]; then
+        printf 'Installation media: %s\n' "$INSTALL_MEDIA_ROOT"
+        printf 'Canonical autorun: %s\n' "$INSTALL_MEDIA_ENTRY"
+    fi
 }
 
 extract_launcher_icon() {
@@ -179,6 +184,42 @@ safe_display_name() {
         exit 2
     fi
     printf '%s\n' "$value"
+}
+
+detect_installation_media() {
+    local selected=$1 mount_json mount_root filesystem options autorun_file autorun_command
+    local relative candidate
+    INSTALL_MEDIA_ROOT=
+    INSTALL_MEDIA_ENTRY=
+
+    mount_json=$(findmnt --json --target "$selected" --output TARGET,FSTYPE,OPTIONS 2>/dev/null || true)
+    [[ -n "$mount_json" ]] || return 0
+    mount_root=$(jq -r '.filesystems[0].target // empty' <<<"$mount_json")
+    filesystem=$(jq -r '.filesystems[0].fstype // empty' <<<"$mount_json")
+    options=$(jq -r '.filesystems[0].options // empty' <<<"$mount_json")
+    [[ "$filesystem" =~ ^(iso9660|udf)$ && ",$options," == *,ro,* ]] || return 0
+    mount_root=$(realpath -e -- "$mount_root")
+    [[ "$selected" == "$mount_root/"* ]] || return 0
+
+    autorun_file=$(find "$mount_root" -maxdepth 1 -type f -iname autorun.inf -print -quit)
+    [[ -n "$autorun_file" ]] || return 0
+    autorun_command=$(tr -d '\r' <"$autorun_file" |
+        sed -n 's/^[[:space:]]*[Oo][Pp][Ee][Nn][[:space:]]*=[[:space:]]*//p' |
+        head -n1)
+    [[ -n "$autorun_command" ]] || return 0
+    if [[ "$autorun_command" =~ ^\"([^\"]+\.[Ee][Xx][Ee])\" ]]; then
+        relative=${BASH_REMATCH[1]}
+    elif [[ "$autorun_command" =~ ^([^[:space:]]+\.[Ee][Xx][Ee]) ]]; then
+        relative=${BASH_REMATCH[1]}
+    else
+        return 0
+    fi
+    relative=${relative//\\//}
+    relative=${relative#/}
+    candidate=$(realpath -e -- "$mount_root/$relative" 2>/dev/null || true)
+    [[ -f "$candidate" && "$candidate" == "$mount_root/"* ]] || return 0
+    INSTALL_MEDIA_ROOT=$mount_root
+    INSTALL_MEDIA_ENTRY=$candidate
 }
 
 discover_entrypoint() {
@@ -255,20 +296,33 @@ install_file() {
 
     local input=$1
     local resolved extension kind checksum base lower_base display_name slug app_id app_dir
-    local source_dir copied prefix runtime_dir runtime_payload runtime_windows_path
+    local source_dir copied prefix runtime_dir runtime_payload runtime_windows_path runtime_working_dir
+    local install_media=false media_root media_relative media_name windows_relative
     local install_log result entrypoint entrypoint_type launcher_icon temp_manifest existing_status failed_dir
     local initialization_log initialization_result detected_name retry_existing=false
     [[ -f "$input" ]] || { printf 'Not a regular file: %s\n' "$input" >&2; exit 2; }
     resolved=$(realpath "$input")
+    detect_installation_media "$resolved"
+    if [[ -n "$INSTALL_MEDIA_ROOT" ]]; then
+        install_media=true
+        media_root=$INSTALL_MEDIA_ROOT
+        resolved=$INSTALL_MEDIA_ENTRY
+        media_relative=${resolved#"$media_root/"}
+    fi
     extension=${resolved##*.}
     extension=${extension,,}
     checksum=$(sha256sum "$resolved" | awk '{print $1}')
     base=$(basename "$resolved")
-    display_name=$(safe_display_name "${base%.*}")
+    if [[ "$install_media" = true ]]; then
+        media_name=$(basename "$media_root")
+        display_name=$(safe_display_name "$media_name")
+    else
+        display_name=$(safe_display_name "${base%.*}")
+    fi
     lower_base=${base,,}
     case "$extension" in
         exe)
-            if [[ "$lower_base" =~ (^|[-_.])(setup|install|installer)([-_.0-9]|$) ]]; then
+            if [[ "$install_media" = true || "$lower_base" =~ (^|[-_.])(setup|install|installer)([-_.0-9]|$) ]]; then
                 kind=exe-installer
             else
                 kind=portable-executable
@@ -306,7 +360,11 @@ install_file() {
         [[ ! -d "$app_dir/prefix" ]] || mv "$app_dir/prefix" "$failed_dir/prefix"
         [[ ! -f "$app_dir/install.log" ]] || mv "$app_dir/install.log" "$failed_dir/install.log"
     else
-        confirm_action "Install/open '$base' in an isolated ECZ Windows environment?\n\nSHA-256: $checksum\n\nWindows software is not sandboxed and can still access granted user files." "$assume_yes"
+        if [[ "$install_media" = true ]]; then
+            confirm_action "Install '$display_name' once from this disc?\n\nECZ Windows uses the disc's autorun entry and copies its complete contents into one isolated environment. Opening Setup.exe from this disc will use the same installation.\n\nWindows software is not sandboxed and can still access granted user files." "$assume_yes"
+        else
+            confirm_action "Install/open '$base' in an isolated ECZ Windows environment?\n\nSHA-256: $checksum\n\nWindows software is not sandboxed and can still access granted user files." "$assume_yes"
+        fi
     fi
 
     source_dir="$app_dir/source"
@@ -325,8 +383,9 @@ install_file() {
         --arg source "$resolved" \
         --arg sha256 "$checksum" \
         --arg prefix "$prefix" \
+        --argjson installationMedia "$install_media" \
         --arg created "$(date --iso-8601=seconds)" \
-        '{schema:1,id:$id,name:$name,kind:$kind,source:$source,sha256:$sha256,runtime:"wine-system-v1",prefix:$prefix,status:"initializing",created:$created,entrypoint:null,entrypointType:null,drives:{}}' \
+        '{schema:1,id:$id,name:$name,kind:$kind,source:$source,sha256:$sha256,runtime:"wine-system-v1",prefix:$prefix,installationMedia:$installationMedia,status:"initializing",created:$created,entrypoint:null,entrypointType:null,drives:{}}' \
         > "$app_dir/manifest.json"
     chmod 0600 "$app_dir/manifest.json"
 
@@ -348,10 +407,24 @@ install_file() {
     fi
     restrict_prefix "$prefix"
     runtime_dir="$prefix/drive_c/ECZOS-Install"
-    runtime_payload="$runtime_dir/payload.$extension"
-    runtime_windows_path="C:\\ECZOS-Install\\payload.$extension"
     mkdir -p "$runtime_dir"
-    install -m 0600 "$copied" "$runtime_payload"
+    if [[ "$install_media" = true ]]; then
+        runtime_payload="$runtime_dir/media/$media_relative"
+        runtime_working_dir=$(dirname "$runtime_payload")
+        windows_relative=${media_relative//\//\\}
+        runtime_windows_path="C:\\ECZOS-Install\\media\\$windows_relative"
+        mkdir -p "$runtime_dir/media"
+        if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+            kdialog --title 'ECZ Windows' --passivepopup \
+                "De inhoud van '$display_name' wordt eenmalig gekopieerd. Dit kan even duren." 8 || true
+        fi
+        cp -a -- "$media_root/." "$runtime_dir/media/"
+    else
+        runtime_payload="$runtime_dir/payload.$extension"
+        runtime_working_dir=$runtime_dir
+        runtime_windows_path="C:\\ECZOS-Install\\payload.$extension"
+        install -m 0600 "$copied" "$runtime_payload"
+    fi
 
     install_log="$app_dir/install.log"
     set +e
@@ -359,7 +432,7 @@ install_file() {
         runtime_call install-msi "$prefix" "$runtime_windows_path" \
             {app_lock_fd}>&- 2>&1 | tee "$install_log"
     else
-        runtime_call execute "$prefix" "$runtime_windows_path" \
+        runtime_call execute-from "$prefix" "$runtime_working_dir" "$runtime_windows_path" \
             {app_lock_fd}>&- 2>&1 | tee "$install_log"
     fi
     result=${PIPESTATUS[0]}
@@ -502,7 +575,8 @@ manage_apps() {
             fi
             ;;
         retry)
-            source_file=$(find "$(app_dir_for "$selection")/source" -maxdepth 1 -type f -print -quit)
+            source_file=$(jq -r '.source // empty' "$manifest")
+            [[ -f "$source_file" ]] || source_file=$(find "$(app_dir_for "$selection")/source" -maxdepth 1 -type f -print -quit)
             if [[ ! "$status" =~ ^(installer-failed|runtime-initialization-failed|initializing)$ || -z "$source_file" ]]; then
                 kdialog --title 'ECZ Windows' --error 'Deze installatie kan niet automatisch opnieuw worden geprobeerd.'
             else

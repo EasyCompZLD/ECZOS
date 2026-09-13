@@ -4,3 +4,4 @@ lib/apply-desktop-defaults usr/lib/eczos/
 xdg/eczos-desktop-first-run.desktop etc/xdg/autostart/
 lookandfeel/org.eczos.desktop usr/share/plasma/look-and-feel/
 config/ksplashrc etc/xdg/
+config/ksplashrc etc/skel/.config/

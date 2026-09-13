@@ -37,6 +37,19 @@ case "$operation" in
         cd "$prefix/drive_c"
         exec wine "$@"
         ;;
+    execute-from)
+        [[ $# -ge 2 ]] || exit 2
+        working_directory=$1
+        shift
+        canonical_working_directory=$(realpath -e -- "$working_directory")
+        [[ -d "$canonical_working_directory" && \
+            "$canonical_working_directory" = "$prefix/drive_c/"* ]] || {
+            printf 'Unsafe Windows working directory.\n' >&2
+            exit 1
+        }
+        cd "$canonical_working_directory"
+        exec wine "$@"
+        ;;
     execute-link)
         [[ $# -eq 1 ]] || exit 2
         shortcut=$1
