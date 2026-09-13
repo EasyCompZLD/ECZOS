@@ -20,6 +20,7 @@ done
 grep -Fx 'Exec=eczos-ui settings' /usr/share/applications/org.eczos.ControlCenter.desktop
 grep -Fx 'Exec=eczos-ui diagnostics' /usr/share/applications/org.eczos.Diagnostics.desktop
 grep -Fx 'Exec=eczos-ui migration' /usr/share/applications/org.eczos.Migration.desktop
+/usr/bin/eczos-ui --list-kcms-json | jq -e '.schemaVersion == 1 and (.modules | type == "array") and (.modules | length > 10)' >/dev/null
 /usr/bin/eczos-doctor --json | jq -e '.schemaVersion == 1 and .office == "installed"' >/dev/null
 jq -e '.office.product == "SoftMaker FreeOffice 2024" and .office.package == "softmaker-freeoffice-2024" and .office.redistributed == true' \
     /usr/share/eczos/product/default-apps.json >/dev/null

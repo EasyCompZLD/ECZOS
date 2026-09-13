@@ -11,11 +11,11 @@ Package: eczos-desktop
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding (>= 0.1.0~dev6),
+ eczos-branding (>= 0.1.0~dev7),
  eczos-desktop-defaults (>= 0.1.0~dev9),
  eczos-desktop-apps (>= 0.1.0~dev2),
- eczos-gaming-core (>= 0.1.0~dev3),
- eczos-platform-tools (>= 0.1.0~dev5),
+ eczos-gaming-core (>= 0.1.0~dev4),
+ eczos-platform-tools (>= 0.1.0~dev6),
  eczos-plymouth-theme (>= 0.1.0~dev5),
  eczos-recovery-media (>= 0.1.0~dev2),
  eczos-release (>= 0.1.0~dev5),

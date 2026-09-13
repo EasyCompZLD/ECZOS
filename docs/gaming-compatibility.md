@@ -10,6 +10,11 @@ Run `eczos-gaming doctor` before provisioning Proton. The verdicts are:
 - `setup-required`: the GPU is suitable, but a runtime component is missing;
 - `unsupported`: no hardware Vulkan device is available.
 
+For `setup-required`, the ECZ Gaming page offers one authenticated repair. It
+installs the Debian 32-bit Vulkan libraries and GameMode, then downloads the
+reviewed UMU package over HTTPS and verifies its pinned checksum and package
+metadata. The page runs the diagnostic again when repair completes.
+
 The Steam integration has been physically launched successfully on the GamePC.
 That result qualifies the current ECZOS gaming prototype. Separate positive
 tests with individual Vulkan, DXVK, VKD3D or UMU games are optional additions

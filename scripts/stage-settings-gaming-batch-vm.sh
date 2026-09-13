@@ -14,16 +14,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(
-    eczos-branding
-    eczos-platform-tools
-    eczos-windows-core
-    eczos-gaming-core
-    eczos-recovery-media
-    eczos-installer
-    eczos-oobe
-    eczos-desktop
-)
+PACKAGES=(eczos-branding eczos-platform-tools eczos-gaming-core eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
 "$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
@@ -43,7 +34,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config polkit product qml xdg; do
+    for data_dir in applications assets branding config polkit product qml runtime-definitions xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi
@@ -63,12 +54,28 @@ apt-get install -y "${debs[@]}"
 
 "$ROOT_DIR/tests/smoke/branding-package.sh"
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
-"$ROOT_DIR/tests/smoke/windows-core-package.sh"
 "$ROOT_DIR/tests/smoke/gaming-core-package.sh"
-"$ROOT_DIR/tests/smoke/recovery-media-package.sh"
-"$ROOT_DIR/tests/smoke/installer-package.sh"
-"$ROOT_DIR/tests/smoke/oobe-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-metapackage.sh"
 
-printf '\nECZOS interface, recovery, OOBE and installer UX batch passed.\n'
-printf 'Open ECZOS Instellingen and ECZOS Herstelmedium for the visual check.\n'
+module_json=$(/usr/bin/eczos-ui --list-kcms-json)
+jq -e '
+    (.modules | length >= 80) and
+    ([.modules[].id] | contains([
+        "kcm_users", "kcm_networkmanagement", "kcm_kscreen",
+        "kcm_pulseaudio", "kcm_printer_manager", "kcm_updates",
+        "kcm_powerdevilprofilesconfig", "kcm_lookandfeel", "kcm_firewall"
+    ]))
+' <<<"$module_json" >/dev/null
+
+set +e
+QT_QPA_PLATFORM=offscreen timeout 5 /usr/bin/eczos-ui system >/tmp/eczos-settings-offscreen.log 2>&1
+ui_status=$?
+set -e
+if [[ $ui_status -ne 124 ]]; then
+    cat /tmp/eczos-settings-offscreen.log >&2
+    printf 'ECZOS Settings did not remain running during the offscreen UI test.\n' >&2
+    exit 1
+fi
+
+printf '\nECZOS Settings and Gaming repair batch passed.\n'
+printf 'Open ECZOS Instellingen > Systeeminstellingen and ECZ Gaming for the visual check.\n'

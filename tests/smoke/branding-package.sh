@@ -19,7 +19,8 @@ for asset in \
     test -s "$asset"
 done
 
-for screenshot in settings windows-apps gaming migration recovery diagnostics; do
+for screenshot in settings windows-apps gaming migration recovery diagnostics \
+    system-appearance system-display system-network; do
     test -s "/usr/share/eczos/branding/screenshots/$screenshot.png"
 done
 

@@ -11,9 +11,11 @@ Package: eczos-gaming-core
 Architecture: amd64
 Depends:
  ${misc:Depends},
- eczos-platform-tools (>= 0.1.0~dev5),
+ curl,
+ eczos-platform-tools (>= 0.1.0~dev6),
  jq,
  pciutils,
+ pkexec,
  vulkan-tools
 Recommends:
  gamemode,

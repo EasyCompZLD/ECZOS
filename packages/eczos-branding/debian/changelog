@@ -1,3 +1,9 @@
+eczos-branding (0.1.0~dev7) UNRELEASED; urgency=medium
+
+  * Add real KDE module screenshots for guided system-settings shortcuts.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 21:00:00 +0200
+
 eczos-branding (0.1.0~dev6) UNRELEASED; urgency=medium
 
   * Add verified product screenshots for the installer and first-run tour.

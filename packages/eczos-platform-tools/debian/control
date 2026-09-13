@@ -11,7 +11,7 @@ Package: eczos-platform-tools
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding (>= 0.1.0~dev6),
+ eczos-branding (>= 0.1.0~dev7),
  jq,
  pciutils,
  procps,
@@ -24,6 +24,7 @@ Depends:
  qml6-module-qtquick-dialogs,
  qml6-module-qtquick-layouts,
  rsync,
+ systemsettings,
  xdg-user-dirs,
  xdg-utils
 Description: consumer-facing management and recovery tools for ECZOS

@@ -1,3 +1,10 @@
+eczos-gaming-core (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Add a guided, authenticated repair for missing gaming components.
+  * Report repair progress without opening a terminal window.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 20:00:00 +0200
+
 eczos-gaming-core (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Present gaming readiness in the shared ECZOS interface.

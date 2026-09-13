@@ -25,6 +25,7 @@ ApplicationWindow {
     property color danger: "#ff6b78"
     property var diagnostics: ({})
     property var gaming: ({})
+    property var systemModules: []
     property var windowsApps: []
     property var recoveryDevices: []
     property var recoveryReleases: []
@@ -34,7 +35,7 @@ ApplicationWindow {
 
     function pageTitle(route) {
         const labels = {
-            settings: "Instellingen", windows: "Windows-apps", gaming: "Gaming",
+            settings: "Instellingen", system: "Systeeminstellingen", windows: "Windows-apps", gaming: "Gaming",
             migration: "Bestanden overzetten", diagnostics: "Diagnose",
             recovery: "Herstelmedium", support: "Ondersteuning"
         }
@@ -182,6 +183,40 @@ ApplicationWindow {
         }
     }
 
+    component VisualModuleCard: Rectangle {
+        id: card
+        property string heading
+        property string description
+        property string imageSource
+        property string moduleId
+        implicitHeight: 154
+        radius: 13
+        clip: true
+        color: root.panelRaised
+        border.color: visualMouse.containsMouse ? root.accent : root.border
+        Image {
+            anchors.fill: parent
+            source: card.imageSource
+            fillMode: Image.PreserveAspectCrop
+            sourceSize.width: 520
+            sourceSize.height: 360
+        }
+        Rectangle {
+            anchors.fill: parent
+            gradient: Gradient {
+                GradientStop { position: 0.24; color: "#1608131f" }
+                GradientStop { position: 1.0; color: "#f208131f" }
+            }
+        }
+        ColumnLayout {
+            anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
+            anchors.margins: 14; spacing: 3
+            Text { Layout.fillWidth: true; text: card.heading; color: root.textPrimary; font.pixelSize: 17; font.weight: Font.Bold }
+            Text { Layout.fillWidth: true; text: card.description; color: "#d4e3ed"; font.pixelSize: 12; elide: Text.ElideRight }
+        }
+        MouseArea { id: visualMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: backend.launchKcm(card.moduleId) }
+    }
+
     component PageHeading: ColumnLayout {
         property string heading
         property string subtitle
@@ -209,6 +244,7 @@ ApplicationWindow {
                 }
                 Item { Layout.preferredHeight: 13 }
                 NavButton { routeName: "settings"; symbol: "⌂"; text: "Instellingen" }
+                NavButton { routeName: "system"; symbol: "⚙"; text: "Systeeminstellingen" }
                 NavButton { routeName: "windows"; symbol: "▦"; text: "Windows-apps" }
                 NavButton { routeName: "gaming"; symbol: "◆"; text: "Gaming" }
                 NavButton { routeName: "migration"; symbol: "⇢"; text: "Bestanden overzetten" }
@@ -224,7 +260,7 @@ ApplicationWindow {
             Layout.fillWidth: true; Layout.fillHeight: true; color: root.color
             Loader {
                 anchors.fill: parent
-                sourceComponent: ({settings: settingsPage, windows: windowsPage, gaming: gamingPage,
+                sourceComponent: ({settings: settingsPage, system: systemPage, windows: windowsPage, gaming: gamingPage,
                                    migration: migrationPage, diagnostics: diagnosticsPage,
                                    recovery: recoveryPage, support: supportPage})[backend.route] || settingsPage
             }
@@ -245,7 +281,7 @@ ApplicationWindow {
                     ActionCard { Layout.fillWidth: true; heading: "Apps"; description: "Programma’s installeren en bijwerken"; symbol: "+"; onActivated: backend.launch("apps") }
                     ActionCard { Layout.fillWidth: true; heading: "Windows-apps"; description: "Geïnstalleerde Windows-programma’s beheren"; symbol: "▦"; onActivated: backend.navigate("windows") }
                     ActionCard { Layout.fillWidth: true; heading: "Gaming"; description: "Steam en game-ondersteuning controleren"; symbol: "◆"; onActivated: backend.navigate("gaming") }
-                    ActionCard { Layout.fillWidth: true; heading: "Apparaten"; description: "Scherm, geluid, netwerk en randapparatuur"; symbol: "⚙"; onActivated: backend.launch("devices") }
+                    ActionCard { Layout.fillWidth: true; heading: "Systeeminstellingen"; description: "Uiterlijk, scherm, geluid, netwerk en alle apparaten"; symbol: "⚙"; onActivated: backend.navigate("system") }
                     ActionCard { Layout.fillWidth: true; heading: "Back-up"; description: "Persoonlijke bestanden beschermen"; symbol: "◴"; onActivated: backend.launch("backup") }
                     ActionCard { Layout.fillWidth: true; heading: "Herstelmedium"; description: "Een opstartbare USB, SD-kaart of dvd maken"; symbol: "↻"; onActivated: backend.navigate("recovery") }
                     ActionCard { Layout.fillWidth: true; heading: "Telefoon"; description: "Je telefoon met ECZOS verbinden"; symbol: "▯"; onActivated: backend.launch("phone") }
@@ -255,6 +291,85 @@ ApplicationWindow {
                     ActionCard { Layout.fillWidth: true; heading: "Over deze computer"; description: "Hardware en systeeminformatie bekijken"; symbol: "i"; onActivated: backend.launch("about") }
                 }
                 Item { Layout.preferredHeight: 30 }
+            }
+        }
+    }
+
+    Component {
+        id: systemPage
+        Item {
+            property string query: systemSearch.text.toLowerCase()
+            property var filteredModules: systemModules.filter(function(item) {
+                return !query || item.name.toLowerCase().indexOf(query) >= 0 || item.category.toLowerCase().indexOf(query) >= 0 || item.id.toLowerCase().indexOf(query) >= 0
+            })
+            ColumnLayout {
+                anchors.fill: parent; anchors.margins: 34; spacing: 18
+                RowLayout {
+                    Layout.fillWidth: true
+                    PageHeading { Layout.fillWidth: true; heading: "Systeeminstellingen"; subtitle: "Alle aanwezige KDE-instellingen, gegroepeerd en doorzoekbaar vanuit ECZOS." }
+                    FlatButton { text: "Onderdelen vernieuwen"; onClicked: backend.refresh("system") }
+                }
+                TextField {
+                    id: systemSearch
+                    Layout.fillWidth: true; implicitHeight: 46
+                    placeholderText: "Zoek bijvoorbeeld scherm, muis, wifi, uiterlijk of gebruikers…"
+                    color: root.textPrimary; placeholderTextColor: root.textMuted
+                    leftPadding: 15; rightPadding: 15; font.pixelSize: 14
+                    background: Rectangle { radius: 10; color: root.panelRaised; border.color: systemSearch.activeFocus ? root.accent : root.border }
+                }
+                GridLayout {
+                    Layout.fillWidth: true; columns: 3; columnSpacing: 12
+                    VisualModuleCard {
+                        Layout.fillWidth: true
+                        heading: "Uiterlijk"
+                        description: "Thema, kleuren, pictogrammen en lettertypen"
+                        imageSource: "file:///usr/share/eczos/branding/screenshots/system-appearance.png"
+                        moduleId: "kcm_lookandfeel"
+                    }
+                    VisualModuleCard {
+                        Layout.fillWidth: true
+                        heading: "Beeldschermen"
+                        description: "Resolutie, positie, schaal en vernieuwingsfrequentie"
+                        imageSource: "file:///usr/share/eczos/branding/screenshots/system-display.png"
+                        moduleId: "kcm_kscreen"
+                    }
+                    VisualModuleCard {
+                        Layout.fillWidth: true
+                        heading: "Netwerk"
+                        description: "Wifi, kabelverbindingen, IP en beveiliging"
+                        imageSource: "file:///usr/share/eczos/branding/screenshots/system-network.png"
+                        moduleId: "kcm_networkmanagement"
+                    }
+                }
+                Text { text: filteredModules.length + " van " + systemModules.length + " onderdelen"; color: root.textMuted; font.pixelSize: 13 }
+                ScrollView {
+                    Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentWidth: availableWidth
+                    GridLayout {
+                        width: parent.width; columns: width > 700 ? 2 : 1; columnSpacing: 12; rowSpacing: 12
+                        Repeater {
+                            model: filteredModules
+                            delegate: Rectangle {
+                                required property var modelData
+                                Layout.fillWidth: true; implicitHeight: 88; radius: 12; color: moduleMouse.containsMouse ? "#1a3043" : root.panelRaised; border.color: moduleMouse.containsMouse ? root.accentDark : root.border
+                                RowLayout {
+                                    anchors.fill: parent; anchors.margins: 15; spacing: 13
+                                    Rectangle { width: 42; height: 42; radius: 11; color: "#183d54"; Text { anchors.centerIn: parent; text: "⚙"; color: root.accent; font.pixelSize: 18 } }
+                                    ColumnLayout { Layout.fillWidth: true; spacing: 3
+                                        Text { Layout.fillWidth: true; text: modelData.name; color: root.textPrimary; font.pixelSize: 15; font.weight: Font.DemiBold; elide: Text.ElideRight }
+                                        Text { Layout.fillWidth: true; text: modelData.category; color: root.textMuted; font.pixelSize: 12; elide: Text.ElideRight }
+                                    }
+                                    Text { text: "›"; color: root.textMuted; font.pixelSize: 25 }
+                                }
+                                MouseArea { id: moduleMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: backend.launchKcm(modelData.id) }
+                            }
+                        }
+                    }
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text { Layout.fillWidth: true; text: backend.status; color: root.textMuted; font.pixelSize: 13 }
+                    FlatButton { text: "KDE-overzicht openen"; onClicked: backend.launch("devices") }
+                }
             }
         }
     }
@@ -308,10 +423,14 @@ ApplicationWindow {
                     }
                 }
                 StatusCard { Layout.fillWidth: true; heading: "Grafische kaart"; okay: gaming.vulkan && gaming.vulkan.hardware; detail: gaming.gpu || "Wordt gecontroleerd…" }
-                StatusCard { Layout.fillWidth: true; heading: "Vulkan en 32-bit drivers"; okay: gaming.vulkan && gaming.vulkan.hardware && gaming.vulkan.driver32Bit; detail: gaming.vulkan ? gaming.vulkan.devices : "Wordt gecontroleerd…" }
-                StatusCard { Layout.fillWidth: true; heading: "Proton-ondersteuning"; okay: gaming.runtime && gaming.runtime.umu && gaming.runtime.gameMode; detail: okay ? "Runtime en GameMode zijn aanwezig" : "Een onderdeel ontbreekt" }
+                StatusCard { Layout.fillWidth: true; heading: "32-bit Vulkan-driver"; okay: gaming.vulkan && gaming.vulkan.driver32Bit; detail: okay ? "Aanwezig voor oudere en Windows-games" : "Ontbreekt" }
+                StatusCard { Layout.fillWidth: true; heading: "UMU/Proton-ondersteuning"; okay: gaming.runtime && gaming.runtime.umu; detail: okay ? "Geïnstalleerd" : "Ontbreekt" }
+                StatusCard { Layout.fillWidth: true; heading: "GameMode"; okay: gaming.runtime && gaming.runtime.gameMode; detail: okay ? "Geïnstalleerd" : "Ontbreekt" }
+                ProgressBar { Layout.fillWidth: true; from: 0; to: 1; value: backend.progress; visible: backend.busy && backend.progress > 0 }
+                Text { Layout.fillWidth: true; visible: backend.status.length > 0; text: backend.status; color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap }
                 RowLayout {
                     Layout.fillWidth: true
+                    FlatButton { text: "Ontbrekende onderdelen installeren"; primary: true; visible: gaming.verdict === "setup-required"; enabled: !backend.busy; onClicked: backend.repairGaming() }
                     FlatButton { text: "Opnieuw controleren"; onClicked: backend.refresh("gaming") }
                     Item { Layout.fillWidth: true }
                 }
@@ -488,6 +607,7 @@ ApplicationWindow {
                 const value = JSON.parse(payload)
                 if (kind === "diagnostics") diagnostics = value
                 else if (kind === "gaming") gaming = value
+                else if (kind === "system") systemModules = value.modules || []
                 else if (kind === "windows") windowsApps = value.apps || []
                 else if (kind === "recovery-devices") recoveryDevices = value.devices || []
                 else if (kind === "recovery-releases") recoveryReleases = value.releases || []

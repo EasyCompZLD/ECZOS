@@ -47,6 +47,7 @@
 - [x] reviewed UMU adapter for non-Steam games
 - optional expanding per-game DXVK/VKD3D and runtime compatibility matrix
 - [x] explicit Gaming Mode through GameMode adapter
+- [x] guided repair for missing 32-bit Vulkan, GameMode and UMU/Proton support
 
 Steam operation on the GamePC qualifies the current gaming integration. Separate
 Vulkan, DXVK, VKD3D and UMU game tests may expand the compatibility matrix later,
@@ -63,6 +64,8 @@ but are not a prototype release blocker.
       migration, diagnostics, recovery media and support
 - [x] terminal-free recovery-media workflow with progress and ETA
 - [x] real product screenshots in the installer and first-boot OOBE
+- [ ] qualify complete KDE configuration-module coverage inside ECZOS Settings;
+      keep the original System Settings launcher until this passes
 - [x] FreeOffice host inclusion and physical install test
 - [x] FreeOffice release artifact pinning and ISO integration
 - [ ] optional cloud and enrolled remote-support services

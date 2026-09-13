@@ -1,4 +1,6 @@
 applications/org.eczos.Gaming.desktop usr/share/applications/
 bin/eczos-gaming usr/bin/
 lib/runtime-umu usr/lib/eczos/gaming/
+lib/repair-runtime usr/lib/eczos/gaming/
+polkit/*.policy usr/share/polkit-1/actions/
 runtime-definitions/umu-launcher-1.4.0.json usr/share/eczos/gaming/runtime-definitions/

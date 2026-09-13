@@ -23,6 +23,9 @@ for required in \
     packages/eczos-branding/assets/screenshots/migration.png \
     packages/eczos-branding/assets/screenshots/recovery.png \
     packages/eczos-branding/assets/screenshots/diagnostics.png \
+    packages/eczos-branding/assets/screenshots/system-appearance.png \
+    packages/eczos-branding/assets/screenshots/system-display.png \
+    packages/eczos-branding/assets/screenshots/system-network.png \
     packages/eczos-sddm-theme/debian/control \
     packages/eczos-plymouth-theme/debian/control \
     packages/eczos-plymouth-theme/debian/preinst \
@@ -42,6 +45,8 @@ for required in \
     packages/eczos-gaming-core/debian/control \
     packages/eczos-gaming-core/bin/eczos-gaming \
     packages/eczos-gaming-core/lib/runtime-umu \
+    packages/eczos-gaming-core/lib/repair-runtime \
+    packages/eczos-gaming-core/polkit/org.eczos.gaming.policy \
     packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json \
     packages/eczos-platform-tools/debian/control \
     packages/eczos-platform-tools/bin/eczos-control-center \
@@ -85,6 +90,7 @@ for required in \
     scripts/build-isolated-hardware-image-vm.sh \
     scripts/stage-prebuild-experience-vm.sh \
     scripts/stage-ux-batch-vm.sh \
+    scripts/stage-settings-gaming-batch-vm.sh \
     scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done

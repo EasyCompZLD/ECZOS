@@ -1,3 +1,15 @@
+eczos-desktop (0.1.0~dev28) UNRELEASED; urgency=medium
+
+  * Require complete, searchable KDE module access from ECZOS Settings.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 20:00:00 +0200
+
+eczos-desktop (0.1.0~dev27) UNRELEASED; urgency=medium
+
+  * Require guided repair support for incomplete gaming runtimes.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 20:00:00 +0200
+
 eczos-desktop (0.1.0~dev26) UNRELEASED; urgency=medium
 
   * Require the screenshot-rich ECZOS first-run tour.

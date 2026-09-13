@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+die() { printf 'FOUT: %s\n' "$*" >&2; exit 1; }
+event() {
+    local fraction=$1 message=$2
+    printf 'ECZOS_EVENT {"type":"progress","fraction":%s,"message":"%s"}\n' "$fraction" "$message"
+}
+
+[[ $(id -u) -eq 0 ]] || die 'de gaming-runtime moet via systeemauthenticatie worden hersteld'
+[[ $# -eq 0 ]] || die 'ongeldige aanroep'
+# shellcheck disable=SC1091
+source /etc/os-release
+[[ ${ID:-} == debian && ${VERSION_CODENAME:-} == trixie ]] || die 'Debian 13 is vereist'
+[[ $(dpkg --print-architecture) == amd64 ]] || die 'alleen amd64 wordt ondersteund'
+
+definition=/usr/share/eczos/gaming/runtime-definitions/umu-launcher-1.4.0.json
+[[ -r $definition ]] || die 'de vastgelegde runtime-definitie ontbreekt'
+url=$(jq -er .url "$definition")
+expected_sha256=$(jq -er .sha256 "$definition")
+expected_package=$(jq -er .package "$definition")
+expected_version=$(jq -er .version "$definition")
+[[ $url == https://* && $expected_sha256 =~ ^[0-9a-fA-F]{64}$ ]] || die 'de runtime-definitie is ongeldig'
+
+export DEBIAN_FRONTEND=noninteractive
+event 0.05 'Gaming-onderdelen voorbereiden…'
+if ! dpkg --print-foreign-architectures | grep -Fxq i386; then
+    dpkg --add-architecture i386
+fi
+apt-get update
+event 0.25 'Vulkan en GameMode controleren…'
+apt-get install -y curl gamemode jq mesa-vulkan-drivers mesa-vulkan-drivers:i386 vulkan-tools
+
+installed_umu_version=$(dpkg-query -W -f='${Version}' "$expected_package" 2>/dev/null || true)
+if ! command -v umu-run >/dev/null 2>&1 || \
+        [[ -z $installed_umu_version ]] || \
+        ! dpkg --compare-versions "$installed_umu_version" ge "$expected_version"; then
+    temp_dir=$(mktemp -d /tmp/eczos-gaming-repair.XXXXXX)
+    trap 'rm -rf "$temp_dir"' EXIT
+    deb="$temp_dir/umu-launcher.deb"
+    event 0.55 'UMU/Proton-ondersteuning downloaden…'
+    curl --fail --location --proto '=https' --tlsv1.2 --output "$deb" "$url"
+    printf '%s  %s\n' "$expected_sha256" "$deb" | sha256sum --check --strict --status || \
+        die 'de veiligheidscontrole van UMU is mislukt'
+    [[ $(dpkg-deb --field "$deb" Package) == "$expected_package" ]] || die 'onverwacht pakket gedownload'
+    [[ $(dpkg-deb --field "$deb" Version) == "$expected_version" ]] || die 'onverwachte pakketversie gedownload'
+    [[ $(dpkg-deb --field "$deb" Architecture) == amd64 ]] || die 'onverwachte pakketarchitectuur gedownload'
+    event 0.78 'UMU/Proton-ondersteuning installeren…'
+    apt-get install -y "$deb"
+fi
+
+command -v gamemoderun >/dev/null 2>&1 || die 'GameMode is na installatie niet beschikbaar'
+command -v umu-run >/dev/null 2>&1 || die 'UMU is na installatie niet beschikbaar'
+[[ -e /usr/lib/i386-linux-gnu/libvulkan.so.1 ]] || die 'de 32-bit Vulkan-driver is na installatie niet beschikbaar'
+event 1.0 'Gaming-ondersteuning is compleet.'

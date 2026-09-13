@@ -35,11 +35,13 @@ PACKAGES=(
 FREEOFFICE_PACKAGE=softmaker-freeoffice-2024
 FREEOFFICE_VERSION=3702
 FREEOFFICE_SHA256=d518ce8058cfae4314f828b3885236aeb964551f3589f2b83d74ef02d80c1e23
+UMU_DEFINITION="$ROOT_DIR/packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json"
 TEMP_DIR=$(mktemp -d /tmp/eczos-image-packages.XXXXXX)
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
 mkdir -p "$STAGING_DIR" "$MANIFEST_DIR"
 find "$STAGING_DIR" -maxdepth 1 -type f -name 'eczos-*.deb' -delete
+find "$STAGING_DIR" -maxdepth 1 -type f -name 'python3-umu-launcher_*.deb' -delete
 
 for package in "${PACKAGES[@]}"; do
     package_dir="$ROOT_DIR/packages/$package"
@@ -56,7 +58,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config lookandfeel product qml release runtime-definitions theme xdg; do
+    for data_dir in applications assets branding config lookandfeel polkit product qml release runtime-definitions theme xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi
@@ -90,6 +92,22 @@ test "$(dpkg-deb -f "$freeoffice_deb" Package)" = "$FREEOFFICE_PACKAGE"
 test "$(dpkg-deb -f "$freeoffice_deb" Version)" = "$FREEOFFICE_VERSION"
 test "$(dpkg-deb -f "$freeoffice_deb" Architecture)" = amd64
 install -m 0644 "$freeoffice_deb" "$STAGING_DIR/"
+
+command -v curl >/dev/null 2>&1 || {
+    printf 'curl is required to retrieve the pinned UMU runtime.\n' >&2
+    exit 1
+}
+umu_url=$(jq -er .url "$UMU_DEFINITION")
+umu_sha256=$(jq -er .sha256 "$UMU_DEFINITION")
+umu_package=$(jq -er .package "$UMU_DEFINITION")
+umu_version=$(jq -er .version "$UMU_DEFINITION")
+umu_deb="$TEMP_DIR/${umu_package}_${umu_version}_amd64.deb"
+curl --fail --location --proto '=https' --tlsv1.2 --output "$umu_deb" "$umu_url"
+printf '%s  %s\n' "$umu_sha256" "$umu_deb" | sha256sum --check --strict --status
+test "$(dpkg-deb -f "$umu_deb" Package)" = "$umu_package"
+test "$(dpkg-deb -f "$umu_deb" Version)" = "$umu_version"
+test "$(dpkg-deb -f "$umu_deb" Architecture)" = amd64
+install -m 0644 "$umu_deb" "$STAGING_DIR/"
 
 lintian "$STAGING_DIR"/eczos-*.deb || true
 (cd "$STAGING_DIR" && sha256sum ./*.deb > "$MANIFEST_DIR/SHA256SUMS")

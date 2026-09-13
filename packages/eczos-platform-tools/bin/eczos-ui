@@ -2,8 +2,10 @@
 """Native ECZOS control surface. Privileged work stays in narrow helpers."""
 
 import json
+import os
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -12,7 +14,57 @@ from PySide6.QtGui import QGuiApplication, QDesktopServices
 from PySide6.QtQml import QQmlApplicationEngine
 
 
-ROUTES = {"settings", "windows", "gaming", "migration", "diagnostics", "recovery", "support"}
+ROUTES = {"settings", "system", "windows", "gaming", "migration", "diagnostics", "recovery", "support"}
+
+
+def kcm_category(module_id):
+    value = module_id.lower()
+    groups = (
+        ("Uiterlijk", ("lookandfeel", "style", "color", "icon", "cursor", "font", "splash", "wallpaper", "decoration")),
+        ("Werkruimte", ("kwin", "workspace", "desktop", "activity", "task", "search", "krunner", "shortcut", "notification", "autostart")),
+        ("Apparaten", ("audio", "sound", "mouse", "keyboard", "touchpad", "kscreen", "display", "powerdevil", "energy", "printer", "tablet", "joystick", "camera")),
+        ("Netwerk en verbinding", ("network", "proxy", "firewall", "bluetooth", "thunderbolt", "smb", "wifi")),
+        ("Taal en accounts", ("region", "language", "format", "spell", "account", "user", "clock", "time", "date")),
+        ("Privacy en beveiliging", ("locker", "wallet", "permission", "privacy", "feedback", "security")),
+    )
+    for label, words in groups:
+        if any(word in value for word in words):
+            return label
+    return "Overige instellingen"
+
+
+def discover_kcms():
+    executable = shutil.which("kcmshell6")
+    if not executable:
+        return []
+    try:
+        environment = dict(os.environ)
+        # Even listing modules initializes Qt. The offscreen backend keeps the
+        # inventory usable in package tests, over SSH and before a GUI session.
+        environment.setdefault("QT_QPA_PLATFORM", "offscreen")
+        result = subprocess.run(
+            [executable, "--list"],
+            text=True,
+            capture_output=True,
+            timeout=20,
+            check=False,
+            env=environment,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    modules = {}
+    for line in (result.stdout + "\n" + result.stderr).splitlines():
+        match = re.match(r"^\s*([A-Za-z0-9_.-]+)\s+-\s+(.+?)\s*$", line)
+        if not match:
+            continue
+        module_id, name = match.groups()
+        modules[module_id] = {"id": module_id, "name": name, "category": kcm_category(module_id)}
+    return sorted(modules.values(), key=lambda item: (item["category"], item["name"].casefold()))
+
+
+if len(sys.argv) > 1 and sys.argv[1] == "--list-kcms-json":
+    print(json.dumps({"schemaVersion": 1, "modules": discover_kcms()}, ensure_ascii=False))
+    raise SystemExit(0)
 
 
 class Bridge(QObject):
@@ -36,6 +88,7 @@ class Bridge(QObject):
         self._download_output = None
         self._download_final = None
         self._download_sha256 = ""
+        self._known_kcms = set()
 
     @Property(str, notify=routeChanged)
     def route(self):
@@ -99,6 +152,8 @@ class Bridge(QObject):
             self.dataReady.emit("windows", json.dumps({"apps": apps}))
         elif kind == "recovery":
             self._start("recovery-devices", "/usr/bin/lsblk", ["-Jpo", "NAME,TYPE,SIZE,MODEL,TRAN,RM"])
+        elif kind == "system":
+            self._start("system", "/usr/bin/eczos-ui", ["--list-kcms-json"])
 
     def _start(self, kind, program, arguments):
         if self._process and self._process.state() != QProcess.NotRunning:
@@ -153,6 +208,15 @@ class Bridge(QObject):
             if kind in {"diagnostics", "gaming"}:
                 self.dataReady.emit(kind, self._stdout.strip())
                 self._set_status("Controle voltooid")
+            elif kind == "system":
+                try:
+                    raw = json.loads(self._stdout)
+                    modules = raw.get("modules", [])
+                    self._known_kcms = {item.get("id") for item in modules if item.get("id")}
+                    self.dataReady.emit("system", json.dumps({"modules": modules}, ensure_ascii=False))
+                    self._set_status(f"{len(modules)} instellingenonderdelen gevonden")
+                except ValueError:
+                    self._set_status("De systeeminstellingen konden niet worden gelezen.")
             elif kind == "recovery-devices":
                 try:
                     raw = json.loads(self._stdout)
@@ -214,6 +278,10 @@ class Bridge(QObject):
             elif kind == "recovery-write":
                 self._set_progress(1)
                 self._set_status("Klaar. Het herstelmedium kan veilig worden verwijderd.")
+            elif kind == "gaming-repair":
+                self._set_progress(1)
+                self._set_status("Gaming-ondersteuning geïnstalleerd; opnieuw controleren…")
+                follow_up = lambda: self.refresh("gaming")
             elif kind == "support":
                 output = self._stdout.strip().splitlines()[-1] if self._stdout.strip() else ""
                 self._set_status(output or "Supportrapport gemaakt")
@@ -255,6 +323,11 @@ class Bridge(QObject):
         else:
             self._start("windows-action", "/usr/bin/eczos-windows", arguments)
 
+    @Slot(str)
+    def launchKcm(self, module_id):
+        if module_id in self._known_kcms and re.fullmatch(r"[A-Za-z0-9_.-]+", module_id):
+            QProcess.startDetached("/usr/bin/kcmshell6", [module_id])
+
     @Slot(str, bool)
     def migrate(self, source, apply):
         if source:
@@ -264,6 +337,10 @@ class Bridge(QObject):
     @Slot()
     def createSupportReport(self):
         self._start("support", "/usr/bin/eczos-support-report", ["--no-gui"])
+
+    @Slot()
+    def repairGaming(self):
+        self._start("gaming-repair", "/usr/bin/pkexec", ["/usr/lib/eczos/gaming/repair-runtime"])
 
     @Slot()
     def loadRecoveryCatalog(self):
