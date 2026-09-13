@@ -16,6 +16,8 @@ grep -Fx '    shortProductName: ECZOS' /usr/share/calamares/branding/eczos/brand
 grep -Fx 'welcomeStyleCalamares: false' /usr/share/calamares/branding/eczos/branding.desc
 grep -F 'color: "#f2071829"' /usr/share/calamares/branding/eczos/show.qml
 grep -F 'Je vertrouwde programma' /usr/share/calamares/branding/eczos/show.qml
+grep -F 'branding/screenshots/windows-apps.png' /usr/share/calamares/branding/eczos/show.qml
+grep -F 'branding/screenshots/gaming.png' /usr/share/calamares/branding/eczos/show.qml
 if grep -REi 'Debian GNU/Linux|Install Debian' \
     /usr/share/calamares/branding/eczos \
     /usr/share/applications/org.eczos.Installer.desktop; then

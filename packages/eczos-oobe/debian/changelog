@@ -1,3 +1,9 @@
+eczos-oobe (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Show real ECZOS application screenshots throughout the first-run tour.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 19:20:00 +0200
+
 eczos-oobe (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Block Plasma Welcome even if it is reinstalled after ECZOS OOBE.

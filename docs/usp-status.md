@@ -10,9 +10,9 @@ Status date: 2026-09-13.
 | Built-in Gaming Mode | Vulkan doctor, GameMode/UMU adapter and physically launched Debian Steam bootstrap | Optional per-game profiles and DXVK/VKD3D qualification |
 | Windows migration | Safe personal-folder dry-run/apply MVP | Browser import, app transition mapping and OOBE page |
 | Windows-style drives | Root `Z:` removed; explicit D:–Y: mappings stored per app and managed graphically | Broader network-drive discovery |
-| Repair and diagnostics | Windows repair plus system, gaming and support diagnostics | Graphical guided system repair actions |
+| Repair and diagnostics | Unified ECZOS interface with Windows repair plus system, gaming and support diagnostics | Guided automatic system repair actions |
 | One app ecosystem | Plasma Discover with APT, firmware and Flathub plus ECZ Windows launchers | Unified trust labels across all sources |
-| Familiar Linux desktop | Windows-style Plasma defaults, ECZOS boot/login/console branding and native desktop app set | Optional dock layout and full OOBE |
+| Familiar Linux desktop | Windows-style Plasma defaults, ECZOS boot/login/console branding, unified native tools and a screenshot-rich OOBE | Optional dock layout |
 | Support-aware OS | Local privacy-conscious support report | Vendor-approved remote-support enrollment |
 
 ## Standard application set

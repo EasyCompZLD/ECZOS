@@ -1,0 +1,331 @@
+#!/usr/bin/python3
+"""Native ECZOS control surface. Privileged work stays in narrow helpers."""
+
+import json
+import re
+import shutil
+import sys
+from pathlib import Path
+
+from PySide6.QtCore import QObject, Property, QProcess, QTimer, QUrl, Signal, Slot
+from PySide6.QtGui import QGuiApplication, QDesktopServices
+from PySide6.QtQml import QQmlApplicationEngine
+
+
+ROUTES = {"settings", "windows", "gaming", "migration", "diagnostics", "recovery", "support"}
+
+
+class Bridge(QObject):
+    routeChanged = Signal()
+    busyChanged = Signal()
+    progressChanged = Signal()
+    statusChanged = Signal()
+    dataReady = Signal(str, str)
+
+    def __init__(self, route):
+        super().__init__()
+        self._route = route
+        self._busy = False
+        self._progress = 0.0
+        self._status = ""
+        self._process = None
+        self._process_kind = ""
+        self._stdout = ""
+        self._stderr = ""
+        self._event_buffer = ""
+        self._download_output = None
+        self._download_final = None
+        self._download_sha256 = ""
+
+    @Property(str, notify=routeChanged)
+    def route(self):
+        return self._route
+
+    @Property(bool, notify=busyChanged)
+    def busy(self):
+        return self._busy
+
+    @Property(float, notify=progressChanged)
+    def progress(self):
+        return self._progress
+
+    @Property(str, notify=statusChanged)
+    def status(self):
+        return self._status
+
+    def _set_busy(self, value):
+        if self._busy != value:
+            self._busy = value
+            self.busyChanged.emit()
+
+    def _set_progress(self, value):
+        value = max(0.0, min(1.0, float(value)))
+        if self._progress != value:
+            self._progress = value
+            self.progressChanged.emit()
+
+    def _set_status(self, text):
+        if self._status != text:
+            self._status = text
+            self.statusChanged.emit()
+
+    @staticmethod
+    def _local_path(value):
+        url = QUrl(value)
+        return url.toLocalFile() if url.isLocalFile() else value
+
+    @Slot(str)
+    def navigate(self, route):
+        if route in ROUTES and route != self._route:
+            self._route = route
+            self.routeChanged.emit()
+        self.refresh(route)
+
+    @Slot(str)
+    def refresh(self, kind):
+        if kind == "diagnostics":
+            self._start("diagnostics", "/usr/bin/eczos-doctor", ["--json"])
+        elif kind == "gaming":
+            self._start("gaming", "/usr/bin/eczos-gaming", ["doctor", "--json"])
+        elif kind == "windows":
+            apps_root = Path.home() / ".local/share/eczos/windows/apps"
+            apps = []
+            for manifest in sorted(apps_root.glob("*/manifest.json")):
+                try:
+                    record = json.loads(manifest.read_text(encoding="utf-8"))
+                    apps.append({key: record.get(key) for key in ("id", "name", "status", "runtime", "icon", "category")})
+                except (OSError, ValueError):
+                    continue
+            self.dataReady.emit("windows", json.dumps({"apps": apps}))
+        elif kind == "recovery":
+            self._start("recovery-devices", "/usr/bin/lsblk", ["-Jpo", "NAME,TYPE,SIZE,MODEL,TRAN,RM"])
+
+    def _start(self, kind, program, arguments):
+        if self._process and self._process.state() != QProcess.NotRunning:
+            self._set_status("Er is al een taak bezig.")
+            return
+        if not Path(program).exists():
+            self._set_status("Dit ECZOS-onderdeel is niet geïnstalleerd.")
+            return
+        self._process_kind = kind
+        self._stdout = ""
+        self._stderr = ""
+        self._event_buffer = ""
+        self._set_progress(0)
+        self._set_busy(True)
+        self._set_status("Bezig…")
+        process = QProcess(self)
+        self._process = process
+        process.setProgram(program)
+        process.setArguments(arguments)
+        process.readyReadStandardOutput.connect(self._read_stdout)
+        process.readyReadStandardError.connect(self._read_stderr)
+        process.finished.connect(self._finished)
+        process.start()
+
+    def _read_stdout(self):
+        text = bytes(self._process.readAllStandardOutput()).decode(errors="replace")
+        self._stdout = (self._stdout + text)[-262144:]
+        self._event_buffer += text
+        lines = self._event_buffer.split("\n")
+        self._event_buffer = lines.pop()
+        for line in lines:
+            if line.startswith("ECZOS_EVENT "):
+                try:
+                    event = json.loads(line.removeprefix("ECZOS_EVENT "))
+                except ValueError:
+                    continue
+                if event.get("type") == "progress":
+                    self._set_progress(event.get("fraction", 0))
+                    self._set_status(event.get("message", "Herstelmedium schrijven…"))
+
+    def _read_stderr(self):
+        self._stderr += bytes(self._process.readAllStandardError()).decode(errors="replace")
+
+    def _finished(self, exit_code, _exit_status):
+        self._read_stdout()
+        self._read_stderr()
+        kind = self._process_kind
+        process = self._process
+        follow_up = None
+        self._set_busy(False)
+        if exit_code == 0:
+            if kind in {"diagnostics", "gaming"}:
+                self.dataReady.emit(kind, self._stdout.strip())
+                self._set_status("Controle voltooid")
+            elif kind == "recovery-devices":
+                try:
+                    raw = json.loads(self._stdout)
+                    devices = []
+                    for item in raw.get("blockdevices", []):
+                        removable = item.get("rm") in (True, 1)
+                        transport = item.get("tran") or ""
+                        dev_type = item.get("type")
+                        if dev_type == "rom" or (dev_type == "disk" and (removable or transport in {"usb", "mmc"} or item.get("name", "").startswith("/dev/mmcblk"))):
+                            model = (item.get("model") or ("Optisch station" if dev_type == "rom" else "Verwisselbaar medium")).strip()
+                            devices.append({"name": item.get("name"), "type": dev_type, "size": item.get("size") or "?", "label": f"{model}  •  {item.get('size') or '?'}  •  {item.get('name')}"})
+                    self.dataReady.emit(kind, json.dumps({"devices": devices}))
+                    self._set_status("Apparaten bijgewerkt")
+                except ValueError:
+                    self._set_status("Apparaten konden niet worden gelezen.")
+            elif kind == "recovery-catalog":
+                try:
+                    raw = json.loads(self._stdout)
+                    if raw.get("schema") != 1 or not isinstance(raw.get("releases"), list):
+                        raise ValueError("unsupported catalog schema")
+                    releases = []
+                    for item in raw.get("releases", []):
+                        url = item.get("url", "")
+                        sha256 = item.get("sha256", "")
+                        version = item.get("version", "")
+                        if isinstance(url, str) and isinstance(sha256, str) and url.startswith("https://") and re.fullmatch(r"[0-9a-fA-F]{64}", sha256) and version:
+                            version = str(version)
+                            channel = str(item.get("channel") or "release")
+                            published = str(item.get("published") or "datum onbekend")
+                            releases.append({
+                                "version": version,
+                                "channel": channel,
+                                "published": published,
+                                "url": url,
+                                "sha256": sha256.lower(),
+                                "label": f"ECZOS {version}  •  {channel}  •  {published}",
+                            })
+                    releases.sort(key=lambda item: item["published"], reverse=True)
+                    self.dataReady.emit("recovery-releases", json.dumps({"releases": releases}))
+                    self._set_status("Beschikbare ECZOS-versies bijgewerkt" if releases else "Er staan nog geen downloadbare versies in de catalogus.")
+                except ValueError:
+                    self._set_status("De ECZOS-downloadcatalogus heeft een ongeldig formaat.")
+            elif kind == "recovery-download":
+                self._set_status("Download voltooid; veiligheidscontrole uitvoeren…")
+                follow_up = lambda: self._start("recovery-verify", "/usr/bin/sha256sum", [str(self._download_output)])
+            elif kind == "recovery-verify":
+                digest = self._stdout.strip().split()[0].lower() if self._stdout.strip() else ""
+                if digest != self._download_sha256:
+                    self._download_output.unlink(missing_ok=True)
+                    self._set_status("De veiligheidscontrole van de download is mislukt.")
+                else:
+                    try:
+                        if self._download_output != self._download_final:
+                            self._download_output.replace(self._download_final)
+                        self.dataReady.emit("recovery-download", json.dumps({"path": str(self._download_final)}))
+                        self._set_status("Installatiekopie gedownload en gecontroleerd")
+                    except OSError:
+                        self._set_status("De gedownloade installatiekopie kon niet worden opgeslagen.")
+            elif kind == "recovery-write":
+                self._set_progress(1)
+                self._set_status("Klaar. Het herstelmedium kan veilig worden verwijderd.")
+            elif kind == "support":
+                output = self._stdout.strip().splitlines()[-1] if self._stdout.strip() else ""
+                self._set_status(output or "Supportrapport gemaakt")
+            elif kind.startswith("migration"):
+                self._set_status("Voorbeeld voltooid" if kind.endswith("preview") else "Bestanden overzetten voltooid")
+            else:
+                self._set_status("Klaar")
+        else:
+            if kind == "recovery-download" and self._download_output:
+                self._download_output.unlink(missing_ok=True)
+            detail = (self._stderr or self._stdout).strip().splitlines()
+            self._set_status(detail[-1] if detail else "De taak is mislukt.")
+        process.deleteLater()
+        self._process = None
+        if follow_up:
+            QTimer.singleShot(0, follow_up)
+
+    @Slot(str)
+    def launch(self, action):
+        commands = {
+            "apps": ["plasma-discover"], "devices": ["systemsettings"],
+            "backup": ["kcmshell6", "kcm_kup"], "phone": ["kdeconnect-app"],
+            "about": ["kinfocenter"], "steam": ["steam"],
+        }
+        command = commands.get(action)
+        if command and shutil.which(command[0]):
+            QProcess.startDetached(command[0], command[1:])
+
+    @Slot(str, str)
+    def windowsAction(self, app_id, action):
+        if not app_id or action not in {"run", "rescan", "repair", "remove"}:
+            return
+        arguments = [action]
+        if action == "remove":
+            arguments.append("--yes")
+        arguments.append(app_id)
+        if action == "run":
+            QProcess.startDetached("/usr/bin/eczos-windows", arguments)
+        else:
+            self._start("windows-action", "/usr/bin/eczos-windows", arguments)
+
+    @Slot(str, bool)
+    def migrate(self, source, apply):
+        if source:
+            source = self._local_path(source)
+            self._start("migration-apply" if apply else "migration-preview", "/usr/bin/eczos-migrate", ["--apply" if apply else "--dry-run", "--source", source, "--no-gui"])
+
+    @Slot()
+    def createSupportReport(self):
+        self._start("support", "/usr/bin/eczos-support-report", ["--no-gui"])
+
+    @Slot()
+    def loadRecoveryCatalog(self):
+        config = Path("/etc/eczos/recovery-media.conf")
+        url = ""
+        try:
+            for line in config.read_text(encoding="utf-8").splitlines():
+                if line.startswith("CatalogURL="):
+                    url = line.partition("=")[2].strip()
+                    break
+        except OSError:
+            pass
+        if not url.startswith("https://"):
+            self._set_status("De ECZOS-downloadcatalogus is nog niet ingesteld. Kies een lokale ISO.")
+            return
+        self._start("recovery-catalog", "/usr/bin/curl", ["--fail", "--silent", "--show-error", "--location", "--proto", "=https", "--tlsv1.2", url])
+
+    @Slot(str, str, str)
+    def downloadRecovery(self, version, url, expected_sha256):
+        if not url.startswith("https://") or not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha256):
+            self._set_status("Deze downloadvermelding is niet veilig bruikbaar.")
+            return
+        safe_version = re.sub(r"[^A-Za-z0-9._-]", "", version)
+        if not safe_version:
+            self._set_status("De gekozen ECZOS-versie heeft een ongeldige naam.")
+            return
+        cache = Path.home() / ".cache/eczos/recovery-media"
+        cache.mkdir(mode=0o700, parents=True, exist_ok=True)
+        final = cache / f"ECZOS-{safe_version}.iso"
+        self._download_sha256 = expected_sha256.lower()
+        self._download_final = final
+        if final.exists():
+            self._download_output = final
+            self._start("recovery-verify", "/usr/bin/sha256sum", [str(final)])
+            self._set_status("Bestaande installatiekopie controleren…")
+            return
+        part = final.with_suffix(final.suffix + ".part")
+        part.unlink(missing_ok=True)
+        self._download_output = part
+        self._start("recovery-download", "/usr/bin/curl", ["--fail", "--location", "--proto", "=https", "--tlsv1.2", "--output", str(part), url])
+        self._set_status(f"ECZOS {version} downloaden…")
+
+    @Slot(str, str, str)
+    def writeRecovery(self, mode, image, target):
+        if mode in {"disk", "dvd"} and image and target:
+            image = self._local_path(image)
+            self._start("recovery-write", "/usr/bin/pkexec", ["/usr/lib/eczos-recovery-media/write-media", mode, image, target, "--json-progress"])
+
+    @Slot(str)
+    def openPath(self, path):
+        if path:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+
+
+route = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] in ROUTES else "settings"
+app = QGuiApplication(sys.argv)
+app.setOrganizationName("EasyComp Zeeland")
+app.setApplicationName("ECZOS Instellingen")
+engine = QQmlApplicationEngine()
+bridge = Bridge(route)
+engine.rootContext().setContextProperty("backend", bridge)
+engine.load(QUrl.fromLocalFile("/usr/share/eczos/ui/Main.qml"))
+if not engine.rootObjects():
+    raise SystemExit(1)
+raise SystemExit(app.exec())

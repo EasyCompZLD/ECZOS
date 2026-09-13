@@ -17,6 +17,12 @@ for required in \
     packages/eczos-branding/debian/control \
     packages/eczos-branding/debian/install \
     packages/eczos-branding/config/zz-eczos-grub.cfg \
+    packages/eczos-branding/assets/screenshots/settings.png \
+    packages/eczos-branding/assets/screenshots/windows-apps.png \
+    packages/eczos-branding/assets/screenshots/gaming.png \
+    packages/eczos-branding/assets/screenshots/migration.png \
+    packages/eczos-branding/assets/screenshots/recovery.png \
+    packages/eczos-branding/assets/screenshots/diagnostics.png \
     packages/eczos-sddm-theme/debian/control \
     packages/eczos-plymouth-theme/debian/control \
     packages/eczos-plymouth-theme/debian/preinst \
@@ -39,6 +45,8 @@ for required in \
     packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json \
     packages/eczos-platform-tools/debian/control \
     packages/eczos-platform-tools/bin/eczos-control-center \
+    packages/eczos-platform-tools/bin/eczos-ui \
+    packages/eczos-platform-tools/qml/Main.qml \
     packages/eczos-platform-tools/bin/eczos-doctor \
     packages/eczos-platform-tools/bin/eczos-migrate \
     packages/eczos-platform-tools/bin/eczos-support-report \
@@ -76,6 +84,7 @@ for required in \
     scripts/build-hardware-qualification-image-vm.sh \
     scripts/build-isolated-hardware-image-vm.sh \
     scripts/stage-prebuild-experience-vm.sh \
+    scripts/stage-ux-batch-vm.sh \
     scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
@@ -89,6 +98,13 @@ sh -n "$ROOT_DIR/image/config/includes.chroot/usr/lib/live/config/1095-eczos-liv
 
 python3 - "$ROOT_DIR/packages/eczos-oobe/bin/eczos-oobe" <<'PY' || \
     fail 'invalid ECZOS OOBE Python source'
+import pathlib
+import sys
+compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
+PY
+
+python3 - "$ROOT_DIR/packages/eczos-platform-tools/bin/eczos-ui" <<'PY' || \
+    fail 'invalid ECZOS interface Python source'
 import pathlib
 import sys
 compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
@@ -143,6 +159,17 @@ for asset in \
     assets/wallpapers/eczoswallpaper-light.png; do
     [[ -s "$ROOT_DIR/packages/eczos-branding/$asset" ]] || fail "missing or empty branding asset: $asset"
 done
+
+for screenshot in settings windows-apps gaming migration recovery diagnostics; do
+    [[ -s "$ROOT_DIR/packages/eczos-branding/assets/screenshots/$screenshot.png" ]] || \
+        fail "missing product screenshot: $screenshot.png"
+done
+grep -Fq 'branding/screenshots/settings.png' \
+    "$ROOT_DIR/packages/eczos-oobe/qml/Main.qml" || \
+    fail 'ECZOS OOBE does not use product screenshots'
+grep -Fq 'branding/screenshots/windows-apps.png' \
+    "$ROOT_DIR/packages/eczos-installer/branding/eczos/show.qml" || \
+    fail 'ECZOS installer does not use product screenshots'
 
 while IFS= read -r script; do
     if head -n 1 "$script" | grep -q 'python3'; then

@@ -3,12 +3,14 @@ set -Eeuo pipefail
 
 die() { printf 'FOUT: %s\n' "$*" >&2; exit 1; }
 [[ $(id -u) -eq 0 ]] || die 'de schrijver moet via systeemauthenticatie als root draaien'
-[[ $# -eq 3 || ($# -eq 4 && $4 == --validate-only) ]] || die 'ongeldige aanroep'
+[[ $# -eq 3 || ($# -eq 4 && ($4 == --validate-only || $4 == --json-progress)) ]] || die 'ongeldige aanroep'
 mode=$1
 image=$(realpath -e -- "$2")
 target=$(readlink -f -- "$3")
 validate_only=false
+json_progress=false
 [[ ${4:-} == --validate-only ]] && validate_only=true
+[[ ${4:-} == --json-progress ]] && json_progress=true
 [[ -f $image && -r $image ]] || die 'de installatiekopie is niet leesbaar'
 [[ $target == /dev/* && -b $target ]] || die 'het doel is geen blokapparaat'
 
@@ -52,7 +54,26 @@ case $mode in
             fi
         done < <(lsblk -lnpo NAME -- "$target")
         printf 'Schrijven naar %s. Dit kan enige tijd duren...\n' "$target"
-        dd if="$image" of="$target" bs=4M iflag=fullblock conv=fsync status=progress
+        if $json_progress; then
+            printf 'ECZOS_EVENT {"type":"progress","fraction":0.01,"message":"Herstelmedium voorbereiden…"}\n'
+            LC_ALL=C dd if="$image" of="$target" bs=4M iflag=fullblock conv=fsync status=progress \
+                2> >(tr '\r' '\n' | awk -v total="$image_size" '
+                    BEGIN { started = systime() }
+                    /^[0-9]+ bytes/ {
+                        bytes = $1
+                        fraction = bytes / total
+                        if (fraction > 1) fraction = 1
+                        elapsed = systime() - started
+                        remaining = (bytes > 0 && elapsed > 0) ? int(((total - bytes) * elapsed / bytes) / 60 + 0.5) : 0
+                        percent = int(fraction * 100)
+                        message = "Herstelmedium schrijven… " percent "%"
+                        if (remaining > 0) message = message " • ongeveer " remaining " min resterend"
+                        printf "ECZOS_EVENT {\"type\":\"progress\",\"fraction\":%.4f,\"message\":\"%s\"}\n", fraction, message
+                        fflush()
+                    }')
+        else
+            dd if="$image" of="$target" bs=4M iflag=fullblock conv=fsync status=progress
+        fi
         sync
         blockdev --rereadpt "$target" 2>/dev/null || true
         ;;
@@ -63,8 +84,35 @@ case $mode in
             exit 0
         fi
         printf 'Branden naar %s. Dit kan enige tijd duren...\n' "$target"
-        xorriso -as cdrecord -v dev="$target" blank=as_needed -eject "$image"
+        if $json_progress; then
+            printf 'ECZOS_EVENT {"type":"progress","fraction":0.05,"message":"Schijf branden… dit kan enige tijd duren"}\n'
+            LC_ALL=C xorriso -as cdrecord -v dev="$target" blank=as_needed -eject "$image" \
+                2> >(tr '\r' '\n' | awk '
+                    BEGIN { started = systime() }
+                    {
+                        print > "/dev/stderr"
+                        for (field = 2; field < NF; field++) {
+                            if ($field == "of" && $(field - 1) + 0 > 0 && $(field + 1) + 0 > 0) {
+                                written = $(field - 1) + 0
+                                total = $(field + 1) + 0
+                                fraction = written / total
+                                if (fraction > 1) fraction = 1
+                                elapsed = systime() - started
+                                remaining = (written > 0 && elapsed > 0) ? int(((total - written) * elapsed / written) / 60 + 0.5) : 0
+                                percent = int(fraction * 100)
+                                message = "Schijf branden… " percent "%"
+                                if (remaining > 0) message = message " • ongeveer " remaining " min resterend"
+                                printf "ECZOS_EVENT {\"type\":\"progress\",\"fraction\":%.4f,\"message\":\"%s\"}\n", fraction, message
+                                fflush()
+                                break
+                            }
+                        }
+                    }')
+        else
+            xorriso -as cdrecord -v dev="$target" blank=as_needed -eject "$image"
+        fi
         ;;
     *) die 'onbekend mediatype' ;;
 esac
 printf '\nKlaar. Het ECZOS-herstelmedium is geschreven en kan veilig worden verwijderd.\n'
+$json_progress && printf 'ECZOS_EVENT {"type":"progress","fraction":1.0,"message":"Klaar. Het herstelmedium kan veilig worden verwijderd."}\n'

@@ -11,8 +11,8 @@ Package: eczos-gaming-core
 Architecture: amd64
 Depends:
  ${misc:Depends},
+ eczos-platform-tools (>= 0.1.0~dev5),
  jq,
- kdialog,
  pciutils,
  vulkan-tools
 Recommends:

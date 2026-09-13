@@ -2,7 +2,7 @@
 Type=Application
 Name=ECZ Windows-apps
 Comment=Windows-applicaties bekijken, starten en herstellen
-Exec=eczos-windows manage
+Exec=eczos-ui windows
 Icon=eczos-start
 Terminal=false
 Categories=System;Utility;

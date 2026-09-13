@@ -5,7 +5,9 @@ json=false
 gui=false
 case ${1:-} in
     --json) json=true ;;
-    --gui) gui=true ;;
+    --gui)
+        exec /usr/bin/eczos-ui diagnostics
+        ;;
     '') ;;
     *) printf 'Gebruik: eczos-doctor [--json|--gui]\n' >&2; exit 2 ;;
 esac
@@ -65,8 +67,4 @@ Mislukte systeemdiensten: $failed_units
 EOF
 )
 
-if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
-    kdialog --title 'ECZOS Diagnose' --msgbox "$report"
-else
-    printf '%s\n' "$report"
-fi
+printf '%s\n' "$report"

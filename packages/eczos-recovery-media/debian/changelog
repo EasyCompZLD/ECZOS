@@ -1,3 +1,10 @@
+eczos-recovery-media (0.1.0~dev2) UNRELEASED; urgency=medium
+
+  * Keep image writing inside the ECZOS interface instead of a terminal.
+  * Report disk-write percentage and an estimated remaining time.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 18:00:00 +0200
+
 eczos-recovery-media (0.1.0~dev1) UNRELEASED; urgency=medium
 
   * Add the first ECZOS recovery media creator.

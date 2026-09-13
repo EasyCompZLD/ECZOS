@@ -12,9 +12,8 @@ Architecture: all
 Depends:
  ${misc:Depends},
  curl,
+ eczos-platform-tools (>= 0.1.0~dev5),
  jq,
- kdialog,
- konsole,
  pkexec,
  xorriso
 Description: create ECZOS recovery media safely

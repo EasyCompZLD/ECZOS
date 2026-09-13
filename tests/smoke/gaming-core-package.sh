@@ -21,6 +21,7 @@ jq -e '.version == "1.4.0-1" and (.sha256 | length == 64)' \
     (.vulkan.hardware | type == "boolean") and
     (.runtime.umu | type == "boolean")' >/dev/null
 grep -F 'Name=ECZ Gaming' /usr/share/applications/org.eczos.Gaming.desktop
+grep -Fx 'Exec=eczos-ui gaming' /usr/share/applications/org.eczos.Gaming.desktop
 grep -F 'PROTONPATH=UMU-Proton' /usr/lib/eczos/gaming/runtime-umu
 grep -F 'Start games niet als root.' /usr/lib/eczos/gaming/runtime-umu
 

@@ -11,81 +11,90 @@ Presentation {
         onTriggered: presentation.goToNextSlide()
     }
 
-    Slide {
+    component Feature: Item {
+        id: feature
+        property string heading
+        property string body
+        property url screenshot
+
         Image { anchors.fill: parent; source: "eczos-welcome.png"; fillMode: Image.PreserveAspectCrop }
+        Rectangle { anchors.fill: parent; color: "#b005101c" }
         Rectangle {
-            anchors.centerIn: parent; width: parent.width * 0.82; height: parent.height * 0.58
-            radius: 20; color: "#f2071829"
+            x: parent.width * 0.04
+            y: parent.height * 0.15
+            width: parent.width * 0.36
+            height: parent.height * 0.70
+            radius: 18
+            color: "#f2071829"
+            border.color: "#496b83"
             Text {
-                anchors.fill: parent; anchors.margins: 34
-                text: qsTr("Welkom bij ECZOS\n\nEen vertrouwde desktop van EasyComp Zeeland. Alles wat je dagelijks nodig hebt staat straks voor je klaar.")
-                color: "white"; font.pixelSize: 24; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+                anchors.fill: parent
+                anchors.margins: 28
+                text: qsTr(feature.heading + "\n\n" + feature.body)
+                color: "white"
+                font.pixelSize: 22
+                font.weight: Font.Medium
+                wrapMode: Text.WordWrap
+                verticalAlignment: Text.AlignVCenter
             }
+        }
+        Image {
+            x: parent.width * 0.43
+            y: parent.height * 0.09
+            width: parent.width * 0.54
+            height: parent.height * 0.82
+            source: feature.screenshot
+            fillMode: Image.PreserveAspectFit
+            smooth: true
         }
     }
 
     Slide {
-        Image { anchors.fill: parent; source: "eczos-welcome.png"; fillMode: Image.PreserveAspectCrop }
-        Rectangle {
-            anchors.centerIn: parent; width: parent.width * 0.82; height: parent.height * 0.58
-            radius: 20; color: "#f2071829"
-            Text {
-                anchors.fill: parent; anchors.margins: 34
-                text: qsTr("Je vertrouwde programma's\n\nOpen veel Windows-programma's gewoon via ECZ Windows. Na installatie vind je ze terug in je startmenu.")
-                color: "white"; font.pixelSize: 24; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-            }
+        Feature {
+            anchors.fill: parent
+            heading: "Welkom bij ECZOS"
+            body: "Een vertrouwde desktop van EasyComp Zeeland. Alles wat je dagelijks nodig hebt staat straks voor je klaar."
+            screenshot: "file:///usr/share/eczos/branding/screenshots/settings.png"
         }
     }
-
     Slide {
-        Image { anchors.fill: parent; source: "eczos-welcome.png"; fillMode: Image.PreserveAspectCrop }
-        Rectangle {
-            anchors.centerIn: parent; width: parent.width * 0.82; height: parent.height * 0.58
-            radius: 20; color: "#f2071829"
-            Text {
-                anchors.fill: parent; anchors.margins: 34
-                text: qsTr("Klaar voor werk en school\n\nFreeOffice, Firefox, e-mail, video en handige bestandsprogramma's maken ECZOS direct bruikbaar.")
-                color: "white"; font.pixelSize: 24; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-            }
+        Feature {
+            anchors.fill: parent
+            heading: "Je vertrouwde programma's"
+            body: "Open veel Windows-programma's gewoon via ECZ Windows. Na installatie vind je ze terug in je startmenu."
+            screenshot: "file:///usr/share/eczos/branding/screenshots/windows-apps.png"
         }
     }
-
     Slide {
-        Image { anchors.fill: parent; source: "eczos-welcome.png"; fillMode: Image.PreserveAspectCrop }
-        Rectangle {
-            anchors.centerIn: parent; width: parent.width * 0.82; height: parent.height * 0.58
-            radius: 20; color: "#f2071829"
-            Text {
-                anchors.fill: parent; anchors.margins: 34
-                text: qsTr("Ook voor games\n\nSteam staat voor je klaar. Veel Windows-games werken via de ingebouwde compatibiliteitslaag.")
-                color: "white"; font.pixelSize: 24; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-            }
+        Feature {
+            anchors.fill: parent
+            heading: "Klaar voor werk en school"
+            body: "FreeOffice, Firefox, e-mail, video en handige bestandsprogramma's maken ECZOS direct bruikbaar."
+            screenshot: "file:///usr/share/eczos/branding/screenshots/diagnostics.png"
         }
     }
-
     Slide {
-        Image { anchors.fill: parent; source: "eczos-welcome.png"; fillMode: Image.PreserveAspectCrop }
-        Rectangle {
-            anchors.centerIn: parent; width: parent.width * 0.82; height: parent.height * 0.58
-            radius: 20; color: "#f2071829"
-            Text {
-                anchors.fill: parent; anchors.margins: 34
-                text: qsTr("Neem je bestanden mee\n\nDe migratie-assistent helpt je documenten, foto's en muziek vanaf een Windows-schijf overzetten. Je ziet altijd eerst wat er gebeurt.")
-                color: "white"; font.pixelSize: 24; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-            }
+        Feature {
+            anchors.fill: parent
+            heading: "Ook voor games"
+            body: "Steam staat voor je klaar. Veel Windows-games werken via de ingebouwde compatibiliteitslaag."
+            screenshot: "file:///usr/share/eczos/branding/screenshots/gaming.png"
         }
     }
-
     Slide {
-        Image { anchors.fill: parent; source: "eczos-welcome.png"; fillMode: Image.PreserveAspectCrop }
-        Rectangle {
-            anchors.centerIn: parent; width: parent.width * 0.82; height: parent.height * 0.58
-            radius: 20; color: "#f2071829"
-            Text {
-                anchors.fill: parent; anchors.margins: 34
-                text: qsTr("Jij houdt de controle\n\nMaak herstelmedia wanneer je wilt. ECZOS deelt geen supportrapport zonder jouw keuze.")
-                color: "white"; font.pixelSize: 24; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-            }
+        Feature {
+            anchors.fill: parent
+            heading: "Neem je bestanden mee"
+            body: "De migratie-assistent helpt je documenten, foto's en muziek vanaf een Windows-schijf overzetten. Je ziet altijd eerst wat er gebeurt."
+            screenshot: "file:///usr/share/eczos/branding/screenshots/migration.png"
+        }
+    }
+    Slide {
+        Feature {
+            anchors.fill: parent
+            heading: "Jij houdt de controle"
+            body: "Maak herstelmedia wanneer je wilt. ECZOS deelt geen supportrapport zonder jouw keuze."
+            screenshot: "file:///usr/share/eczos/branding/screenshots/recovery.png"
         }
     }
 }

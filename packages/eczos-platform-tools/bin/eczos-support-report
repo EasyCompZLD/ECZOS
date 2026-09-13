@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+if [[ $# -eq 0 && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+    exec /usr/bin/eczos-ui support
+fi
+
+gui=true
+case ${1:-} in
+    --no-gui) gui=false ;;
+    '') ;;
+    -h|--help) printf 'Gebruik: eczos-support-report [--no-gui]\n'; exit 0 ;;
+    *) printf 'Onbekende optie: %s\n' "$1" >&2; exit 2 ;;
+esac
+
 if [[ $(id -u) -eq 0 ]]; then
     printf 'Maak een supportrapport als de ingelogde gebruiker, niet als root.\n' >&2
     exit 2
@@ -30,6 +42,6 @@ umask 077
 } > "$output"
 
 printf 'Supportrapport opgeslagen: %s\n' "$output"
-if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
     kdialog --title 'ECZOS Ondersteuning' --msgbox "Het rapport is opgeslagen als:\n$output\n\nHet is niet automatisch verzonden."
 fi

@@ -1,3 +1,9 @@
+eczos-branding (0.1.0~dev6) UNRELEASED; urgency=medium
+
+  * Add verified product screenshots for the installer and first-run tour.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 19:20:00 +0200
+
 eczos-branding (0.1.0~dev5) UNRELEASED; urgency=medium
 
   * Force the installed GRUB menu to use ECZOS graphics and branding.

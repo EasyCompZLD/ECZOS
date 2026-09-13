@@ -54,7 +54,7 @@ ApplicationWindow {
         opacity: 0.70
     }
 
-    ToolButton {
+    OobeButton {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 22
@@ -105,14 +105,15 @@ ApplicationWindow {
             OobePage {
                 heading: "Welkom bij ECZOS"
                 body: "Je computer is klaar. We lopen samen de belangrijkste keuzes en mogelijkheden langs."
-                detail: "Je kunt deze instellingen later altijd wijzigen via het ECZOS Configuratiecentrum."
+                detail: "Je kunt deze keuzes later altijd wijzigen via ECZOS Instellingen."
+                visual: "file:///usr/share/eczos/branding/screenshots/settings.png"
             }
 
             OobePage {
                 heading: "Maak verbinding"
                 body: "Internet is nodig voor updates, nieuwe apps, browsers en online diensten."
                 detail: "Wifi en bekabelde verbindingen beheer je vanuit het netwerkicoon of Systeeminstellingen."
-                Button {
+                OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: "Netwerkinstellingen openen"
                     onClicked: oobe.openNetworkSettings()
@@ -125,10 +126,10 @@ ApplicationWindow {
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 16
-                    Button { text: "Automatisch"; onClicked: oobe.setTheme("auto") }
-                    Button { text: "Licht"; onClicked: oobe.setTheme("light") }
-                    Button { text: "Donker"; onClicked: oobe.setTheme("dark") }
-                    Button { text: "Meer instellingen"; onClicked: oobe.openSystemSettings() }
+                    OobeButton { text: "Automatisch"; onClicked: oobe.setTheme("auto") }
+                    OobeButton { text: "Licht"; onClicked: oobe.setTheme("light") }
+                    OobeButton { text: "Donker"; onClicked: oobe.setTheme("dark") }
+                    OobeButton { text: "Meer instellingen"; onClicked: oobe.openSystemSettings() }
                 }
             }
 
@@ -146,28 +147,28 @@ ApplicationWindow {
                     columnSpacing: 18
                     rowSpacing: 14
 
-                    Button {
+                    OobeButton {
                         text: "Firefox"
                         checkable: true
                         checked: window.selectedBrowser === "firefox"
                         ButtonGroup.group: browserGroup
                         onClicked: window.selectedBrowser = "firefox"
                     }
-                    Button {
+                    OobeButton {
                         text: "Google Chrome"
                         checkable: true
                         checked: window.selectedBrowser === "chrome"
                         ButtonGroup.group: browserGroup
                         onClicked: window.selectedBrowser = "chrome"
                     }
-                    Button {
+                    OobeButton {
                         text: "Microsoft Edge via ECZ Windows"
                         checkable: true
                         checked: window.selectedBrowser === "edge-windows"
                         ButtonGroup.group: browserGroup
                         onClicked: window.selectedBrowser = "edge-windows"
                     }
-                    Button {
+                    OobeButton {
                         text: "Konqueror"
                         checkable: true
                         checked: window.selectedBrowser === "konqueror"
@@ -181,7 +182,8 @@ ApplicationWindow {
                 heading: "Apps vinden met Ontdekken"
                 body: "In Ontdekken vind je programma's, games, systeemupdates en firmware op één plek. Zoek op naam en klik op Installeren."
                 detail: "ECZOS ondersteunt normale Debian-pakketten en Flatpak-apps."
-                Button {
+                visual: "file:///usr/share/eczos/branding/screenshots/diagnostics.png"
+                OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: "Ontdekken openen"
                     onClicked: oobe.openDiscover()
@@ -191,14 +193,15 @@ ApplicationWindow {
             OobePage {
                 heading: "Bestanden veilig bewaren"
                 body: "Met Plasma Vaults kun je versleutelde kluizen voor privébestanden maken."
-                detail: "Gebruik zoeken in het startmenu om snel apps en bestanden te vinden. Back-ups en herstelmedia beheer je via het ECZOS Configuratiecentrum."
+                detail: "Gebruik zoeken in het startmenu om snel apps en bestanden te vinden. Back-ups en herstelmedia beheer je via ECZOS Instellingen."
             }
 
             OobePage {
                 heading: "Neem je bestanden mee"
                 body: "De migratie-assistent kan Documenten, Afbeeldingen, Muziek en andere persoonlijke mappen vanaf een Windows-schijf overzetten."
                 detail: "Er wordt eerst een voorbeeld getoond. Zonder jouw bevestiging wordt niets gekopieerd."
-                Button {
+                visual: "file:///usr/share/eczos/branding/screenshots/migration.png"
+                OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: "Migratie-assistent openen"
                     onClicked: oobe.openMigration()
@@ -209,9 +212,10 @@ ApplicationWindow {
                 heading: "Windows-apps en games"
                 body: "Open .exe- en .msi-bestanden met ECZ Windows. Gamingcontroles helpen met Vulkan, controllers en Windows-games."
                 detail: "Iedere beheerde Windows-app krijgt een eigen omgeving en verschijnt daarna in het startmenu."
-                Button {
+                visual: "file:///usr/share/eczos/branding/screenshots/gaming.png"
+                OobeButton {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "Configuratiecentrum bekijken"
+                    text: "ECZOS Instellingen bekijken"
                     onClicked: oobe.openControlCenter()
                 }
             }
@@ -220,11 +224,12 @@ ApplicationWindow {
                 heading: "Privacy en gemeenschap"
                 body: "ECZOS verstuurt niet automatisch een supportrapport. Jij bepaalt wat je deelt en wanneer."
                 detail: "ECZOS gebruikt de vrije KDE Plasma-desktop. Via ondersteuning kun je hulp krijgen en problemen melden."
+                visual: "file:///usr/share/eczos/branding/screenshots/recovery.png"
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 16
-                    Button { text: "Privacy-instellingen"; onClicked: oobe.openPrivacySettings() }
-                    Button { text: "Over KDE Plasma"; onClicked: oobe.openKdeInformation() }
+                    OobeButton { text: "Privacy-instellingen"; onClicked: oobe.openPrivacySettings() }
+                    OobeButton { text: "Over KDE Plasma"; onClicked: oobe.openKdeInformation() }
                 }
             }
 
@@ -257,13 +262,13 @@ ApplicationWindow {
 
             Item { Layout.fillWidth: true }
 
-            Button {
+            OobeButton {
                 text: "Vorige"
                 enabled: window.page > 0
                 onClicked: window.page--
             }
 
-            Button {
+            OobeButton {
                 text: window.page === window.pageCount - 1 ? "Aan de slag" : "Volgende"
                 highlighted: true
                 onClicked: {
@@ -281,6 +286,7 @@ ApplicationWindow {
         property string heading
         property string body
         property string detail: ""
+        property url visual: ""
         spacing: 22
 
         Item { Layout.fillHeight: true }
@@ -314,6 +320,47 @@ ApplicationWindow {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
+        Rectangle {
+            visible: pageLayout.visual.toString().length > 0
+            Layout.preferredWidth: Math.min(980, window.width * 0.72)
+            Layout.preferredHeight: Math.min(410, window.height * 0.37)
+            Layout.alignment: Qt.AlignHCenter
+            radius: 14
+            color: "#d9071829"
+            border.color: "#47718e"
+            clip: true
+            Image {
+                anchors.fill: parent
+                anchors.margins: 7
+                source: pageLayout.visual
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+            }
+        }
         Item { Layout.fillHeight: true }
+    }
+
+    component OobeButton: Button {
+        id: control
+        implicitHeight: 44
+        leftPadding: 20
+        rightPadding: 20
+        font.pixelSize: 14
+        font.weight: Font.DemiBold
+        contentItem: Text {
+            text: control.text
+            color: control.enabled ? (control.highlighted || control.checked ? "#04121c" : "white") : "#7791a4"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+        }
+        background: Rectangle {
+            radius: 10
+            color: control.down ? "#77d6fa"
+                                : control.highlighted || control.checked ? "#36bdf4"
+                                : control.hovered ? "#24475e" : "#132b3c"
+            border.color: control.highlighted || control.checked ? "#78d8fb" : "#42647b"
+            opacity: control.enabled ? 1 : 0.5
+        }
     }
 }

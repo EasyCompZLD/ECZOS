@@ -16,6 +16,7 @@ for package in \
     eczos-windows-core \
     eczos-gaming-core \
     eczos-platform-tools \
+    eczos-recovery-media \
     eczos-desktop-apps; do
     dpkg-query -W -f='${Status}\n' "$package" | grep -Fx 'install ok installed'
 done

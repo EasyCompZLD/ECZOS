@@ -11,9 +11,9 @@ Package: eczos-oobe
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding (>= 0.1.0~dev5),
+ eczos-branding (>= 0.1.0~dev6),
  eczos-desktop-defaults (>= 0.1.0~dev9),
- eczos-platform-tools,
+ eczos-platform-tools (>= 0.1.0~dev5),
  konqueror,
  python3,
  python3-pyside6.qtcore,

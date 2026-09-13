@@ -1,3 +1,15 @@
+eczos-desktop (0.1.0~dev26) UNRELEASED; urgency=medium
+
+  * Require the screenshot-rich ECZOS first-run tour.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 19:20:00 +0200
+
+eczos-desktop (0.1.0~dev25) UNRELEASED; urgency=medium
+
+  * Require the unified ECZOS applications and terminal-free recovery tool.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 18:00:00 +0200
+
 eczos-desktop (0.1.0~dev24) UNRELEASED; urgency=medium
 
   * Require the single-logo Plymouth presentation.

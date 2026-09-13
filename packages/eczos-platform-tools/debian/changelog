@@ -1,3 +1,10 @@
+eczos-platform-tools (0.1.0~dev5) UNRELEASED; urgency=medium
+
+  * Replace the dialog menus with one native ECZOS Qt interface.
+  * Add friendly pages for settings, diagnostics, migration and support.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 18:00:00 +0200
+
 eczos-platform-tools (0.1.0~dev4) UNRELEASED; urgency=medium
 
   * Add the recovery media creator to ECZOS Settings.

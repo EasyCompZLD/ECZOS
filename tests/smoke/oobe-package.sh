@@ -16,6 +16,8 @@ grep -Fx 'Hidden=true' /etc/xdg/autostart/org.kde.plasma-welcome.desktop
 grep -Fx '    property bool musicEnabled: true' /usr/share/eczos/oobe/Main.qml
 grep -Fx '    visibility: Window.FullScreen' /usr/share/eczos/oobe/Main.qml
 grep -F 'Muziek uitzetten' /usr/share/eczos/oobe/Main.qml
+grep -F 'branding/screenshots/settings.png' /usr/share/eczos/oobe/Main.qml
+grep -F 'branding/screenshots/recovery.png' /usr/share/eczos/oobe/Main.qml
 for browser in 'Firefox' 'Google Chrome' 'Microsoft Edge via ECZ Windows' 'Konqueror'; do
     grep -F "$browser" /usr/share/eczos/oobe/Main.qml
 done

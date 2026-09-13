@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+if [[ $# -eq 0 && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+    exec /usr/bin/eczos-ui migration
+fi
+
 if [[ $(id -u) -eq 0 ]]; then
     printf 'Voer de migratie uit als de ingelogde gebruiker, niet als root.\n' >&2
     exit 2
@@ -8,18 +12,20 @@ fi
 
 mode=dry-run
 source_profile=''
+gui=true
 while (( $# )); do
     case $1 in
         --dry-run) mode=dry-run ;;
         --apply) mode=apply ;;
         --source) shift; source_profile=${1:-} ;;
-        -h|--help) printf 'Gebruik: eczos-migrate [--dry-run|--apply] [--source WINDOWS-PROFIEL]\n'; exit 0 ;;
+        --no-gui) gui=false ;;
+        -h|--help) printf 'Gebruik: eczos-migrate [--dry-run|--apply] [--source WINDOWS-PROFIEL] [--no-gui]\n'; exit 0 ;;
         *) printf 'Onbekende optie: %s\n' "$1" >&2; exit 2 ;;
     esac
     shift
 done
 
-if [[ -z "$source_profile" && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+if [[ -z "$source_profile" && $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
     source_profile=$(kdialog --getexistingdirectory "$HOME" --title 'Kies de Windows-gebruikersmap' || true)
 fi
 [[ -n "$source_profile" ]] || { printf 'Geen Windows-profiel gekozen.\n' >&2; exit 2; }
@@ -39,7 +45,7 @@ log="$state_dir/$(date +%Y%m%d-%H%M%S).log"
 rsync_options=(-a --safe-links --ignore-existing --exclude=desktop.ini --exclude=Thumbs.db)
 [[ $mode == dry-run ]] && rsync_options+=(--dry-run --itemize-changes)
 
-if [[ $mode == apply && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+if [[ $mode == apply && $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
     kdialog --yesno "Bestaande bestanden worden niet overschreven. Bestanden overzetten uit:\n$source_profile?" || exit 0
 fi
 
@@ -65,4 +71,4 @@ else
     message="Overzetten voltooid. Bestaande bestanden zijn behouden. Log: $log"
 fi
 printf '%s\n' "$message"
-if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then kdialog --msgbox "$message" --title 'Overstappen vanaf Windows'; fi
+if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then kdialog --msgbox "$message" --title 'Overstappen vanaf Windows'; fi

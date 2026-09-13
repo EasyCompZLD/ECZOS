@@ -634,10 +634,7 @@ unmap_drive() {
 
 manage_apps() {
     require_unprivileged
-    [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] || {
-        printf 'ECZ Windows app management requires a graphical session.\n' >&2
-        exit 1
-    }
+    exec /usr/bin/eczos-ui windows
 
     local manifest app_id name status selection action details source_file drive_action letter directory
     local -a menu_items=() drive_items=()

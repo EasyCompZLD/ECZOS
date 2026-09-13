@@ -1,3 +1,9 @@
+eczos-windows-core (0.1.0~dev15) UNRELEASED; urgency=medium
+
+  * Manage installed Windows applications in the shared ECZOS interface.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 18:00:00 +0200
+
 eczos-windows-core (0.1.0~dev14) UNRELEASED; urgency=medium
 
   * Prefer product-matching executables over installed helper tools.

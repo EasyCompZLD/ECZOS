@@ -59,6 +59,10 @@ but are not a prototype release blocker.
 - [x] hardware and system diagnostics foundation
 - [x] backup application and recovery entry points
 - [x] phone integration and privacy-conscious support-report foundation
+- [x] unified ECZOS Qt interface for settings, Windows apps, gaming,
+      migration, diagnostics, recovery media and support
+- [x] terminal-free recovery-media workflow with progress and ETA
+- [x] real product screenshots in the installer and first-boot OOBE
 - [x] FreeOffice host inclusion and physical install test
 - [x] FreeOffice release artifact pinning and ISO integration
 - [ ] optional cloud and enrolled remote-support services
@@ -68,4 +72,4 @@ but are not a prototype release blocker.
 - signed ECZOS package repository
 - release channels and upgrade policy
 - [x] selected installer implementation (Calamares with ECZOS-owned presentation)
-- reproducible production images and release qualification
+- [ ] reproducible production images and release qualification

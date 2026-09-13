@@ -1,3 +1,9 @@
+eczos-installer (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Replace text-only feature slides with real ECZOS product screenshots.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 19:20:00 +0200
+
 eczos-installer (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Simplify and strengthen the contrast of the installer feature slides.

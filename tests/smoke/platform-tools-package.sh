@@ -7,9 +7,19 @@ for command in eczos-control-center eczos-doctor eczos-migrate eczos-support-rep
     test -x "/usr/bin/$command"
     bash -n "/usr/bin/$command"
 done
+test -x /usr/bin/eczos-ui
+test -r /usr/share/eczos/ui/Main.qml
+python3 - /usr/bin/eczos-ui <<'PY'
+import pathlib
+import sys
+compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
+PY
 for desktop in ControlCenter Diagnostics Migration; do
     desktop-file-validate "/usr/share/applications/org.eczos.${desktop}.desktop"
 done
+grep -Fx 'Exec=eczos-ui settings' /usr/share/applications/org.eczos.ControlCenter.desktop
+grep -Fx 'Exec=eczos-ui diagnostics' /usr/share/applications/org.eczos.Diagnostics.desktop
+grep -Fx 'Exec=eczos-ui migration' /usr/share/applications/org.eczos.Migration.desktop
 /usr/bin/eczos-doctor --json | jq -e '.schemaVersion == 1 and .office == "installed"' >/dev/null
 jq -e '.office.product == "SoftMaker FreeOffice 2024" and .office.package == "softmaker-freeoffice-2024" and .office.redistributed == true' \
     /usr/share/eczos/product/default-apps.json >/dev/null

@@ -120,13 +120,7 @@ doctor() {
 }
 
 manage() {
-    collect_status
-    report=$(print_human)
-    if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] && command -v kdialog >/dev/null 2>&1; then
-        kdialog --title 'ECZ Gaming' --msgbox "$report"
-    else
-        printf '%s\n' "$report"
-    fi
+    exec /usr/bin/eczos-ui gaming
 }
 
 case ${1:-} in

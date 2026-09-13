@@ -19,6 +19,10 @@ for asset in \
     test -s "$asset"
 done
 
+for screenshot in settings windows-apps gaming migration recovery diagnostics; do
+    test -s "/usr/share/eczos/branding/screenshots/$screenshot.png"
+done
+
 for link in \
     /usr/share/icons/hicolor/512x512/apps/eczos-start.png \
     /usr/share/icons/hicolor/512x512/apps/eczos-start-light.png \
