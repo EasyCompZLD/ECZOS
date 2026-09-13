@@ -19,6 +19,8 @@ for required in \
     packages/eczos-branding/config/zz-eczos-grub.cfg \
     packages/eczos-sddm-theme/debian/control \
     packages/eczos-plymouth-theme/debian/control \
+    packages/eczos-plymouth-theme/debian/preinst \
+    packages/eczos-plymouth-theme/debian/postrm \
     packages/eczos-plymouth-theme/theme/eczos.plymouth \
     packages/eczos-desktop-defaults/debian/control \
     packages/eczos-desktop-defaults/lib/apply-desktop-defaults \
@@ -107,6 +109,10 @@ grep -Fxq '    property bool musicEnabled: true' \
 grep -Fxq 'Hidden=true' \
     "$ROOT_DIR/packages/eczos-oobe/xdg/org.kde.plasma-welcome.desktop" || \
     fail 'Plasma Welcome autostart is not blocked'
+if grep -Fq 'Even geduld' \
+    "$ROOT_DIR/packages/eczos-plymouth-theme/theme/eczos.plymouth"; then
+    fail 'normal Plymouth boot still contains waiting text'
+fi
 
 cmp -s \
     "$ROOT_DIR/image/config/bootloaders/grub-pc/splash.png" \

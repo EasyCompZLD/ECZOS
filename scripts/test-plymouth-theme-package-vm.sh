@@ -25,9 +25,11 @@ chmod 0644 \
     "$PACKAGE_DIR/debian/control" \
     "$PACKAGE_DIR/debian/copyright" \
     "$PACKAGE_DIR/debian/install" \
+    "$PACKAGE_DIR/debian/links" \
     "$PACKAGE_DIR/debian/source/format" \
     "$PACKAGE_DIR/theme/eczos.plymouth"
 chmod 0755 "$PACKAGE_DIR/debian/rules"
+chmod 0755 "$PACKAGE_DIR/debian/preinst" "$PACKAGE_DIR/debian/postrm"
 find "$PACKAGE_DIR/theme/images" -type f -exec chmod 0644 {} +
 
 (cd "$PACKAGE_DIR" && dpkg-buildpackage -us -uc -b)

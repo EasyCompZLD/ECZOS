@@ -2,6 +2,8 @@
 set -eu
 
 plymouth-set-default-theme eczos
+test "$(readlink -f /usr/share/plymouth/debian-logo.png)" = \
+    /usr/share/plymouth/themes/eczos/images/watermark.png
 update-initramfs -u
 
 if [ -f /etc/plymouth/plymouthd.conf ]; then

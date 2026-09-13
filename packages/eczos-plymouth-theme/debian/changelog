@@ -1,3 +1,11 @@
+eczos-plymouth-theme (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Remove normal-boot text from the graphical splash.
+  * Divert Plymouth's global Debian-logo fallback to ECZOS artwork while this
+    package is installed, restoring the original file on removal.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 15:00:00 +0200
+
 eczos-plymouth-theme (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Complete both contiguous animation sequences.

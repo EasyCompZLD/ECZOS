@@ -22,6 +22,14 @@ done
 for image in watermark.png bgrt-fallback.png logo.png; do
     test -s "$THEME_DIR/images/$image"
 done
+test "$(readlink /usr/share/plymouth/debian-logo.png)" = \
+    themes/eczos/images/watermark.png
+test "$(dpkg-divert --listpackage /usr/share/plymouth/debian-logo.png)" = \
+    eczos-plymouth-theme
+if grep -Fq 'Even geduld' "$THEME_DIR/eczos.plymouth"; then
+    printf 'Normal boot splash must not show waiting text.\n' >&2
+    exit 1
+fi
 for image in bullet.png capslock.png entry.png keyboard.png keymap-render.png lock.png; do
     test -s "$THEME_DIR/images/$image"
 done

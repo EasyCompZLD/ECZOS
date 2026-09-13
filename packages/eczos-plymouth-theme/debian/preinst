@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+FALLBACK=/usr/share/plymouth/debian-logo.png
+PACKAGE=eczos-plymouth-theme
+
+case "$1" in
+    install|upgrade)
+        if [ "$(dpkg-divert --listpackage "$FALLBACK" 2>/dev/null || true)" != "$PACKAGE" ]; then
+            dpkg-divert --package "$PACKAGE" --add --rename \
+                --divert "$FALLBACK.distrib" "$FALLBACK"
+        fi
+        ;;
+esac
+
+exit 0

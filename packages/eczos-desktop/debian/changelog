@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev23) UNRELEASED; urgency=medium
+
+  * Require the text-free ECZOS Plymouth fallback correction.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 15:00:00 +0200
+
 eczos-desktop (0.1.0~dev22) UNRELEASED; urgency=medium
 
   * Require the complete first-boot, GRUB, Plymouth and OOBE polish batch.
