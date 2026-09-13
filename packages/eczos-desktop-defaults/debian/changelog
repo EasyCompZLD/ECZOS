@@ -1,3 +1,9 @@
+eczos-desktop-defaults (0.1.0~dev9) UNRELEASED; urgency=medium
+
+  * Guarantee the ECZOS splash choice for newly created user profiles.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 12:00:00 +0200
+
 eczos-desktop-defaults (0.1.0~dev8) UNRELEASED; urgency=medium
 
   * Keep first-run configuration healthy when Plasma starts slowly.

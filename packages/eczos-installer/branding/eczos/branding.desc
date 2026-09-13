@@ -3,13 +3,13 @@ componentName: eczos
 welcomeStyleCalamares: false
 welcomeExpandingLogo: true
 windowExpanding: normal
-windowSize: 980px,680px
+windowSize: 1040px,720px
 windowPlacement: center
 
 strings:
     productName: EasyComp Zeeland Operating System
     shortProductName: ECZOS
-    version: Development
+    version: Ontwikkelversie
     shortVersion: Dev
     versionedName: EasyComp Zeeland Operating System
     shortVersionedName: ECZOS

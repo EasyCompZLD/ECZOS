@@ -11,6 +11,8 @@ test -s /usr/share/eczos/oobe/Main.qml
 test -s /usr/share/eczos/oobe/assets/ambient-loop.mp4
 test -s /usr/share/eczos/oobe/assets/new-dawn.m4a
 test -s /etc/xdg/autostart/org.eczos.OobeFirstRun.desktop
+test -s /etc/xdg/autostart/org.kde.plasma-welcome.desktop
+grep -Fx 'Hidden=true' /etc/xdg/autostart/org.kde.plasma-welcome.desktop
 grep -Fx '    property bool musicEnabled: true' /usr/share/eczos/oobe/Main.qml
 grep -Fx '    visibility: Window.FullScreen' /usr/share/eczos/oobe/Main.qml
 grep -F 'Muziek uitzetten' /usr/share/eczos/oobe/Main.qml

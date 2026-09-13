@@ -58,7 +58,9 @@ for required in \
     packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/Splash.qml \
     packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/eczos-startup.mp4 \
     image/config/bootloaders/grub-pc/grub.cfg \
+    image/config/bootloaders/grub-pc/splash.png \
     image/config/bootloaders/grub-pc/live-theme/theme.txt \
+    image/config/includes.chroot/etc/skel/.config/ksplashrc \
     image/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session \
     image/config/includes.chroot/etc/calamares/settings.conf \
     image/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
@@ -99,11 +101,30 @@ grep -Fxq 'welcomeStyleCalamares: false' \
 grep -Fq 'visibility: Window.FullScreen' \
     "$ROOT_DIR/packages/eczos-oobe/qml/Main.qml" || \
     fail 'ECZOS OOBE is not configured for full-screen display'
+grep -Fxq '    property bool musicEnabled: true' \
+    "$ROOT_DIR/packages/eczos-oobe/qml/Main.qml" || \
+    fail 'ECZOS OOBE music is not enabled by default'
+grep -Fxq 'Hidden=true' \
+    "$ROOT_DIR/packages/eczos-oobe/xdg/org.kde.plasma-welcome.desktop" || \
+    fail 'Plasma Welcome autostart is not blocked'
 
-if [[ $(find "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images" -maxdepth 1 \
-    -type f -name 'animation-*.png' | wc -l | tr -d ' ') -ne 12 ]]; then
-    fail 'Plymouth animation must contain 12 runtime frames'
-fi
+cmp -s \
+    "$ROOT_DIR/image/config/bootloaders/grub-pc/splash.png" \
+    "$ROOT_DIR/packages/eczos-branding/assets/wallpapers/eczoswallpaper-dark.png" || \
+    fail 'live GRUB does not use the approved ECZOS dark wallpaper'
+
+for frame in $(seq 0 11); do
+    for sequence in animation throbber; do
+        [[ -s "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images/$sequence-$frame.png" ]] || \
+            fail "Plymouth $sequence sequence is missing frame $frame"
+    done
+done
+for support_image in watermark.png bgrt-fallback.png logo.png; do
+    cmp -s \
+        "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images/$support_image" \
+        "$ROOT_DIR/packages/eczos-branding/assets/logo/logo.png" || \
+        fail "Plymouth $support_image is not ECZOS artwork"
+done
 
 for asset in \
     assets/login/login-bg.png \

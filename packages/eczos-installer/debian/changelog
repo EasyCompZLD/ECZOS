@@ -1,3 +1,10 @@
+eczos-installer (0.1.0~dev3) UNRELEASED; urgency=medium
+
+  * Simplify and strengthen the contrast of the installer feature slides.
+  * Keep all visible installer identity under the ECZOS product name.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 12:00:00 +0200
+
 eczos-installer (0.1.0~dev2) UNRELEASED; urgency=medium
 
   * Use ECZOS-only welcome wording and clearer consumer installation slides.

@@ -11,6 +11,11 @@ new user's generated `~/.config/kdedefaults/ksplashrc` to the system search
 path. `eczos-desktop-defaults` dev7 seeds `/etc/skel/.config/ksplashrc`; this
 correction remains pending qualification in the next clean image.
 
+The next image also carries the same `ksplashrc` directly in its `/etc/skel`
+overlay, independently of package installation order. Its live GRUB input now
+contains an explicit ECZOS `splash.png` identical to the approved dark
+wallpaper, preventing live-build from falling back to Debian artwork.
+
 Tactical Ops was installed and played from its original optical medium. This
 test exposed and then verified fixes for transient disc read failures, visible
 copy progress, resumable media copies, unreliable autorun exit codes, product

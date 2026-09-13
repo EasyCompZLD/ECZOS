@@ -31,6 +31,9 @@ MessageBelowAnimation=true
 [boot-up]
 UseEndAnimation=true
 UseFirmwareBackground=false
+SuppressMessages=true
+Title=ECZOS
+SubTitle=Even geduld…
 
 [shutdown]
 UseEndAnimation=false

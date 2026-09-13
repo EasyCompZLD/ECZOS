@@ -136,9 +136,9 @@ ApplicationWindow {
                 heading: "Kies je browser"
                 body: "Selecteer waarmee webpagina's standaard worden geopend."
                 detail: window.selectedBrowser === "chrome"
-                    ? "Chrome wordt na de configuratie via de officiële downloadpagina aangeboden."
+                    ? "Als Chrome nog niet is geïnstalleerd, opent ECZOS na afloop de officiële downloadpagina."
                     : window.selectedBrowser === "edge-windows"
-                      ? "Edge voor Windows wordt na de configuratie via ECZ Windows voorbereid."
+                      ? "ECZOS opent de officiële Edge-download en daarna ECZ Windows om de Windows-installer te beheren."
                       : "Deze browser is al onderdeel van de ECZOS-desktop."
                 GridLayout {
                     Layout.alignment: Qt.AlignHCenter
@@ -179,7 +179,7 @@ ApplicationWindow {
 
             OobePage {
                 heading: "Apps vinden met Ontdekken"
-                body: "In Ontdekken vind je programma's, games, systeemupdates en firmware op één plek."
+                body: "In Ontdekken vind je programma's, games, systeemupdates en firmware op één plek. Zoek op naam en klik op Installeren."
                 detail: "ECZOS ondersteunt normale Debian-pakketten en Flatpak-apps."
                 Button {
                     Layout.alignment: Qt.AlignHCenter
@@ -191,7 +191,7 @@ ApplicationWindow {
             OobePage {
                 heading: "Bestanden veilig bewaren"
                 body: "Met Plasma Vaults kun je versleutelde kluizen voor privébestanden maken."
-                detail: "Open het pijltje bij de systeemvakpictogrammen en kies Kluizen. Back-ups beheer je via het ECZOS Configuratiecentrum."
+                detail: "Gebruik zoeken in het startmenu om snel apps en bestanden te vinden. Back-ups en herstelmedia beheer je via het ECZOS Configuratiecentrum."
             }
 
             OobePage {

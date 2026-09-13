@@ -67,5 +67,5 @@ but are not a prototype release blocker.
 
 - signed ECZOS package repository
 - release channels and upgrade policy
-- selected installer implementation
+- [x] selected installer implementation (Calamares with ECZOS-owned presentation)
 - reproducible production images and release qualification

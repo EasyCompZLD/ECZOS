@@ -1,3 +1,10 @@
+eczos-oobe (0.1.0~dev3) UNRELEASED; urgency=medium
+
+  * Block Plasma Welcome even if it is reinstalled after ECZOS OOBE.
+  * Clarify the browser choices and retain music as the enabled default.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 12:00:00 +0200
+
 eczos-oobe (0.1.0~dev2) UNRELEASED; urgency=medium
 
   * Replace Plasma Welcome with a full-screen ECZOS first-login experience.

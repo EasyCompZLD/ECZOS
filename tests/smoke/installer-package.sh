@@ -14,7 +14,7 @@ test -e /usr/share/calamares/branding/eczos/eczos-welcome.png
 grep -Fx 'Name=ECZOS installeren' /usr/share/applications/org.eczos.Installer.desktop
 grep -Fx '    shortProductName: ECZOS' /usr/share/calamares/branding/eczos/branding.desc
 grep -Fx 'welcomeStyleCalamares: false' /usr/share/calamares/branding/eczos/branding.desc
-grep -F 'color: "#e6071829"' /usr/share/calamares/branding/eczos/show.qml
+grep -F 'color: "#f2071829"' /usr/share/calamares/branding/eczos/show.qml
 grep -F 'Je vertrouwde programma' /usr/share/calamares/branding/eczos/show.qml
 if grep -REi 'Debian GNU/Linux|Install Debian' \
     /usr/share/calamares/branding/eczos \

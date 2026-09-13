@@ -1,4 +1,5 @@
 desktop-image: "../splash.png"
+desktop-color: "#020713"
 title-color: "#ffffff"
 title-font: "Unifont Regular 18"
 title-text: "ECZOS — proberen of installeren"
@@ -19,9 +20,9 @@ terminal-font: "Unifont Regular 16"
 + boot_menu {
     left = 10%
     width = 80%
-    top = 52%
+    top = 55%
     height = 48%-80
-    item_color = "#c7d2e0"
+    item_color = "#d7e9f8"
     item_font = "Unifont Regular 16"
     selected_item_color = "#ffffff"
     selected_item_font = "Unifont Regular 16"

@@ -14,7 +14,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-release eczos-branding eczos-desktop-defaults eczos-installer eczos-oobe eczos-desktop)
+PACKAGES=(eczos-release eczos-branding eczos-plymouth-theme eczos-desktop-defaults eczos-installer eczos-oobe eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
 "$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
@@ -49,10 +49,17 @@ for package in "${PACKAGES[@]}"; do
 done
 apt-get install -y "${debs[@]}"
 
+# The package owns only the theme files; this development batch deliberately
+# activates them and refreshes both early-boot artifacts for the next reboot.
+plymouth-set-default-theme --rebuild-initrd eczos
+update-grub
+
 "$ROOT_DIR/tests/smoke/branding-package.sh"
+"$ROOT_DIR/tests/smoke/plymouth-theme-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-defaults-package.sh"
 "$ROOT_DIR/tests/smoke/installer-package.sh"
 "$ROOT_DIR/tests/smoke/oobe-package.sh"
 dpkg-query -W -f='${Status}\n' eczos-desktop | grep -Fx 'install ok installed'
 
 printf 'ECZOS pre-build experience batch installed and verified\n'
+printf 'Reboot once to preview the corrected GRUB and Plymouth presentation.\n'

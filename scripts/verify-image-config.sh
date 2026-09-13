@@ -13,7 +13,9 @@ for required in \
     config/hooks/normal/0100-eczos-image-policy.hook.chroot \
     config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
     config/bootloaders/grub-pc/grub.cfg \
+    config/bootloaders/grub-pc/splash.png \
     config/bootloaders/grub-pc/live-theme/theme.txt \
+    config/includes.chroot/etc/skel/.config/ksplashrc \
     config/includes.chroot/etc/calamares/settings.conf \
     config/includes.chroot/etc/calamares/modules/users.conf \
     config/includes.chroot/etc/calamares/modules/packages.conf \
@@ -49,6 +51,13 @@ grep -F 'menuentry "ECZOS proberen"' \
     "$IMAGE_DIR/config/bootloaders/grub-pc/grub.cfg"
 grep -F 'menuentry "ECZOS installeren"' \
     "$IMAGE_DIR/config/bootloaders/grub-pc/grub.cfg"
+grep -Fx 'desktop-image: "../splash.png"' \
+    "$IMAGE_DIR/config/bootloaders/grub-pc/live-theme/theme.txt"
+cmp -s \
+    "$IMAGE_DIR/config/bootloaders/grub-pc/splash.png" \
+    "$ROOT_DIR/packages/eczos-branding/assets/wallpapers/eczoswallpaper-dark.png"
+grep -Fx 'Theme=org.eczos.desktop' \
+    "$IMAGE_DIR/config/includes.chroot/etc/skel/.config/ksplashrc"
 grep -Fx 'branding: eczos' \
     "$IMAGE_DIR/config/includes.chroot/etc/calamares/settings.conf"
 grep -Fx '  - sudo' \

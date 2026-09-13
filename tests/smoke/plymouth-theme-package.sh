@@ -15,6 +15,13 @@ grep -Fx 'ModuleName=two-step' "$THEME_DIR/eczos.plymouth"
 test -s "$PLUGIN_DIR/two-step.so"
 test "$(find "$THEME_DIR/images" -maxdepth 1 -type f -name 'animation-*.png' | wc -l)" -eq 12
 test "$(find "$THEME_DIR/images" -maxdepth 1 -type f -name 'throbber-*.png' | wc -l)" -eq 12
+for frame in $(seq 0 11); do
+    test -s "$THEME_DIR/images/animation-$frame.png"
+    test -s "$THEME_DIR/images/throbber-$frame.png"
+done
+for image in watermark.png bgrt-fallback.png logo.png; do
+    test -s "$THEME_DIR/images/$image"
+done
 for image in bullet.png capslock.png entry.png keyboard.png keymap-render.png lock.png; do
     test -s "$THEME_DIR/images/$image"
 done

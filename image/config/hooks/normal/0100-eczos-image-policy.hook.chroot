@@ -7,3 +7,11 @@ update-initramfs -u
 if [ -f /etc/plymouth/plymouthd.conf ]; then
     grep -q '^Theme=eczos$' /etc/plymouth/plymouthd.conf
 fi
+
+if command -v lsinitramfs >/dev/null 2>&1; then
+    initrd=$(find /boot -maxdepth 1 -type f -name 'initrd.img-*' -print | sort -V | tail -n 1)
+    if [ -n "$initrd" ]; then
+        lsinitramfs "$initrd" | grep -q \
+            'usr/share/plymouth/themes/eczos/eczos.plymouth'
+    fi
+fi

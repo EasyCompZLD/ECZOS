@@ -1,3 +1,11 @@
+eczos-plymouth-theme (0.1.0~dev3) UNRELEASED; urgency=medium
+
+  * Complete both contiguous animation sequences.
+  * Supply ECZOS watermark and firmware-fallback artwork so the two-step plugin
+    cannot fall back to Debian's logo.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 12:20:00 +0200
+
 eczos-plymouth-theme (0.1.0~dev2) UNRELEASED; urgency=medium
 
   * Restore the existing ECZOS two-step power-logo animation.

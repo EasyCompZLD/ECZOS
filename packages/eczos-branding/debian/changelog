@@ -1,3 +1,9 @@
+eczos-branding (0.1.0~dev5) UNRELEASED; urgency=medium
+
+  * Force the installed GRUB menu to use ECZOS graphics and branding.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 12:00:00 +0200
+
 eczos-branding (0.1.0~dev4) UNRELEASED; urgency=medium
 
   * Apply the ECZOS background and identity to installed-system GRUB.
