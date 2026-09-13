@@ -21,6 +21,7 @@ Depends:
  rsync,
  wine (>= 10.0~repack-6),
  wine64 (>= 10.0~repack-6),
+ xdg-user-dirs,
  xdg-utils,
  zenity
 Recommends:

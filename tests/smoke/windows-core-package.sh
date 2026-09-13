@@ -27,6 +27,10 @@ grep -F 'autorun.inf' /usr/bin/eczos-windows
 grep -F 'zenity --progress' /usr/bin/eczos-windows
 grep -F 'rsync -a --partial' /usr/bin/eczos-windows
 grep -F '.status="media-copy-failed"' /usr/bin/eczos-windows
+grep -F 'product_matches' /usr/bin/eczos-windows
+grep -F 'installerWarning=($result != 0)' /usr/bin/eczos-windows
+grep -F 'Categories=$category;' /usr/bin/eczos-windows
+grep -F 'xdg-user-dir DESKTOP' /usr/bin/eczos-windows
 grep -F 'execute-from' /usr/bin/eczos-windows
 grep -F 'Name=ECZ Windows-apps' /usr/share/applications/org.eczos.Windows.Manager.desktop
 grep -F 'exec wine "$@"' /usr/lib/eczos/windows/runtime-wine-system

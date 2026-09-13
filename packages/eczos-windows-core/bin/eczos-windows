@@ -163,6 +163,8 @@ write_launcher() {
     local app_id=$1
     local display_name=$2
     local icon=${3:-application-x-executable}
+    local category=${4:-Utility}
+    local desktop_dir desktop_launcher
     mkdir -p "$LAUNCHERS_DIR"
     cat > "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop" <<EOF
 [Desktop Entry]
@@ -171,9 +173,15 @@ Name=$display_name
 Exec=eczos-windows run $app_id
 Icon=$icon
 Terminal=false
-Categories=Utility;
+Categories=$category;
 EOF
     chmod 0644 "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop"
+    desktop_dir=$(xdg-user-dir DESKTOP 2>/dev/null || true)
+    if [[ -n "$desktop_dir" && -d "$desktop_dir" ]]; then
+        desktop_launcher="$desktop_dir/ECZOS-$app_id.desktop"
+        install -m 0755 "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop" "$desktop_launcher"
+        gio set "$desktop_launcher" metadata::trusted true >/dev/null 2>&1 || true
+    fi
     update-desktop-database "$LAUNCHERS_DIR" >/dev/null 2>&1 || true
 }
 
@@ -255,7 +263,8 @@ copy_installation_media() {
 discover_entrypoint() {
     local prefix=$1 kind=$2 portable_payload=$3 fallback_name=$4
     local runtime_user shortcut_root shortcut candidate_root windows_target relative target canonical_target
-    local -a shortcut_roots=() shortcuts=() candidate_roots=() candidates=()
+    local candidate executable_key ancestor ancestor_key depth
+    local -a shortcut_roots=() shortcuts=() candidate_roots=() candidates=() product_matches=()
     DISCOVERED_ENTRYPOINT=null
     DISCOVERED_ENTRYPOINT_TYPE=null
     DISCOVERED_NAME=$fallback_name
@@ -311,6 +320,40 @@ discover_entrypoint() {
     if [[ ${#candidates[@]} -eq 1 ]]; then
         DISCOVERED_ENTRYPOINT=${candidates[0]}
         DISCOVERED_ENTRYPOINT_TYPE=executable
+        return 0
+    fi
+
+    # Installers often leave a game executable beside helper tools. Prefer an
+    # executable whose normalized name exactly matches one of its product
+    # directories, for example Tactical Ops/System/TacticalOps.exe over UCC.exe.
+    for candidate in "${candidates[@]}"; do
+        executable_key=$(basename "${candidate%.*}")
+        executable_key=${executable_key,,}
+        executable_key=${executable_key//[^a-z0-9]/}
+        ancestor=$(dirname "$candidate")
+        for depth in 1 2 3 4; do
+            ancestor=$(dirname "$ancestor")
+            ancestor_key=$(basename "$ancestor")
+            ancestor_key=${ancestor_key,,}
+            ancestor_key=${ancestor_key//[^a-z0-9]/}
+            if [[ ${#executable_key} -ge 4 && "$executable_key" = "$ancestor_key" ]]; then
+                product_matches+=("$candidate")
+                break
+            fi
+        done
+    done
+    if [[ ${#product_matches[@]} -eq 1 ]]; then
+        DISCOVERED_ENTRYPOINT=${product_matches[0]}
+        DISCOVERED_ENTRYPOINT_TYPE=executable
+    fi
+}
+
+launcher_category() {
+    local executable=${1,,}
+    if [[ "$executable" =~ (game|games|steam|tactical|unreal|gog) ]]; then
+        printf 'Game\n'
+    else
+        printf 'Utility\n'
     fi
 }
 
@@ -328,7 +371,7 @@ install_file() {
     local resolved extension kind checksum base lower_base display_name slug app_id app_dir
     local source_dir copied prefix runtime_dir runtime_payload runtime_windows_path runtime_working_dir
     local install_media=false media_root media_relative media_name windows_relative
-    local install_log result entrypoint entrypoint_type launcher_icon temp_manifest existing_status failed_dir
+    local install_log result entrypoint entrypoint_type launcher_icon launcher_group temp_manifest existing_status failed_dir
     local initialization_log initialization_result detected_name retry_existing=false retry_media_copy=false
     local copy_log copy_result
     [[ -f "$input" ]] || { printf 'Not a regular file: %s\n' "$input" >&2; exit 2; }
@@ -506,30 +549,32 @@ install_file() {
     detected_name=$DISCOVERED_NAME
 
     temp_manifest="$app_dir/manifest.json.new"
-    if ((result != 0)); then
-        jq --argjson result "$result" '.status="installer-failed" | .installerExit=$result' \
-            "$app_dir/manifest.json" > "$temp_manifest"
-    elif [[ "$entrypoint" = null ]]; then
-        jq --argjson result "$result" '.status="installed-needs-entrypoint" | .installerExit=$result' \
-            "$app_dir/manifest.json" > "$temp_manifest"
-    else
+    if [[ "$entrypoint" != null ]]; then
+        launcher_group=$(launcher_category "$entrypoint")
         jq --argjson result "$result" --arg entrypoint "$entrypoint" \
             --arg entrypointType "$entrypoint_type" --arg name "$detected_name" \
-            '.status="installed" | .installerExit=$result | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name' \
+            --arg category "$launcher_group" \
+            '.status="installed" | .installerExit=$result | .installerWarning=($result != 0) | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name | .category=$category' \
+            "$app_dir/manifest.json" > "$temp_manifest"
+    elif ((result != 0)); then
+        jq --argjson result "$result" '.status="installer-failed" | .installerExit=$result' \
+            "$app_dir/manifest.json" > "$temp_manifest"
+    else
+        jq --argjson result "$result" '.status="installed-needs-entrypoint" | .installerExit=$result' \
             "$app_dir/manifest.json" > "$temp_manifest"
     fi
     chmod 0600 "$temp_manifest"
     mv -f "$temp_manifest" "$app_dir/manifest.json"
 
     launcher_icon=application-x-executable
-    if ((result == 0)) && [[ "$entrypoint" != null ]]; then
+    if [[ "$entrypoint" != null ]]; then
         extract_launcher_icon "$app_dir" "$entrypoint"
         launcher_icon=$EXTRACTED_ICON
         temp_manifest="$app_dir/manifest.json.new"
         jq --arg icon "$launcher_icon" '.icon=$icon' "$app_dir/manifest.json" >"$temp_manifest"
         chmod 0600 "$temp_manifest"
         mv -f "$temp_manifest" "$app_dir/manifest.json"
-        write_launcher "$app_id" "$detected_name" "$launcher_icon"
+        write_launcher "$app_id" "$detected_name" "$launcher_icon" "$launcher_group"
     fi
     printf 'ECZ Windows application ID: %s\n' "$app_id"
     printf 'Installer exit status: %s\n' "$result"
@@ -715,7 +760,7 @@ run_app() {
 
 rescan_app() {
     require_unprivileged
-    local app_id=$1 app_dir manifest prefix kind name payload launcher_icon temp_manifest
+    local app_id=$1 app_dir manifest prefix kind name payload launcher_icon launcher_group temp_manifest
     app_dir=$(app_dir_for "$app_id")
     manifest=$(read_manifest "$app_id")
     prefix=$(jq -er '.prefix' "$manifest")
@@ -740,15 +785,17 @@ rescan_app() {
     temp_manifest="$app_dir/manifest.json.new"
     extract_launcher_icon "$app_dir" "$DISCOVERED_ENTRYPOINT"
     launcher_icon=$EXTRACTED_ICON
+    launcher_group=$(launcher_category "$DISCOVERED_ENTRYPOINT")
     jq --arg entrypoint "$DISCOVERED_ENTRYPOINT" \
         --arg entrypointType "$DISCOVERED_ENTRYPOINT_TYPE" \
         --arg name "$DISCOVERED_NAME" --arg icon "$launcher_icon" \
+        --arg category "$launcher_group" \
         --arg rescanned "$(date --iso-8601=seconds)" \
-        '.status="installed" | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name | .icon=$icon | .rescanned=$rescanned' \
+        '.status="installed" | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name | .icon=$icon | .category=$category | .rescanned=$rescanned' \
         "$manifest" >"$temp_manifest"
     chmod 0600 "$temp_manifest"
     mv -f "$temp_manifest" "$manifest"
-    write_launcher "$app_id" "$DISCOVERED_NAME" "$launcher_icon"
+    write_launcher "$app_id" "$DISCOVERED_NAME" "$launcher_icon" "$launcher_group"
     printf 'Registered installed application: %s\n' "$DISCOVERED_NAME"
 }
 
@@ -772,11 +819,13 @@ remove_app() {
     local assume_yes=false
     if [[ ${1:-} = --yes ]]; then assume_yes=true; shift; fi
     [[ $# -eq 1 ]] || { usage >&2; exit 2; }
-    local app_id=$1 app_dir
+    local app_id=$1 app_dir desktop_dir
     app_dir=$(app_dir_for "$app_id")
     [[ -f "$app_dir/manifest.json" ]] || { printf 'Unknown application: %s\n' "$app_id" >&2; exit 2; }
     confirm_action "Move managed Windows application '$app_id' to the trash?" "$assume_yes"
     rm -f "$LAUNCHERS_DIR/org.eczos.Windows.$app_id.desktop"
+    desktop_dir=$(xdg-user-dir DESKTOP 2>/dev/null || true)
+    [[ -z "$desktop_dir" ]] || rm -f "$desktop_dir/ECZOS-$app_id.desktop"
     gio trash "$app_dir"
     update-desktop-database "$LAUNCHERS_DIR" >/dev/null 2>&1 || true
     printf 'Moved %s to the trash.\n' "$app_id"

@@ -1,3 +1,11 @@
+eczos-windows-core (0.1.0~dev14) UNRELEASED; urgency=medium
+
+  * Prefer product-matching executables over installed helper tools.
+  * Register a discovered app despite unreliable autorun exit codes.
+  * Create categorized start-menu and desktop launchers.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 11:15:00 +0200
+
 eczos-windows-core (0.1.0~dev13) UNRELEASED; urgency=medium
 
   * Show real optical-media copy progress with percentage, speed and ETA.
