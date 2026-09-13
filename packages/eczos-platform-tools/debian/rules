@@ -4,4 +4,13 @@
 	dh $@
 
 override_dh_auto_configure:
-	dh_auto_configure --sourcedirectory=native
+	dh_auto_configure --buildsystem=cmake --sourcedirectory=native
+
+override_dh_auto_build:
+	dh_auto_build --buildsystem=cmake --sourcedirectory=native
+
+override_dh_auto_install:
+	dh_auto_install --buildsystem=cmake --sourcedirectory=native
+
+override_dh_auto_clean:
+	dh_auto_clean --buildsystem=cmake --sourcedirectory=native

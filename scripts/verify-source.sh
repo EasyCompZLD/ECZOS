@@ -93,6 +93,7 @@ for required in \
     scripts/stage-prebuild-experience-vm.sh \
     scripts/stage-ux-batch-vm.sh \
     scripts/stage-settings-gaming-batch-vm.sh \
+    scripts/stage-embedded-settings-hotfix-vm.sh \
     scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done

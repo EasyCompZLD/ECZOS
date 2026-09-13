@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev30) UNRELEASED; urgency=medium
+
+  * Require the packaged native settings-host hotfix.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 22:30:00 +0200
+
 eczos-desktop (0.1.0~dev29) UNRELEASED; urgency=medium
 
   * Require the in-window native KDE settings-module host.
