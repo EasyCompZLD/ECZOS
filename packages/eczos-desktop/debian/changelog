@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev19) UNRELEASED; urgency=medium
+
+  * Require visible and recoverable installation-media copy progress.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 10:45:00 +0200
+
 eczos-desktop (0.1.0~dev18) UNRELEASED; urgency=medium
 
   * Require first-login splash seeding and optical-disc installation handling.

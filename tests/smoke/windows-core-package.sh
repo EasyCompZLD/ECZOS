@@ -24,7 +24,9 @@ grep -F 'C:\\ECZOS-Install\\payload.$extension' /usr/bin/eczos-windows
 grep -F 'detect_installation_media' /usr/bin/eczos-windows
 grep -F 'Canonical autorun:' /usr/bin/eczos-windows
 grep -F 'autorun.inf' /usr/bin/eczos-windows
-grep -F 'cp -a -- "$media_root/." "$runtime_dir/media/"' /usr/bin/eczos-windows
+grep -F 'zenity --progress' /usr/bin/eczos-windows
+grep -F 'rsync -a --partial' /usr/bin/eczos-windows
+grep -F '.status="media-copy-failed"' /usr/bin/eczos-windows
 grep -F 'execute-from' /usr/bin/eczos-windows
 grep -F 'Name=ECZ Windows-apps' /usr/share/applications/org.eczos.Windows.Manager.desktop
 grep -F 'exec wine "$@"' /usr/lib/eczos/windows/runtime-wine-system

@@ -1,3 +1,10 @@
+eczos-windows-core (0.1.0~dev13) UNRELEASED; urgency=medium
+
+  * Show real optical-media copy progress with percentage, speed and ETA.
+  * Preserve partial copies and expose disc read failures for guided retry.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 10:45:00 +0200
+
 eczos-windows-core (0.1.0~dev12) UNRELEASED; urgency=medium
 
   * Treat an optical installation disc as one application source.

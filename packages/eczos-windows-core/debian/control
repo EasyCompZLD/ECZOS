@@ -18,9 +18,11 @@ Depends:
  jq,
  kdialog,
  libglib2.0-bin,
+ rsync,
  wine (>= 10.0~repack-6),
  wine64 (>= 10.0~repack-6),
- xdg-utils
+ xdg-utils,
+ zenity
 Recommends:
  wine32
 Description: managed Windows application compatibility for ECZOS
