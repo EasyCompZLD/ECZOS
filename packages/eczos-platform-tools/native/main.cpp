@@ -18,6 +18,7 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QQmlEngine>
 #include <QScrollArea>
 #include <QSplitter>
 #include <QStandardPaths>

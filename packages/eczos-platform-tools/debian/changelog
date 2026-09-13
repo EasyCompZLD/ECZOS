@@ -1,6 +1,7 @@
 eczos-platform-tools (0.1.0~dev8) UNRELEASED; urgency=medium
 
   * Install the compiled native settings host into the binary package.
+  * Include the complete Qt QML engine type required by the native host.
 
  -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 22:30:00 +0200
 
