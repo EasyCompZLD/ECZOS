@@ -1,13 +1,13 @@
 # ECZOS USP implementation status
 
-Status date: 2026-09-07.
+Status date: 2026-09-13.
 
 | USP | Current implementation | Remaining release gate |
 | --- | --- | --- |
 | Windows apps without Wine complexity | EXE/MSI handler, confirmation, isolated prefix, launcher, icon extraction, repair and recoverable removal | Broader real-app matrix |
 | Per-app isolation | Implemented and physically tested | Upgrade/rollback matrix |
-| Wine/Proton selection | Wine adapter plus UMU gaming adapter | Automatic game classification and positive Vulkan-PC test |
-| Built-in Gaming Mode | Vulkan doctor, GameMode/UMU adapter and Debian Steam bootstrap | Per-game profiles and positive DXVK/VKD3D test |
+| Wine/Proton selection | Wine adapter plus UMU gaming adapter | Optional broader per-game compatibility matrix |
+| Built-in Gaming Mode | Vulkan doctor, GameMode/UMU adapter and physically launched Debian Steam bootstrap | Optional per-game profiles and DXVK/VKD3D qualification |
 | Windows migration | Safe personal-folder dry-run/apply MVP | Browser import, app transition mapping and OOBE page |
 | Windows-style drives | Root `Z:` removed; explicit D:–Y: mappings stored per app and managed graphically | Broader network-drive discovery |
 | Repair and diagnostics | Windows repair plus system, gaming and support diagnostics | Graphical guided system repair actions |

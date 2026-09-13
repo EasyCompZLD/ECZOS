@@ -43,10 +43,14 @@
 ## Phase 3 — ECZ Gaming
 
 - [x] Vulkan and 32-bit graphics diagnostics
-- [x] Steam bootstrap and controller integration (positive launch test pending)
-- [x] reviewed UMU adapter for non-Steam games (positive GPU test pending)
-- per-game DXVK/VKD3D and runtime profiles
+- [x] Steam bootstrap and controller integration (physically launched on GamePC)
+- [x] reviewed UMU adapter for non-Steam games
+- optional expanding per-game DXVK/VKD3D and runtime compatibility matrix
 - [x] explicit Gaming Mode through GameMode adapter
+
+Steam operation on the GamePC qualifies the current gaming integration. Separate
+Vulkan, DXVK, VKD3D and UMU game tests may expand the compatibility matrix later,
+but are not a prototype release blocker.
 
 ## Phase 4 — broader product experience
 
