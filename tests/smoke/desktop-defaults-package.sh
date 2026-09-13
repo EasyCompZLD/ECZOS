@@ -20,8 +20,10 @@ test -s /etc/skel/.config/ksplashrc
 grep -Fx 'Theme=org.eczos.desktop' /etc/xdg/ksplashrc
 grep -Fx 'Theme=org.eczos.desktop' /etc/skel/.config/ksplashrc
 grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
-grep -F 'START_ICON=eczos-start-dark' /usr/bin/eczos-theme-switch
-grep -F 'START_ICON=eczos-start-light' /usr/bin/eczos-theme-switch
+grep -F 'START_ICON=file:///usr/share/eczos/branding/logo/logo-dark.png' /usr/bin/eczos-theme-switch
+grep -F 'START_ICON=file:///usr/share/eczos/branding/logo/logo.png' /usr/bin/eczos-theme-switch
+grep -F 'desktop-defaults-v5' /usr/lib/eczos/apply-desktop-defaults
+grep -F 'timeout 12s plasma-apply-wallpaperimage' /usr/bin/eczos-theme-switch
 grep -F 'kscreenlockerrc' /usr/bin/eczos-theme-switch
 grep -F 'org.eczos.desktop' /usr/bin/eczos-theme-switch
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/metadata.json

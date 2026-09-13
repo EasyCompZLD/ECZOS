@@ -11,6 +11,7 @@ for required in \
     config/package-lists/eczos-desktop.list.chroot \
     config/hooks/normal/0090-eczos-product-policy.hook.chroot \
     config/hooks/normal/0100-eczos-image-policy.hook.chroot \
+    config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
     config/bootloaders/grub-pc/grub.cfg \
     config/bootloaders/grub-pc/live-theme/theme.txt \
     config/includes.chroot/etc/calamares/settings.conf \
@@ -58,6 +59,8 @@ grep -Fx '      - eczos-installer' \
     "$IMAGE_DIR/config/includes.chroot/etc/calamares/modules/packages.conf"
 grep -Fx 'plymouth-set-default-theme eczos' \
     "$IMAGE_DIR/config/hooks/normal/0100-eczos-image-policy.hook.chroot"
+grep -Fx 'rm -f /etc/apt/sources.list' \
+    "$IMAGE_DIR/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot"
 grep -F 'softmaker-archive-keyring.asc' \
     "$IMAGE_DIR/config/includes.chroot/etc/apt/sources.list.d/softmaker.list"
 grep -F 'BEGIN PGP PUBLIC KEY BLOCK' \

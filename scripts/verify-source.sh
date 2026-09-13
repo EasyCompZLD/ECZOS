@@ -61,6 +61,7 @@ for required in \
     image/config/bootloaders/grub-pc/live-theme/theme.txt \
     image/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session \
     image/config/includes.chroot/etc/calamares/settings.conf \
+    image/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
     scripts/configure-freeoffice-repository-vm.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \

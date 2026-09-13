@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+
+# eczos-release owns the Debian base, updates and security definitions in
+# deb822 format. live-build's generated legacy list would duplicate them in
+# the installed system after Calamares copies the live filesystem.
+rm -f /etc/apt/sources.list

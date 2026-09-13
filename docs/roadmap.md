@@ -21,12 +21,12 @@
 - [x] versioned Debian 13 KDE live-build configuration
 - [x] first isolated ECZOS hardware-qualification ISO build
 - [x] hardware-qualification ISO boot and installation on the Vulkan-capable game PC
-- [ ] qualify the explicit `eczos` / `live` live identity and live-only no-lock policy on a new ISO
+- [x] qualify the explicit `eczos` / `live` live identity and live-only no-lock policy on a new ISO
 - [ ] qualify the ECZOS GRUB live menu and existing dark wallpaper on BIOS and UEFI
-- [ ] qualify the ECZOS-branded Calamares installation path and USP slideshow
+- [x] qualify the ECZOS-branded Calamares installation path and USP slideshow
 - [ ] qualify the ECZOS Plasma startup splash from the approved animation asset
-- [ ] qualify the ECZOS first-boot OOBE with default-on, user-mutable intro audio
-- [ ] qualify Calamares-created users as password-authenticated sudo members
+- [x] qualify the ECZOS first-boot OOBE with default-on, user-mutable intro audio
+- [x] qualify Calamares-created users as password-authenticated sudo members
 - UEFI VM boot, install, upgrade and removal tests
 
 ## Phase 2 — ECZ Windows MVP
@@ -37,6 +37,8 @@
 - [x] launcher/icon/menu integration (physical icon extraction test passed)
 - [x] install logs, repair and recoverable removal (physical test passed)
 - [x] constrained default file mappings without a Linux-root `Z:` drive
+- [x] physical classic-game installation from optical media with progress,
+      recovery, executable discovery and categorized launchers
 
 ## Phase 3 — ECZ Gaming
 
@@ -54,7 +56,7 @@
 - [x] backup application and recovery entry points
 - [x] phone integration and privacy-conscious support-report foundation
 - [x] FreeOffice host inclusion and physical install test
-- [ ] FreeOffice release artifact pinning and ISO integration
+- [x] FreeOffice release artifact pinning and ISO integration
 - [ ] optional cloud and enrolled remote-support services
 
 ## Phase 5 — distribution

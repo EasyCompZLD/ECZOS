@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev21) UNRELEASED; urgency=medium
+
+  * Require the resilient first-session desktop configuration.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 11:45:00 +0200
+
 eczos-desktop (0.1.0~dev20) UNRELEASED; urgency=medium
 
   * Require reliable game detection and categorized Windows launchers.
