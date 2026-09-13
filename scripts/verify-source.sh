@@ -126,10 +126,11 @@ for frame in $(seq 0 11); do
     done
 done
 for support_image in watermark.png bgrt-fallback.png logo.png; do
-    cmp -s \
-        "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images/$support_image" \
-        "$ROOT_DIR/packages/eczos-branding/assets/logo/logo.png" || \
-        fail "Plymouth $support_image is not ECZOS artwork"
+    printf '%s  %s\n' \
+        '8f2b50229408f2d44222ee07e5309938fa82491804cb79a396981ddcb04ac42d' \
+        "$ROOT_DIR/packages/eczos-plymouth-theme/theme/images/$support_image" | \
+        shasum -a 256 -c - >/dev/null || \
+        fail "Plymouth $support_image is not the transparent fallback"
 done
 
 for asset in \

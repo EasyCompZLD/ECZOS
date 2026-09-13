@@ -21,6 +21,9 @@ for frame in $(seq 0 11); do
 done
 for image in watermark.png bgrt-fallback.png logo.png; do
     test -s "$THEME_DIR/images/$image"
+    printf '%s  %s\n' \
+        '8f2b50229408f2d44222ee07e5309938fa82491804cb79a396981ddcb04ac42d' \
+        "$THEME_DIR/images/$image" | sha256sum --check --status
 done
 test "$(readlink /usr/share/plymouth/debian-logo.png)" = \
     themes/eczos/images/watermark.png

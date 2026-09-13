@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev24) UNRELEASED; urgency=medium
+
+  * Require the single-logo Plymouth presentation.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 15:20:00 +0200
+
 eczos-desktop (0.1.0~dev23) UNRELEASED; urgency=medium
 
   * Require the text-free ECZOS Plymouth fallback correction.
