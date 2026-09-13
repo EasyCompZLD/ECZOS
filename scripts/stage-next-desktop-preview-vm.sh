@@ -18,6 +18,11 @@ normalize_package() {
     local package_dir=$1
     find "$package_dir/debian" -type f -exec chmod 0644 {} +
     chmod 0755 "$package_dir/debian/rules"
+    for maintainer_script in preinst postinst prerm postrm; do
+        if [[ -f "$package_dir/debian/$maintainer_script" ]]; then
+            chmod 0755 "$package_dir/debian/$maintainer_script"
+        fi
+    done
 }
 
 normalize_package "$PLYMOUTH_DIR"
