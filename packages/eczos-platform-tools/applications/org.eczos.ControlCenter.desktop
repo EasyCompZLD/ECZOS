@@ -2,7 +2,7 @@
 Type=Application
 Name=ECZOS Instellingen
 Comment=Beheer apps, apparaten, back-ups, herstel en ondersteuning
-Exec=eczos-ui settings
+Exec=eczos-system-settings
 Icon=preferences-system
 Terminal=false
 Categories=Settings;

@@ -25,18 +25,26 @@ apt-get update
 apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
+    cmake \
     debhelper \
     devscripts \
     dosfstools \
     git \
+    extra-cmake-modules \
     grub-efi-amd64-bin \
     grub-pc-bin \
     intel-microcode \
     isolinux \
     live-build \
+    libkf6auth-dev \
+    libkf6config-dev \
+    libkf6coreaddons-dev \
+    libkf6kcmutils-dev \
     lintian \
     mtools \
     rsync \
+    qt6-base-dev \
+    qt6-declarative-dev \
     shellcheck \
     squashfs-tools \
     syslinux-common \

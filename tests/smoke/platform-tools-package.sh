@@ -8,6 +8,8 @@ for command in eczos-control-center eczos-doctor eczos-migrate eczos-support-rep
     bash -n "/usr/bin/$command"
 done
 test -x /usr/bin/eczos-ui
+test -x /usr/bin/eczos-system-settings
+grep -F 'exec /usr/bin/eczos-system-settings "$@"' /usr/bin/eczos-control-center
 test -r /usr/share/eczos/ui/Main.qml
 python3 - /usr/bin/eczos-ui <<'PY'
 import pathlib
@@ -17,10 +19,14 @@ PY
 for desktop in ControlCenter Diagnostics Migration; do
     desktop-file-validate "/usr/share/applications/org.eczos.${desktop}.desktop"
 done
-grep -Fx 'Exec=eczos-ui settings' /usr/share/applications/org.eczos.ControlCenter.desktop
+grep -Fx 'Exec=eczos-system-settings' /usr/share/applications/org.eczos.ControlCenter.desktop
 grep -Fx 'Exec=eczos-ui diagnostics' /usr/share/applications/org.eczos.Diagnostics.desktop
 grep -Fx 'Exec=eczos-ui migration' /usr/share/applications/org.eczos.Migration.desktop
 /usr/bin/eczos-ui --list-kcms-json | jq -e '.schemaVersion == 1 and (.modules | type == "array") and (.modules | length > 10)' >/dev/null
+QT_QPA_PLATFORM=offscreen /usr/bin/eczos-system-settings --list-json | jq -e '
+    .schemaVersion == 1 and (.modules | length >= 80) and
+    ([.modules[].id] | contains(["kcm_users", "kcm_networkmanagement", "kcm_kscreen", "kcm_printer_manager", "kcm_updates"]))
+' >/dev/null
 /usr/bin/eczos-doctor --json | jq -e '.schemaVersion == 1 and .office == "installed"' >/dev/null
 jq -e '.office.product == "SoftMaker FreeOffice 2024" and .office.package == "softmaker-freeoffice-2024" and .office.redistributed == true' \
     /usr/share/eczos/product/default-apps.json >/dev/null

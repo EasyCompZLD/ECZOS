@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-exec /usr/bin/eczos-ui settings
+exec /usr/bin/eczos-system-settings "$@"

@@ -2,15 +2,25 @@ Source: eczos-platform-tools
 Section: admin
 Priority: optional
 Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
-Build-Depends: debhelper-compat (= 13)
+Build-Depends:
+ cmake,
+ debhelper-compat (= 13),
+ extra-cmake-modules,
+ libkf6auth-dev,
+ libkf6config-dev,
+ libkf6coreaddons-dev,
+ libkf6kcmutils-dev,
+ qt6-base-dev,
+ qt6-declarative-dev
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
 Homepage: https://easycompzeeland.nl/
 
 Package: eczos-platform-tools
-Architecture: all
+Architecture: amd64
 Depends:
  ${misc:Depends},
+ ${shlibs:Depends},
  eczos-branding (>= 0.1.0~dev7),
  jq,
  pciutils,
@@ -28,5 +38,6 @@ Depends:
  xdg-user-dirs,
  xdg-utils
 Description: consumer-facing management and recovery tools for ECZOS
- Provides one ECZOS settings entry point, understandable system diagnostics,
- a privacy-conscious support report and a safe user-file migration assistant.
+ Provides an embedded native KDE settings-module host, understandable system
+ diagnostics, a privacy-conscious support report and a safe user-file
+ migration assistant.

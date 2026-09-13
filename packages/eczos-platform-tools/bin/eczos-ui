@@ -129,6 +129,10 @@ class Bridge(QObject):
 
     @Slot(str)
     def navigate(self, route):
+        if route == "system" and Path("/usr/bin/eczos-system-settings").exists():
+            QProcess.startDetached("/usr/bin/eczos-system-settings", [])
+            QTimer.singleShot(0, QGuiApplication.quit)
+            return
         if route in ROUTES and route != self._route:
             self._route = route
             self.routeChanged.emit()
@@ -302,7 +306,7 @@ class Bridge(QObject):
     @Slot(str)
     def launch(self, action):
         commands = {
-            "apps": ["plasma-discover"], "devices": ["systemsettings"],
+            "apps": ["plasma-discover"], "devices": ["eczos-system-settings"],
             "backup": ["kcmshell6", "kcm_kup"], "phone": ["kdeconnect-app"],
             "about": ["kinfocenter"], "steam": ["steam"],
         }

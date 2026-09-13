@@ -40,16 +40,17 @@ trees from a development workstation is prohibited.
 System defaults and per-user state are separate. A first-run operation may seed
 defaults once; normal logins must not continuously overwrite user choices.
 
-ECZOS Settings presents KDE configuration modules rather than copying their
-implementation. KDE documents KCMs as reusable modules that may be opened by
-`systemsettings` or `kcmshell6`; ECZOS discovers the installed list at runtime
-and launches the same modules through `kcmshell6`. This preserves driver,
-hardware, authorization, save/reset and future package functionality while the
-ECZOS shell supplies clearer navigation. The original System Settings launcher
-must remain available until a physical coverage test confirms every reported
-module is reachable from ECZOS Settings. Real screenshots provide guided entry
-points for appearance, displays and networking; the complete runtime-discovered
-list remains below them so visual simplification never removes functionality.
+ECZOS Settings embeds KDE configuration modules rather than copying their
+implementation. A native host uses `KCModuleLoader` to place both Qt Quick and
+legacy QtWidgets KCMs inside the ECZOS window. This preserves driver, hardware,
+authorization, save/reset and future package functionality without spawning a
+standalone `kcmshell6` window. It discovers normal System Settings and Info
+Center namespaces at runtime, applies KDE authorization and platform filters,
+and exposes every resulting module in the ECZOS sidebar. The original System
+Settings launcher must remain available until a physical coverage test confirms
+every reported module is usable from ECZOS Settings. Real screenshots provide
+guided context for appearance, displays and networking without replacing the
+complete module list.
 
 ## Package layers
 

@@ -17,6 +17,16 @@ ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 PACKAGES=(eczos-branding eczos-platform-tools eczos-gaming-core eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y --no-install-recommends \
+    cmake \
+    extra-cmake-modules \
+    libkf6auth-dev \
+    libkf6config-dev \
+    libkf6coreaddons-dev \
+    libkf6kcmutils-dev \
+    qt6-base-dev \
+    qt6-declarative-dev
 "$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
 "$ROOT_DIR/scripts/verify-source.sh"
 
@@ -57,7 +67,7 @@ apt-get install -y "${debs[@]}"
 "$ROOT_DIR/tests/smoke/gaming-core-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-metapackage.sh"
 
-module_json=$(/usr/bin/eczos-ui --list-kcms-json)
+module_json=$(QT_QPA_PLATFORM=offscreen /usr/bin/eczos-system-settings --list-json)
 jq -e '
     (.modules | length >= 80) and
     ([.modules[].id] | contains([

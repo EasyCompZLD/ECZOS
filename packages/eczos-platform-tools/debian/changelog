@@ -1,3 +1,10 @@
+eczos-platform-tools (0.1.0~dev7) UNRELEASED; urgency=medium
+
+  * Replace external KCM windows with one native embedded settings host.
+  * Keep every KDE settings and information module inside the ECZOS window.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 13 Sep 2026 22:00:00 +0200
+
 eczos-platform-tools (0.1.0~dev6) UNRELEASED; urgency=medium
 
   * Discover every installed KDE configuration module dynamically.

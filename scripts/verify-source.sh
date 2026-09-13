@@ -51,6 +51,8 @@ for required in \
     packages/eczos-platform-tools/debian/control \
     packages/eczos-platform-tools/bin/eczos-control-center \
     packages/eczos-platform-tools/bin/eczos-ui \
+    packages/eczos-platform-tools/native/CMakeLists.txt \
+    packages/eczos-platform-tools/native/main.cpp \
     packages/eczos-platform-tools/qml/Main.qml \
     packages/eczos-platform-tools/bin/eczos-doctor \
     packages/eczos-platform-tools/bin/eczos-migrate \
