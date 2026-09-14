@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QProcess, QUrl, Slot
+from PySide6.QtCore import QObject, QProcess, QLocale, QTranslator, QUrl, Slot
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
@@ -107,6 +107,15 @@ app = QGuiApplication(sys.argv)
 app.setOrganizationName("EasyComp Zeeland")
 app.setOrganizationDomain("easycompzeeland.nl")
 app.setApplicationName("ECZOS OOBE")
+
+# Load the matching ECZOS catalogue when present. QML strings marked with
+# qsTr() then follow the desktop language, with English as the fallback.
+translator = QTranslator(app)
+locale = QLocale.system().name()
+for root in ("/usr/share/eczos/translations", "/usr/share/eczos/oobe/translations"):
+    if translator.load(f"eczos-oobe_{locale}", root) or translator.load(f"eczos-oobe_{locale[:2]}", root):
+        app.installTranslator(translator)
+        break
 
 engine = QQmlApplicationEngine()
 bridge = OobeBridge()

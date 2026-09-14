@@ -1,3 +1,9 @@
+eczos-oobe (0.1.0~dev5) UNRELEASED; urgency=medium
+
+  * Load locale-specific Qt catalogues for translated QML OOBE content.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 16:10:00 +0200
+
 eczos-oobe (0.1.0~dev4) UNRELEASED; urgency=medium
 
   * Show real ECZOS application screenshots throughout the first-run tour.
