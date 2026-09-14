@@ -192,8 +192,17 @@ grep -Fq 'branding/screenshots/windows-apps.png' \
     fail 'ECZOS installer does not use product screenshots'
 
 while IFS= read -r script; do
-    if head -n 1 "$script" | grep -q 'python3'; then
-        continue
+    # Debian package builds leave native ELF binaries below debian/*/usr/bin
+    # and debug artefacts below debian/.debhelper.  They can legitimately
+    # match the source path patterns below, but must never be parsed as shell.
+    if [[ "$script" != *.sh ]]; then
+        grep -Iq . "$script" || continue
+        first_line=$(head -n 1 "$script" || true)
+        case "$first_line" in
+            '#!'*python*) continue ;;
+            '#!'*sh*|'#!'*bash*) ;;
+            *) continue ;;
+        esac
     fi
     bash -n "$script" || fail "invalid shell syntax: ${script#"$ROOT_DIR/"}"
 done < <(find "$ROOT_DIR/scripts" "$ROOT_DIR/tests" "$ROOT_DIR/packages" \
