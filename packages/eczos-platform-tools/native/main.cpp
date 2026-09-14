@@ -257,6 +257,7 @@ public:
             #sidebar QTreeWidget::item { min-height: 34px; padding: 2px 6px; border-radius: 7px; }
             #sidebar QTreeWidget::item:selected { background: #183b52; color: #ffffff; }
             #sidebar QTreeWidget::item:hover { background: #132b3d; }
+            #sidebar QTreeWidget::branch { background: transparent; }
             #identity { color: #6f8da2; font-size: 11px; }
             #pageHeading { font-size: 25px; font-weight: 700; }
             #pageDescription { color: palette(mid); font-size: 13px; }
