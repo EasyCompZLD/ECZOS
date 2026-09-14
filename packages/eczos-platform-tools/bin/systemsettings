@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+for argument in "$@"; do
+    case "$argument" in
+        kcm_*|kwincompositing|breezestyleconfig)
+            exec /usr/bin/eczos-system-settings --module "$argument"
+            ;;
+    esac
+done
+
+exec /usr/bin/eczos-system-settings

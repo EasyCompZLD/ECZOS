@@ -33,6 +33,21 @@ case "$1" in
                     "$target"
             fi
         done
+        target=/etc/xdg/kcm-about-distrorc
+        diversion_owner=$(dpkg-divert --listpackage "$target" || true)
+        if [ -n "$diversion_owner" ] && [ "$diversion_owner" != eczos-release ]; then
+            printf 'Cannot install eczos-release: %s is diverted by %s.\n' \
+                "$target" "$diversion_owner" >&2
+            exit 1
+        fi
+        if [ "$diversion_owner" != eczos-release ]; then
+            dpkg-divert \
+                --package eczos-release \
+                --add \
+                --rename \
+                --divert "$target.debian" \
+                "$target"
+        fi
         ;;
 esac
 

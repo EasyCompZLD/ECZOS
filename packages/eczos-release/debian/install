@@ -1,6 +1,7 @@
 apt/eczos-debian.sources etc/apt/sources.list.d/
 bin/eczos-info usr/bin/
 config/80-eczos-release.cfg etc/default/grub.d/
+config/kcm-about-distrorc usr/lib/eczos/release/
 lib/update-os-release usr/lib/eczos/
 release/eczos-release usr/lib/eczos/release/
 release/issue usr/lib/eczos/release/

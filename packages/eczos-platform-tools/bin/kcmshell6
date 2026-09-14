@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+case "${1:-}" in
+    --list|--help|-h|--version|-v)
+        exec /usr/bin/kcmshell6.eczos-distrib "$@"
+        ;;
+esac
+
+for argument in "$@"; do
+    case "$argument" in
+        kcm_*|kwincompositing|breezestyleconfig)
+            exec /usr/bin/eczos-system-settings --module "$argument"
+            ;;
+    esac
+done
+
+exec /usr/bin/eczos-system-settings

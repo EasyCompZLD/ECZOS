@@ -6,6 +6,8 @@ if [ "$1" = configure ]; then
     install -m 0644 /usr/lib/eczos/release/issue /etc/issue
     install -m 0644 /usr/lib/eczos/release/issue.net /etc/issue.net
     install -m 0644 /usr/lib/eczos/release/motd /etc/motd
+    install -d -m 0755 /etc/xdg
+    install -m 0644 /usr/lib/eczos/release/kcm-about-distrorc /etc/xdg/kcm-about-distrorc
 fi
 
 #DEBHELPER#

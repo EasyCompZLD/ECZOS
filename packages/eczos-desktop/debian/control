@@ -15,10 +15,10 @@ Depends:
  eczos-desktop-defaults (>= 0.1.0~dev9),
  eczos-desktop-apps (>= 0.1.0~dev2),
  eczos-gaming-core (>= 0.1.0~dev5),
- eczos-platform-tools (>= 0.1.0~dev9),
+ eczos-platform-tools (>= 0.1.0~dev10),
  eczos-plymouth-theme (>= 0.1.0~dev6),
  eczos-recovery-media (>= 0.1.0~dev3),
- eczos-release (>= 0.1.0~dev5),
+ eczos-release (>= 0.1.0~dev6),
  eczos-sddm-theme (>= 0.1.0~dev1),
  eczos-oobe (>= 0.1.0~dev4),
  eczos-windows-core (>= 0.1.0~dev16)

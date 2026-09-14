@@ -13,6 +13,11 @@ grep -Fx 'ECZOS_BASE_ID=debian' /usr/lib/eczos/release/eczos-release
 /usr/bin/eczos-info | grep -Fx 'ECZOS Development'
 grep -Fx 'PRETTY_NAME="ECZOS Development 0.1"' /etc/os-release
 grep -Fx 'ID=debian' /etc/os-release
+grep -Fx 'LOGO=eczos-start' /etc/os-release
+grep -Fx 'LogoPath=eczos-start' /etc/xdg/kcm-about-distrorc
+grep -Fx 'Version=Development 0.1' /etc/xdg/kcm-about-distrorc
+test -e /etc/xdg/kcm-about-distrorc.debian
+test "$(dpkg-divert --listpackage /etc/xdg/kcm-about-distrorc)" = eczos-release
 grep -Fx 'GRUB_DISTRIBUTOR=ECZOS' /etc/default/grub.d/80-eczos-release.cfg
 grep -Fx 'GRUB_BACKGROUND=/usr/share/eczos/branding/wallpapers/eczoswallpaper-dark.png' \
     /etc/default/grub.d/80-eczos-release.cfg

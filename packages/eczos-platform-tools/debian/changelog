@@ -1,3 +1,10 @@
+eczos-platform-tools (0.1.0~dev10) UNRELEASED; urgency=medium
+
+  * Route legacy System Settings and KCM launch commands into the unified
+    native ECZOS Settings window.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 13:00:00 +0200
+
 eczos-platform-tools (0.1.0~dev9) UNRELEASED; urgency=medium
 
   * Put Windows apps, gaming, recovery, migration, diagnostics and support in

@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove|abort-install)
+        for target in /usr/bin/systemsettings /usr/bin/kcmshell6; do
+            if [ "$(dpkg-divert --listpackage "$target")" = eczos-platform-tools ]; then
+                rm -f "$target"
+                dpkg-divert \
+                    --package eczos-platform-tools \
+                    --remove \
+                    --rename \
+                    --divert "$target.eczos-distrib" \
+                    "$target"
+            fi
+        done
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

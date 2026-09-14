@@ -9,6 +9,15 @@ for command in eczos-control-center eczos-doctor eczos-migrate eczos-support-rep
 done
 test -x /usr/bin/eczos-ui
 test -x /usr/bin/eczos-system-settings
+test -x /usr/bin/systemsettings
+test -x /usr/bin/kcmshell6
+test -x /usr/bin/systemsettings.eczos-distrib
+test -x /usr/bin/kcmshell6.eczos-distrib
+test "$(dpkg-divert --listpackage /usr/bin/systemsettings)" = eczos-platform-tools
+test "$(dpkg-divert --listpackage /usr/bin/kcmshell6)" = eczos-platform-tools
+grep -F 'exec /usr/bin/eczos-system-settings --module "$argument"' /usr/bin/systemsettings
+grep -F 'exec /usr/bin/eczos-system-settings --module "$argument"' /usr/bin/kcmshell6
+grep -F 'exec /usr/bin/kcmshell6.eczos-distrib "$@"' /usr/bin/kcmshell6
 grep -F 'exec /usr/bin/eczos-system-settings "$@"' /usr/bin/eczos-control-center
 test -r /usr/share/eczos/ui/Main.qml
 python3 - /usr/bin/eczos-ui <<'PY'

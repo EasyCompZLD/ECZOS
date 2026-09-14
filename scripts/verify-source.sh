@@ -37,6 +37,7 @@ for required in \
     packages/eczos-release/debian/control \
     packages/eczos-release/apt/eczos-debian.sources \
     packages/eczos-release/lib/update-os-release \
+    packages/eczos-release/config/kcm-about-distrorc \
     packages/eczos-release/release/eczos-release \
     packages/eczos-windows-core/debian/control \
     packages/eczos-windows-core/bin/eczos-windows \
@@ -51,6 +52,10 @@ for required in \
     packages/eczos-platform-tools/debian/control \
     packages/eczos-platform-tools/bin/eczos-control-center \
     packages/eczos-platform-tools/bin/eczos-ui \
+    packages/eczos-platform-tools/bin/systemsettings \
+    packages/eczos-platform-tools/bin/kcmshell6 \
+    packages/eczos-platform-tools/debian/preinst \
+    packages/eczos-platform-tools/debian/postrm \
     packages/eczos-platform-tools/native/CMakeLists.txt \
     packages/eczos-platform-tools/native/main.cpp \
     packages/eczos-platform-tools/qml/Main.qml \

@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    install|upgrade)
+        for target in /usr/bin/systemsettings /usr/bin/kcmshell6; do
+            diversion_owner=$(dpkg-divert --listpackage "$target" || true)
+            if [ -n "$diversion_owner" ] && [ "$diversion_owner" != eczos-platform-tools ]; then
+                printf 'Cannot install eczos-platform-tools: %s is diverted by %s.\n' \
+                    "$target" "$diversion_owner" >&2
+                exit 1
+            fi
+            if [ "$diversion_owner" != eczos-platform-tools ]; then
+                dpkg-divert \
+                    --package eczos-platform-tools \
+                    --add \
+                    --rename \
+                    --divert "$target.eczos-distrib" \
+                    "$target"
+            fi
+        done
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
