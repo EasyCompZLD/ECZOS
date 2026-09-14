@@ -7,6 +7,10 @@ if [[ $(id -u) -ne 0 ]]; then
 fi
 
 dpkg-query -W -f='${Status}\n' eczos-release | grep -Fx 'install ok installed'
+test -s /usr/share/keyrings/eczos-archive-keyring.asc
+grep -Fx 'URIs: https://repo.easycomp.cloud/eczos' /etc/apt/sources.list.d/eczos.sources
+grep -Fx 'Suites: trixie' /etc/apt/sources.list.d/eczos.sources
+grep -Fx 'Signed-By: /usr/share/keyrings/eczos-archive-keyring.asc' /etc/apt/sources.list.d/eczos.sources
 test -x /usr/bin/eczos-info
 test -s /usr/lib/eczos/release/eczos-release
 grep -Fx 'ECZOS_BASE_ID=debian' /usr/lib/eczos/release/eczos-release
