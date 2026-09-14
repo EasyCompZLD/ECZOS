@@ -17,7 +17,7 @@ TEMP_DIR=$(mktemp -d /tmp/eczos-windows-gates.XXXXXX)
 chmod 0755 "$TEMP_DIR"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-for package in eczos-release eczos-windows-core eczos-desktop; do
+for package in eczos-archive-keyring eczos-release eczos-windows-core eczos-desktop; do
     package_dir="$ROOT_DIR/packages/$package"
     find "$package_dir/debian" -type f -exec chmod 0644 {} +
     chmod 0755 "$package_dir/debian/rules"
@@ -36,7 +36,8 @@ for package in eczos-release eczos-windows-core eczos-desktop; do
     install -m 0644 "$built" "$TEMP_DIR/$package.deb"
 done
 
-apt-get install -y "$TEMP_DIR/eczos-release.deb" "$TEMP_DIR/eczos-windows-core.deb" "$TEMP_DIR/eczos-desktop.deb"
+apt-get install -y "$TEMP_DIR/eczos-archive-keyring.deb" "$TEMP_DIR/eczos-release.deb" "$TEMP_DIR/eczos-windows-core.deb" "$TEMP_DIR/eczos-desktop.deb"
+"$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
 "$ROOT_DIR/tests/smoke/release-package.sh"
 "$ROOT_DIR/tests/smoke/windows-core-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-metapackage.sh"

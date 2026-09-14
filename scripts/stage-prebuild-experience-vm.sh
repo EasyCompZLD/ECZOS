@@ -14,7 +14,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-release eczos-branding eczos-plymouth-theme eczos-desktop-defaults eczos-installer eczos-oobe eczos-desktop)
+PACKAGES=(eczos-archive-keyring eczos-release eczos-branding eczos-plymouth-theme eczos-desktop-defaults eczos-installer eczos-oobe eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
 "$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
@@ -34,7 +34,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config lookandfeel qml xdg; do
+    for data_dir in applications assets branding config keyrings lookandfeel qml xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi

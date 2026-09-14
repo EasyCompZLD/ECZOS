@@ -1,4 +1,5 @@
 apt/eczos-debian.sources etc/apt/sources.list.d/
+apt/eczos.sources etc/apt/sources.list.d/
 bin/eczos-info usr/bin/
 config/80-eczos-release.cfg etc/default/grub.d/
 config/kcm-about-distrorc usr/lib/eczos/release/

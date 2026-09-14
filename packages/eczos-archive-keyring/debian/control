@@ -1,0 +1,15 @@
+Source: eczos-archive-keyring
+Section: misc
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-archive-keyring
+Architecture: all
+Depends: ${misc:Depends}
+Description: ECZOS software repository signing key
+ Installs the public archive key used by APT to authenticate packages and
+ repository metadata published by EasyComp Zeeland.

@@ -12,6 +12,7 @@ Architecture: all
 Depends:
  ${misc:Depends},
  debian-archive-keyring,
+ eczos-archive-keyring (>= 2026.09.14~dev1),
  eczos-branding (>= 0.1.0~dev3)
 Description: ECZOS product release identity
  Provides machine-readable ECZOS product metadata and the eczos-info command

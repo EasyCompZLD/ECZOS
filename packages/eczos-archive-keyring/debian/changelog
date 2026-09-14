@@ -1,0 +1,5 @@
+eczos-archive-keyring (2026.09.14~dev1) UNRELEASED; urgency=medium
+
+  * Add the initial ECZOS repository signing key.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 17:10:00 +0200

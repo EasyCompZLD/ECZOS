@@ -18,7 +18,7 @@ Depends:
  eczos-platform-tools (>= 0.1.0~dev10),
  eczos-plymouth-theme (>= 0.1.0~dev6),
  eczos-recovery-media (>= 0.1.0~dev3),
- eczos-release (>= 0.1.0~dev6),
+ eczos-release (>= 0.1.0~dev7),
  eczos-sddm-theme (>= 0.1.0~dev1),
  eczos-oobe (>= 0.1.0~dev4),
  eczos-windows-core (>= 0.1.0~dev16)

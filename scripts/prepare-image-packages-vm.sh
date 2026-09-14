@@ -18,6 +18,7 @@ OUTPUT_DIR="$ROOT_DIR/packages"
 STAGING_DIR="$ROOT_DIR/image/config/packages.chroot"
 MANIFEST_DIR="$ROOT_DIR/image/.build/packages"
 PACKAGES=(
+    eczos-archive-keyring
     eczos-branding
     eczos-sddm-theme
     eczos-plymouth-theme
@@ -58,7 +59,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config lookandfeel polkit product qml release runtime-definitions theme xdg; do
+    for data_dir in applications assets branding config keyrings lookandfeel polkit product qml release runtime-definitions theme xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi

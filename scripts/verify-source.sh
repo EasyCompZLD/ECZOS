@@ -17,6 +17,9 @@ for required in \
     docs/security.md \
     repository/conf/distributions.template \
     repository/index.html \
+    packages/eczos-archive-keyring/debian/control \
+    packages/eczos-archive-keyring/debian/install \
+    packages/eczos-archive-keyring/keyrings/eczos-archive-keyring.asc \
     packages/eczos-branding/debian/control \
     packages/eczos-branding/debian/install \
     packages/eczos-branding/config/zz-eczos-grub.cfg \
@@ -39,6 +42,7 @@ for required in \
     packages/eczos-desktop-defaults/config/ksplashrc \
     packages/eczos-release/debian/control \
     packages/eczos-release/apt/eczos-debian.sources \
+    packages/eczos-release/apt/eczos.sources \
     packages/eczos-release/lib/update-os-release \
     packages/eczos-release/config/kcm-about-distrorc \
     packages/eczos-release/release/eczos-release \

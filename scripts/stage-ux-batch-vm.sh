@@ -15,6 +15,8 @@ fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 PACKAGES=(
+    eczos-archive-keyring
+    eczos-release
     eczos-branding
     eczos-platform-tools
     eczos-windows-core
@@ -43,7 +45,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config polkit product qml xdg; do
+    for data_dir in applications assets branding config keyrings polkit product qml xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi
@@ -61,6 +63,8 @@ for package in "${PACKAGES[@]}"; do
 done
 apt-get install -y "${debs[@]}"
 
+"$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
+"$ROOT_DIR/tests/smoke/release-package.sh"
 "$ROOT_DIR/tests/smoke/branding-package.sh"
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
 "$ROOT_DIR/tests/smoke/windows-core-package.sh"

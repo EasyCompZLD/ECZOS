@@ -1,3 +1,9 @@
+eczos-release (0.1.0~dev7) UNRELEASED; urgency=medium
+
+  * Configure the signed stable ECZOS software repository.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 17:10:00 +0200
+
 eczos-release (0.1.0~dev6) UNRELEASED; urgency=medium
 
   * Replace desktop-base's forced Debian About System logo with ECZOS release

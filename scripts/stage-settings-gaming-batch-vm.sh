@@ -14,7 +14,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-branding eczos-platform-tools eczos-gaming-core eczos-desktop)
+PACKAGES=(eczos-archive-keyring eczos-release eczos-branding eczos-platform-tools eczos-gaming-core eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
@@ -44,7 +44,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config polkit product qml runtime-definitions xdg; do
+    for data_dir in applications assets branding config keyrings polkit product qml runtime-definitions xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi
@@ -62,6 +62,8 @@ for package in "${PACKAGES[@]}"; do
 done
 apt-get install -y "${debs[@]}"
 
+"$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
+"$ROOT_DIR/tests/smoke/release-package.sh"
 "$ROOT_DIR/tests/smoke/branding-package.sh"
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
 "$ROOT_DIR/tests/smoke/gaming-core-package.sh"

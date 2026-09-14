@@ -1,0 +1,6 @@
+Types: deb
+URIs: https://repo.easycomp.cloud/eczos
+Suites: trixie
+Components: main
+Architectures: amd64
+Signed-By: /usr/share/keyrings/eczos-archive-keyring.asc

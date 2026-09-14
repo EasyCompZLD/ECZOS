@@ -7,7 +7,7 @@ source /etc/os-release
 [[ ${ID:-} == debian && ${VERSION_CODENAME:-} == trixie ]] || { printf 'Debian 13 (trixie) is required.\n' >&2; exit 1; }
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-platform-tools eczos-windows-core eczos-gaming-core eczos-recovery-media eczos-desktop)
+PACKAGES=(eczos-archive-keyring eczos-release eczos-platform-tools eczos-windows-core eczos-gaming-core eczos-recovery-media eczos-desktop)
 export DEBIAN_FRONTEND=noninteractive
 
 "$ROOT_DIR/scripts/verify-source.sh"
@@ -28,8 +28,15 @@ for package in "${PACKAGES[@]}"; do
     [[ $architecture == all ]] || architecture=$(dpkg --print-architecture)
     package_debs+=("$ROOT_DIR/packages/${package}_${version}_${architecture}.deb")
 done
-platform_deb=${package_debs[0]}
+platform_deb=
+for package_deb in "${package_debs[@]}"; do
+    if [[ $(dpkg-deb -f "$package_deb" Package) == eczos-platform-tools ]]; then
+        platform_deb=$package_deb
+        break
+    fi
+done
 
+test -n "$platform_deb"
 test -f "$platform_deb"
 platform_contents=$(dpkg-deb -c "$platform_deb")
 grep -Fq './usr/bin/eczos-system-settings' <<<"$platform_contents"
@@ -38,6 +45,8 @@ for package_deb in "${package_debs[@]}"; do
 done
 apt-get install -y "${package_debs[@]}"
 
+"$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
+"$ROOT_DIR/tests/smoke/release-package.sh"
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
 "$ROOT_DIR/tests/smoke/windows-core-package.sh"
 "$ROOT_DIR/tests/smoke/gaming-core-package.sh"
