@@ -35,18 +35,18 @@ ApplicationWindow {
 
     function pageTitle(route) {
         const labels = {
-            settings: "Instellingen", system: "Systeeminstellingen", windows: "Windows-apps", gaming: "Gaming",
-            migration: "Bestanden overzetten", diagnostics: "Diagnose",
-            recovery: "Herstelmedium", support: "Ondersteuning"
+            settings: qsTr("Settings"), system: qsTr("System settings"), windows: qsTr("Windows apps"), gaming: qsTr("Gaming"),
+            migration: qsTr("Transfer files"), diagnostics: qsTr("Diagnostics"),
+            recovery: qsTr("Recovery media"), support: qsTr("Support")
         }
-        return labels[route] || "Instellingen"
+        return labels[route] || qsTr("Settings")
     }
 
-    function yesNo(value) { return value ? "Gereed" : "Aandacht nodig" }
+    function yesNo(value) { return value ? qsTr("Ready") : qsTr("Attention needed") }
     function fileName(path) {
         const decoded = decodeURIComponent(path.replace("file://", ""))
         const parts = decoded.split("/")
-        return parts[parts.length - 1] || "Geen bestand gekozen"
+        return parts[parts.length - 1] || qsTr("No file selected")
     }
 
     component FlatButton: Button {
@@ -112,7 +112,7 @@ ApplicationWindow {
 
     component DarkComboBox: ComboBox {
         id: control
-        property string emptyText: "Geen geschikt apparaat gevonden"
+        property string emptyText: qsTr("No suitable device found")
         implicitHeight: 42
         leftPadding: 13; rightPadding: 34
         contentItem: Text {

@@ -31,6 +31,8 @@
 #include <QQmlEngine>
 #include <QRadioButton>
 #include <QRegularExpression>
+#include <QLocale>
+#include <QTranslator>
 #include <QScrollArea>
 #include <QSplitter>
 #include <QStandardPaths>
@@ -65,13 +67,13 @@ struct EczosPage {
 const QList<EczosPage> &eczosPages()
 {
     static const QList<EczosPage> pages = {
-        {QStringLiteral("eczos:overview"), QStringLiteral("Overzicht"), QStringLiteral("Alles voor je computer"), QStringLiteral("go-home")},
-        {QStringLiteral("eczos:windows"), QStringLiteral("Windows-apps"), QStringLiteral("Windows-programma's beheren"), QStringLiteral("application-x-ms-dos-executable")},
-        {QStringLiteral("eczos:gaming"), QStringLiteral("Gaming"), QStringLiteral("Steam, Proton en Vulkan controleren"), QStringLiteral("applications-games")},
-        {QStringLiteral("eczos:recovery"), QStringLiteral("Herstelmedium"), QStringLiteral("Een ECZOS-medium maken"), QStringLiteral("drive-removable-media")},
-        {QStringLiteral("eczos:migration"), QStringLiteral("Bestanden overzetten"), QStringLiteral("Bestanden uit Windows meenemen"), QStringLiteral("folder-sync")},
-        {QStringLiteral("eczos:diagnostics"), QStringLiteral("Diagnose"), QStringLiteral("De computer controleren"), QStringLiteral("tools-report-bug")},
-        {QStringLiteral("eczos:support"), QStringLiteral("Ondersteuning"), QStringLiteral("Een supportrapport maken"), QStringLiteral("help-support")},
+        {QStringLiteral("eczos:overview"), QObject::tr("Overview"), QObject::tr("Everything for your computer"), QStringLiteral("go-home")},
+        {QStringLiteral("eczos:windows"), QObject::tr("Windows apps"), QObject::tr("Manage Windows programs"), QStringLiteral("application-x-ms-dos-executable")},
+        {QStringLiteral("eczos:gaming"), QObject::tr("Gaming"), QObject::tr("Check Steam, Proton and Vulkan"), QStringLiteral("applications-games")},
+        {QStringLiteral("eczos:recovery"), QObject::tr("Recovery media"), QObject::tr("Create an ECZOS medium"), QStringLiteral("drive-removable-media")},
+        {QStringLiteral("eczos:migration"), QObject::tr("Transfer files"), QObject::tr("Bring files over from Windows"), QStringLiteral("folder-sync")},
+        {QStringLiteral("eczos:diagnostics"), QObject::tr("Diagnostics"), QObject::tr("Check your computer"), QStringLiteral("tools-report-bug")},
+        {QStringLiteral("eczos:support"), QObject::tr("Support"), QObject::tr("Create a support report"), QStringLiteral("help-support")},
     };
     return pages;
 }
@@ -89,24 +91,24 @@ QString categoryFor(const KPluginMetaData &data)
         return false;
     };
     if (file.contains(QStringLiteral("/kinfocenter/"))) {
-        return QStringLiteral("Systeeminformatie");
+        return QObject::tr("System information");
     }
     if (containsAny({"lookandfeel", "style", "color", "icon", "cursor", "font", "splash", "wallpaper", "decoration", "theme"})) {
-        return QStringLiteral("Uiterlijk");
+        return QObject::tr("Appearance");
     }
     if (containsAny({"network", "proxy", "firewall", "bluetooth", "bolt", "samba", "webshortcut", "kdeconnect"})) {
-        return QStringLiteral("Netwerk en verbindingen");
+        return QObject::tr("Network and connections");
     }
     if (containsAny({"audio", "sound", "mouse", "keyboard", "touch", "screen", "display", "power", "energy", "printer", "tablet", "controller", "kamera", "automount"})) {
-        return QStringLiteral("Apparaten en energie");
+        return QObject::tr("Devices and power");
     }
     if (containsAny({"region", "language", "spell", "user", "clock", "time", "date", "account"})) {
-        return QStringLiteral("Taal, tijd en accounts");
+        return QObject::tr("Language, time and accounts");
     }
     if (containsAny({"locker", "wallet", "permission", "privacy", "feedback", "security", "recent"})) {
-        return QStringLiteral("Privacy en beveiliging");
+        return QObject::tr("Privacy and security");
     }
-    return QStringLiteral("Werkruimte en gedrag");
+    return QObject::tr("Workspace and behaviour");
 }
 
 QList<KPluginMetaData> availableModules()
@@ -1225,14 +1227,27 @@ private:
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    QApplication::setApplicationName(QStringLiteral("ECZOS Instellingen"));
+    QTranslator translator;
+    const QString locale = QLocale::system().name();
+    const QStringList translationRoots = {
+        QStringLiteral("/usr/share/eczos/translations"),
+        QCoreApplication::applicationDirPath() + QStringLiteral("/../share/eczos/translations"),
+    };
+    for (const QString &root : translationRoots) {
+        if (translator.load(QStringLiteral("eczos-system-settings_%1").arg(locale), root)
+            || translator.load(QStringLiteral("eczos-system-settings_%1").arg(locale.left(2)), root)) {
+            app.installTranslator(&translator);
+            break;
+        }
+    }
+    QApplication::setApplicationName(QObject::tr("ECZOS Settings"));
     QApplication::setOrganizationName(QStringLiteral("EasyComp Zeeland"));
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Geïntegreerde systeemvoorkeuren voor ECZOS"));
+    parser.setApplicationDescription(QObject::tr("Integrated system settings for ECZOS"));
     parser.addHelpOption();
-    QCommandLineOption listOption(QStringLiteral("list-json"), QStringLiteral("Toon alle ingesloten modules als JSON"));
-    QCommandLineOption moduleOption(QStringLiteral("module"), QStringLiteral("Open direct een instellingenonderdeel"), QStringLiteral("id"));
+    QCommandLineOption listOption(QStringLiteral("list-json"), QObject::tr("Show all embedded modules as JSON"));
+    QCommandLineOption moduleOption(QStringLiteral("module"), QObject::tr("Open a settings module directly"), QStringLiteral("id"));
     parser.addOption(listOption);
     parser.addOption(moduleOption);
     parser.process(app);
