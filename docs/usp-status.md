@@ -1,6 +1,6 @@
 # ECZOS USP implementation status
 
-Status date: 2026-09-13.
+Status date: 2026-09-14.
 
 | USP | Current implementation | Remaining release gate |
 | --- | --- | --- |
@@ -14,6 +14,8 @@ Status date: 2026-09-13.
 | One app ecosystem | Plasma Discover with APT, firmware and Flathub plus ECZ Windows launchers | Unified trust labels across all sources |
 | Familiar Linux desktop | Windows-style Plasma defaults, ECZOS boot/login/console branding, unified native tools and a screenshot-rich OOBE | Optional dock layout |
 | Support-aware OS | Local privacy-conscious support report | Vendor-approved remote-support enrollment |
+| Unified settings | ECZOS tools and all 87 discovered KDE modules share one native window; legacy settings launch commands are redirected | Fresh-install BIOS/UEFI qualification |
+| Mac application experiment | Darling feasibility recorded for a future optional ECZ Mac layer | Complex GUI applications are not yet dependable; not a release blocker |
 
 ## Standard application set
 

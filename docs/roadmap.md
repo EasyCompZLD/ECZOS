@@ -64,11 +64,27 @@ but are not a prototype release blocker.
       migration, diagnostics, recovery media and support
 - [x] terminal-free recovery-media workflow with progress and ETA
 - [x] real product screenshots in the installer and first-boot OOBE
-- [ ] qualify complete KDE configuration-module coverage inside ECZOS Settings;
-      keep the original System Settings launcher until this passes
+- [x] qualify all 87 discovered KDE configuration modules inside ECZOS
+      Settings and redirect legacy System Settings/KCM launchers to the same
+      ECZOS window
+- [x] replace Debian's forced About This System logo and version override with
+      ECZOS release identity
 - [x] FreeOffice host inclusion and physical install test
 - [x] FreeOffice release artifact pinning and ISO integration
 - [ ] optional cloud and enrolled remote-support services
+- [ ] experimental ECZ Mac compatibility based on Darling, initially limited
+      to separately installed CLI and simple GUI applications; this is not a
+      prototype-release blocker
+
+## Next hardware-qualification image
+
+- [ ] verify the off-canvas Plymouth watermark correction on a clean boot
+- [ ] verify that every Start-menu settings entry opens ECZOS Settings
+- [ ] verify Users, Printers, Backups and About This System inside the ECZOS
+      window on a freshly installed account
+- [ ] verify the ECZOS logo and version on About This System
+- [ ] recheck first-login ECZOS splash, OOBE, installer slideshow and audio
+- [ ] boot and install the same image in both BIOS and UEFI mode
 
 ## Phase 5 — distribution
 
