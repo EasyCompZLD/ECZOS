@@ -70,6 +70,8 @@ grep -Fx 'plymouth-set-default-theme eczos' \
     "$IMAGE_DIR/config/hooks/normal/0100-eczos-image-policy.hook.chroot"
 grep -Fx 'rm -f /etc/apt/sources.list' \
     "$IMAGE_DIR/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot"
+grep -Fx 'rm -f /etc/apt/sources.list.d/zz-sources.list' \
+    "$IMAGE_DIR/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot"
 grep -F 'softmaker-archive-keyring.asc' \
     "$IMAGE_DIR/config/includes.chroot/etc/apt/sources.list.d/softmaker.list"
 grep -F 'BEGIN PGP PUBLIC KEY BLOCK' \
