@@ -43,6 +43,7 @@ for required in \
     packages/eczos-release/debian/control \
     packages/eczos-release/apt/eczos-debian.sources \
     packages/eczos-release/apt/eczos.sources \
+    packages/eczos-release/config/eczos.pref \
     packages/eczos-release/lib/update-os-release \
     packages/eczos-release/config/kcm-about-distrorc \
     packages/eczos-release/release/eczos-release \

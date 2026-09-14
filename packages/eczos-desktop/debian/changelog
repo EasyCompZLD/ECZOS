@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev35) UNRELEASED; urgency=medium
+
+  * Require the ECZOS archive-origin package policy.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 18:20:00 +0200
+
 eczos-desktop (0.1.0~dev34) UNRELEASED; urgency=medium
 
   * Require the signed ECZOS software repository integration.
