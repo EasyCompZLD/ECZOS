@@ -27,7 +27,8 @@ platform_deb="$ROOT_DIR/packages/eczos-platform-tools_${platform_version}_amd64.
 desktop_deb="$ROOT_DIR/packages/eczos-desktop_${desktop_version}_all.deb"
 
 test -f "$platform_deb"
-dpkg-deb -c "$platform_deb" | grep -Fq './usr/bin/eczos-system-settings'
+platform_contents=$(dpkg-deb -c "$platform_deb")
+grep -Fq './usr/bin/eczos-system-settings' <<<"$platform_contents"
 apt-get install -y "$platform_deb" "$desktop_deb"
 
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
