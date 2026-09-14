@@ -23,6 +23,19 @@ command -v rsync >/dev/null 2>&1 || {
     exit 1
 }
 
+if [[ -n "${ECZOS_SSH_PASSWORD_FILE:-}" ]]; then
+    [[ -s "$ECZOS_SSH_PASSWORD_FILE" ]] || {
+        printf 'SSH password file is missing or empty: %s\n' "$ECZOS_SSH_PASSWORD_FILE" >&2
+        exit 1
+    }
+    command -v sshpass >/dev/null 2>&1 || {
+        printf 'sshpass is required when ECZOS_SSH_PASSWORD_FILE is set.\n' >&2
+        exit 1
+    }
+    RSYNC_RSH="sshpass -f $ECZOS_SSH_PASSWORD_FILE ssh -o StrictHostKeyChecking=accept-new ${ECZOS_SSH_OPTIONS:-}"
+    export RSYNC_RSH
+fi
+
 publish_target() {
     local target=$1
     # Publish immutable package payloads first and signed indices last. Old pool

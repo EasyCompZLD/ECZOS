@@ -52,6 +52,11 @@ index transition.
     USER@repo.easycomp.cloud:/home/easycomp/domains/repo.easycomp.cloud/public_html/eczos
 ```
 
+For the current password-authenticated Virtualmin account, keep the password
+outside the source tree in a mode-600 file and set `ECZOS_SSH_PASSWORD_FILE`
+plus `ECZOS_SSH_OPTIONS` when publishing. The script then configures `sshpass`
+for rsync automatically; the password is never committed or printed.
+
 Add the mirror target as the final argument only after its SSH account and
 document root have been verified.
 
