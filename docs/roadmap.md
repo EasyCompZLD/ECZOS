@@ -88,7 +88,12 @@ but are not a prototype release blocker.
 
 ## Phase 5 — distribution
 
-- signed ECZOS package repository
+- [ ] signed ECZOS package repository
+  - [x] primary and mirror endpoints plus stable/testing archive layout
+  - [x] local initialization, package import and safe publication tooling
+  - [ ] protected signing key and first signed repository export
+  - [ ] public HTTPS authentication and clean-client update test
+  - [ ] `eczos-archive-keyring` and ECZOS client source integration
 - release channels and upgrade policy
 - [x] selected installer implementation (Calamares with ECZOS-owned presentation)
 - [ ] reproducible production images and release qualification

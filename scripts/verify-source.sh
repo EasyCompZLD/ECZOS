@@ -13,7 +13,10 @@ for required in \
     README.md \
     config/debian-extra-components.list \
     docs/architecture.md \
+    docs/repository.md \
     docs/security.md \
+    repository/conf/distributions.template \
+    repository/index.html \
     packages/eczos-branding/debian/control \
     packages/eczos-branding/debian/install \
     packages/eczos-branding/config/zz-eczos-grub.cfg \
@@ -87,6 +90,9 @@ for required in \
     image/config/includes.chroot/etc/calamares/settings.conf \
     image/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
     scripts/configure-freeoffice-repository-vm.sh \
+    scripts/init-eczos-repository.sh \
+    scripts/import-eczos-repository-packages.sh \
+    scripts/publish-eczos-repository.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \
     scripts/install-next-product-batch-vm.sh \
