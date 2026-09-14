@@ -215,8 +215,8 @@ public:
 
         m_tree = new QTreeWidget(sidebar);
         m_tree->setHeaderHidden(true);
-        m_tree->setRootIsDecorated(true);
-        m_tree->setIndentation(15);
+        m_tree->setRootIsDecorated(false);
+        m_tree->setIndentation(0);
         m_tree->setAnimated(true);
         sideLayout->addWidget(m_tree, 1);
 
