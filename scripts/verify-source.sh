@@ -122,6 +122,12 @@ PY
 grep -Fxq 'Theme=org.eczos.desktop' \
     "$ROOT_DIR/packages/eczos-desktop-defaults/config/ksplashrc" || \
     fail 'ECZOS splash is not selected system-wide'
+grep -Fxq 'WatermarkHorizontalAlignment=1.5' \
+    "$ROOT_DIR/packages/eczos-plymouth-theme/theme/eczos.plymouth" || \
+    fail 'Plymouth watermark is still horizontally visible'
+grep -Fxq 'WatermarkVerticalAlignment=1.5' \
+    "$ROOT_DIR/packages/eczos-plymouth-theme/theme/eczos.plymouth" || \
+    fail 'Plymouth watermark is still vertically visible'
 grep -Fxq 'welcomeStyleCalamares: false' \
     "$ROOT_DIR/packages/eczos-installer/branding/eczos/branding.desc" || \
     fail 'Calamares name is still enabled in the welcome heading'

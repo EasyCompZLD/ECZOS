@@ -12,6 +12,8 @@ PLUGIN_DIR=$(plymouth --get-splash-plugin-path)
 dpkg-query -W -f='${Status}\n' eczos-plymouth-theme | grep -Fx 'install ok installed'
 test -s "$THEME_DIR/eczos.plymouth"
 grep -Fx 'ModuleName=two-step' "$THEME_DIR/eczos.plymouth"
+grep -Fx 'WatermarkHorizontalAlignment=1.5' "$THEME_DIR/eczos.plymouth"
+grep -Fx 'WatermarkVerticalAlignment=1.5' "$THEME_DIR/eczos.plymouth"
 test -s "$PLUGIN_DIR/two-step.so"
 test "$(find "$THEME_DIR/images" -maxdepth 1 -type f -name 'animation-*.png' | wc -l)" -eq 12
 test "$(find "$THEME_DIR/images" -maxdepth 1 -type f -name 'throbber-*.png' | wc -l)" -eq 12

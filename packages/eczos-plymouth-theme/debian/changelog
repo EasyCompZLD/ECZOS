@@ -1,3 +1,10 @@
+eczos-plymouth-theme (0.1.0~dev6) UNRELEASED; urgency=medium
+
+  * Move Plymouth's secondary watermark outside the visible canvas so vendor
+    fallback artwork cannot cover the ECZOS boot animation.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 12:15:00 +0200
+
 eczos-plymouth-theme (0.1.0~dev5) UNRELEASED; urgency=medium
 
   * Make every secondary two-step logo transparent so only the existing ECZOS

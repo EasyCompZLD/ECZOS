@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0~dev32) UNRELEASED; urgency=medium
+
+  * Require the off-canvas Plymouth watermark correction.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 12:15:00 +0200
+
 eczos-desktop (0.1.0~dev31) UNRELEASED; urgency=medium
 
   * Require the fully unified native ECZOS settings application.
