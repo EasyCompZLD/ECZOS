@@ -2,7 +2,7 @@
 Type=Application
 Name=ECZ Gaming
 Comment=Controleer of deze computer klaar is voor Windows-games
-Exec=eczos-ui gaming
+Exec=eczos-system-settings --module eczos:gaming
 Icon=applications-games
 Terminal=false
 Categories=Game;System;

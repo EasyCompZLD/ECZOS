@@ -20,11 +20,14 @@ for desktop in ControlCenter Diagnostics Migration; do
     desktop-file-validate "/usr/share/applications/org.eczos.${desktop}.desktop"
 done
 grep -Fx 'Exec=eczos-system-settings' /usr/share/applications/org.eczos.ControlCenter.desktop
-grep -Fx 'Exec=eczos-ui diagnostics' /usr/share/applications/org.eczos.Diagnostics.desktop
-grep -Fx 'Exec=eczos-ui migration' /usr/share/applications/org.eczos.Migration.desktop
+grep -Fx 'Exec=eczos-system-settings --module eczos:diagnostics' /usr/share/applications/org.eczos.Diagnostics.desktop
+grep -Fx 'Exec=eczos-system-settings --module eczos:migration' /usr/share/applications/org.eczos.Migration.desktop
+grep -F 'os.execv(str(native_host), [str(native_host), "--module", native_page])' /usr/bin/eczos-ui
 /usr/bin/eczos-ui --list-kcms-json | jq -e '.schemaVersion == 1 and (.modules | type == "array") and (.modules | length > 10)' >/dev/null
 QT_QPA_PLATFORM=offscreen /usr/bin/eczos-system-settings --list-json | jq -e '
-    .schemaVersion == 1 and (.modules | length >= 80) and
+    .schemaVersion == 1 and (.eczosPages | length == 7) and
+    ([.eczosPages[].id] | contains(["eczos:overview", "eczos:windows", "eczos:gaming", "eczos:recovery", "eczos:migration", "eczos:diagnostics", "eczos:support"])) and
+    (.modules | length >= 80) and
     ([.modules[].id] | contains(["kcm_users", "kcm_networkmanagement", "kcm_kscreen", "kcm_printer_manager", "kcm_updates"]))
 ' >/dev/null
 /usr/bin/eczos-doctor --json | jq -e '.schemaVersion == 1 and .office == "installed"' >/dev/null

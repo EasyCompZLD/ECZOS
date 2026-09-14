@@ -2,7 +2,7 @@
 Type=Application
 Name=ECZOS Diagnose
 Comment=Controleer de belangrijkste onderdelen van deze computer
-Exec=eczos-ui diagnostics
+Exec=eczos-system-settings --module eczos:diagnostics
 Icon=tools-report-bug
 Terminal=false
 Categories=System;

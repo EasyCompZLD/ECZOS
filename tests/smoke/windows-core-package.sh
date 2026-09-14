@@ -33,7 +33,7 @@ grep -F 'Categories=$category;' /usr/bin/eczos-windows
 grep -F 'xdg-user-dir DESKTOP' /usr/bin/eczos-windows
 grep -F 'execute-from' /usr/bin/eczos-windows
 grep -F 'Name=ECZ Windows-apps' /usr/share/applications/org.eczos.Windows.Manager.desktop
-grep -Fx 'Exec=eczos-ui windows' /usr/share/applications/org.eczos.Windows.Manager.desktop
+grep -Fx 'Exec=eczos-system-settings --module eczos:windows' /usr/share/applications/org.eczos.Windows.Manager.desktop
 grep -F 'exec wine "$@"' /usr/lib/eczos/windows/runtime-wine-system
 grep -F 'canonical_working_directory=$(realpath -e -- "$working_directory")' \
     /usr/lib/eczos/windows/runtime-wine-system

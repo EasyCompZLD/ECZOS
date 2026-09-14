@@ -2,7 +2,7 @@
 Type=Application
 Name=ECZOS Herstelmedium maken
 Comment=Schrijf een ECZOS-installatiekopie naar USB, SD-kaart of dvd
-Exec=eczos-ui recovery
+Exec=eczos-system-settings --module eczos:recovery
 Icon=drive-removable-media
 Terminal=false
 Categories=System;

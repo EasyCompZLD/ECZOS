@@ -66,6 +66,22 @@ if len(sys.argv) > 1 and sys.argv[1] == "--list-kcms-json":
     print(json.dumps({"schemaVersion": 1, "modules": discover_kcms()}, ensure_ascii=False))
     raise SystemExit(0)
 
+# Compatibility entry point for older desktop launchers and scripts. The native
+# host owns every visible ECZOS page now; keep this QML implementation only as a
+# fallback for upgrades where the compiled host is not installed yet.
+requested_route = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] in ROUTES else "settings"
+native_host = Path("/usr/bin/eczos-system-settings")
+if native_host.exists():
+    native_page = {
+        "windows": "eczos:windows",
+        "gaming": "eczos:gaming",
+        "migration": "eczos:migration",
+        "diagnostics": "eczos:diagnostics",
+        "recovery": "eczos:recovery",
+        "support": "eczos:support",
+    }.get(requested_route, "eczos:overview")
+    os.execv(str(native_host), [str(native_host), "--module", native_page])
+
 
 class Bridge(QObject):
     routeChanged = Signal()

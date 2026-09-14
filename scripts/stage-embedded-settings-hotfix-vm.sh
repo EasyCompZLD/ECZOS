@@ -7,7 +7,7 @@ source /etc/os-release
 [[ ${ID:-} == debian && ${VERSION_CODENAME:-} == trixie ]] || { printf 'Debian 13 (trixie) is required.\n' >&2; exit 1; }
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-platform-tools eczos-desktop)
+PACKAGES=(eczos-platform-tools eczos-windows-core eczos-gaming-core eczos-recovery-media eczos-desktop)
 export DEBIAN_FRONTEND=noninteractive
 
 "$ROOT_DIR/scripts/verify-source.sh"
@@ -21,17 +21,27 @@ for package in "${PACKAGES[@]}"; do
     (cd "$package_dir" && dpkg-buildpackage -us -uc -b)
 done
 
-platform_version=$(dpkg-parsechangelog -l"$ROOT_DIR/packages/eczos-platform-tools/debian/changelog" -S Version)
-desktop_version=$(dpkg-parsechangelog -l"$ROOT_DIR/packages/eczos-desktop/debian/changelog" -S Version)
-platform_deb="$ROOT_DIR/packages/eczos-platform-tools_${platform_version}_amd64.deb"
-desktop_deb="$ROOT_DIR/packages/eczos-desktop_${desktop_version}_all.deb"
+declare -a package_debs=()
+for package in "${PACKAGES[@]}"; do
+    version=$(dpkg-parsechangelog -l"$ROOT_DIR/packages/$package/debian/changelog" -S Version)
+    architecture=$(awk '/^Architecture:/ { print $2; exit }' "$ROOT_DIR/packages/$package/debian/control")
+    [[ $architecture == all ]] || architecture=$(dpkg --print-architecture)
+    package_debs+=("$ROOT_DIR/packages/${package}_${version}_${architecture}.deb")
+done
+platform_deb=${package_debs[0]}
 
 test -f "$platform_deb"
 platform_contents=$(dpkg-deb -c "$platform_deb")
 grep -Fq './usr/bin/eczos-system-settings' <<<"$platform_contents"
-apt-get install -y "$platform_deb" "$desktop_deb"
+for package_deb in "${package_debs[@]}"; do
+    test -f "$package_deb"
+done
+apt-get install -y "${package_debs[@]}"
 
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
+"$ROOT_DIR/tests/smoke/windows-core-package.sh"
+"$ROOT_DIR/tests/smoke/gaming-core-package.sh"
+"$ROOT_DIR/tests/smoke/recovery-media-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-metapackage.sh"
 
 printf '\nEmbedded ECZOS system-settings hotfix passed.\n'

@@ -1,3 +1,9 @@
+eczos-gaming-core (0.1.0~dev5) UNRELEASED; urgency=medium
+
+  * Open gaming checks and repair inside native ECZOS Settings.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 11:30:00 +0200
+
 eczos-gaming-core (0.1.0~dev4) UNRELEASED; urgency=medium
 
   * Add a guided, authenticated repair for missing gaming components.

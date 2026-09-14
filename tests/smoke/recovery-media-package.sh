@@ -8,7 +8,7 @@ test -x /usr/lib/eczos-recovery-media/write-media
 bash -n /usr/bin/eczos-recovery-media
 bash -n /usr/lib/eczos-recovery-media/write-media
 desktop-file-validate /usr/share/applications/org.eczos.RecoveryMedia.desktop
-grep -Fx 'Exec=eczos-ui recovery' /usr/share/applications/org.eczos.RecoveryMedia.desktop
+grep -Fx 'Exec=eczos-system-settings --module eczos:recovery' /usr/share/applications/org.eczos.RecoveryMedia.desktop
 if grep -Fq 'konsole --hold' /usr/bin/eczos-recovery-media; then
     printf 'Recovery media creator still launches a terminal.\n' >&2
     exit 1

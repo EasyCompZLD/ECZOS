@@ -1,3 +1,11 @@
+eczos-platform-tools (0.1.0~dev9) UNRELEASED; urgency=medium
+
+  * Put Windows apps, gaming, recovery, migration, diagnostics and support in
+    the same native window as every KDE settings module.
+  * Preserve old ECZOS launch commands as native-page compatibility aliases.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Mon, 14 Sep 2026 11:30:00 +0200
+
 eczos-platform-tools (0.1.0~dev8) UNRELEASED; urgency=medium
 
   * Install the compiled native settings host into the binary package.
