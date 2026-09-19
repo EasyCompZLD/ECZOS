@@ -15,18 +15,18 @@ fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 SMOKE_TESTS=(
-    archive-keyring
-    release
-    branding
-    desktop-defaults
-    platform-tools
-    windows-core
-    gaming-core
-    recovery-media
-    installer
-    oobe
-    desktop-apps
-    desktop-metapackage
+    archive-keyring-package.sh
+    release-package.sh
+    branding-package.sh
+    desktop-defaults-package.sh
+    platform-tools-package.sh
+    windows-core-package.sh
+    gaming-core-package.sh
+    recovery-media-package.sh
+    installer-package.sh
+    oobe-package.sh
+    desktop-apps-package.sh
+    desktop-metapackage.sh
 )
 
 run_smoke_tests() {
@@ -34,7 +34,7 @@ run_smoke_tests() {
     for test_name in "${SMOKE_TESTS[@]}"; do
         # Invoke through Bash so a checkout on an SMB share cannot break the
         # test run merely by dropping the executable bit.
-        bash "$ROOT_DIR/tests/smoke/${test_name}-package.sh"
+        bash "$ROOT_DIR/tests/smoke/$test_name"
     done
 }
 
