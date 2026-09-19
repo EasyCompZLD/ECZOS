@@ -9,7 +9,9 @@ for command in eczos-control-center eczos-doctor eczos-migrate eczos-support-rep
 done
 test -x /usr/bin/eczos-ui
 test -x /usr/bin/eczos-system-settings
-grep -F 'eczos-system-settings.sock' /usr/bin/eczos-system-settings >/dev/null
+# QStringLiteral stores this value as little-endian UTF-16 in the native
+# executable, so inspect that encoding instead of treating the binary as text.
+strings -a -el /usr/bin/eczos-system-settings | grep -Fx 'eczos-system-settings.sock' >/dev/null
 test -x /usr/bin/systemsettings
 test -x /usr/bin/kcmshell6
 test -x /usr/bin/systemsettings.eczos-distrib
