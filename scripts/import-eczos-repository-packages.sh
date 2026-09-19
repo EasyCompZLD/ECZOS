@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 REPOSITORY_DIR=${1:-}
 SUITE=${2:-}
 shift $(( $# >= 2 ? 2 : $# ))
@@ -17,6 +18,10 @@ command -v reprepro >/dev/null 2>&1 || {
     printf 'reprepro is required.\n' >&2
     exit 1
 }
+
+if [[ -n "${ECZOS_GPG_PASSPHRASE_FILE:-}" || -s /srv/eczos-repository-secrets/repository-signing-passphrase ]]; then
+    "$ROOT_DIR/scripts/unlock-eczos-repository-key.sh"
+fi
 
 for package_file in "$@"; do
     [[ -f "$package_file" ]] || {

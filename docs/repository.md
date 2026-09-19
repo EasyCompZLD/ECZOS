@@ -16,8 +16,11 @@ The archive is managed with `reprepro` and has two Debian 13 suites:
 Create the repository signing key as the unprivileged repository operator on a
 controlled Debian host. Protect it with a passphrase and back it up encrypted.
 Never store the secret key, passphrase or complete GnuPG home in this source
-tree, network share, webroot or installation image. Only the exported public
-key at `keys/eczos-archive-keyring.gpg` is public.
+tree, network share, webroot or installation image. On the dedicated repository
+host, the passphrase may be kept in the external mode-600 file
+`/srv/eczos-repository-secrets/repository-signing-passphrase`; the import tool
+uses it to prime that user's GPG agent without printing it. Only the exported
+public key at `keys/eczos-archive-keyring.gpg` is public.
 
 After installing `reprepro` and `gnupg`, initialize an external repository with
 the full fingerprint of an available secret signing key:

@@ -111,6 +111,7 @@ for required in \
     scripts/init-eczos-repository.sh \
     scripts/import-eczos-repository-packages.sh \
     scripts/publish-eczos-repository.sh \
+    scripts/unlock-eczos-repository-key.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \
     scripts/install-next-product-batch-vm.sh \
