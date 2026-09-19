@@ -1,3 +1,13 @@
 #!/usr/bin/make -f
+
 %:
 	dh $@
+
+override_dh_auto_build:
+	mkdir -p debian/build/i18n
+	for catalogue in i18n/*.ts; do \
+		/usr/lib/qt6/bin/lrelease "$$catalogue" -qm "debian/build/i18n/$$(basename "$$catalogue" .ts).qm"; \
+	done
+
+override_dh_auto_clean:
+	rm -rf debian/build

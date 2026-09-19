@@ -81,8 +81,12 @@ for required in \
     packages/eczos-installer/bin/eczos-installer \
     packages/eczos-installer/branding/eczos/branding.desc \
     packages/eczos-oobe/debian/control \
+    packages/eczos-oobe/debian/rules \
     packages/eczos-oobe/bin/eczos-oobe \
     packages/eczos-oobe/qml/Main.qml \
+    packages/eczos-oobe/i18n/eczos-oobe_nl.ts \
+    packages/eczos-oobe/i18n/eczos-oobe_de.ts \
+    packages/eczos-oobe/i18n/eczos-oobe_fr.ts \
     packages/eczos-oobe/assets/ambient-loop.mp4 \
     packages/eczos-oobe/assets/new-dawn.m4a \
     packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/Splash.qml \

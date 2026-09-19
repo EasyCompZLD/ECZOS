@@ -20,6 +20,9 @@ grep -F 'exec /usr/bin/eczos-system-settings --module "$argument"' /usr/bin/kcms
 grep -F 'exec /usr/bin/kcmshell6.eczos-distrib "$@"' /usr/bin/kcmshell6
 grep -F 'exec /usr/bin/eczos-system-settings "$@"' /usr/bin/eczos-control-center
 test -r /usr/share/eczos/ui/Main.qml
+for locale in nl de fr; do
+    test -s "/usr/share/eczos/translations/eczos-system-settings_${locale}.qm"
+done
 python3 - /usr/bin/eczos-ui <<'PY'
 import pathlib
 import sys

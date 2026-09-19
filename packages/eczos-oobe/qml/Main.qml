@@ -10,7 +10,7 @@ ApplicationWindow {
     id: window
     visible: true
     visibility: Window.FullScreen
-    title: "Welkom bij ECZOS"
+    title: qsTr("Welcome to ECZOS")
     color: "#030812"
 
     property int page: 0
@@ -59,7 +59,7 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.margins: 22
         z: 4
-        text: window.musicEnabled ? "Muziek uitzetten" : "Muziek aanzetten"
+        text: window.musicEnabled ? qsTr("Turn music off") : qsTr("Turn music on")
         icon.name: window.musicEnabled ? "audio-volume-high" : "audio-volume-muted"
         Accessible.name: text
         onClicked: window.musicEnabled = !window.musicEnabled
@@ -88,7 +88,7 @@ ApplicationWindow {
                     font.weight: Font.DemiBold
                 }
                 Label {
-                    text: "Eerste configuratie"
+                    text: qsTr("Initial setup")
                     color: "#a9c7dc"
                     font.pixelSize: 15
                 }
@@ -103,44 +103,44 @@ ApplicationWindow {
             Layout.fillHeight: true
 
             OobePage {
-                heading: "Welkom bij ECZOS"
-                body: "Je computer is klaar. We lopen samen de belangrijkste keuzes en mogelijkheden langs."
-                detail: "Je kunt deze keuzes later altijd wijzigen via ECZOS Instellingen."
+                heading: qsTr("Welcome to ECZOS")
+                body: qsTr("Your computer is ready. We will guide you through the most important choices and features.")
+                detail: qsTr("You can always change these choices later in ECZOS Settings.")
                 visual: "file:///usr/share/eczos/branding/screenshots/settings.png"
             }
 
             OobePage {
-                heading: "Maak verbinding"
-                body: "Internet is nodig voor updates, nieuwe apps, browsers en online diensten."
-                detail: "Wifi en bekabelde verbindingen beheer je vanuit het netwerkicoon of Systeeminstellingen."
+                heading: qsTr("Connect to a network")
+                body: qsTr("An internet connection is needed for updates, new apps, browsers and online services.")
+                detail: qsTr("Manage Wi-Fi and wired connections from the network icon or System Settings.")
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "Netwerkinstellingen openen"
+                    text: qsTr("Open network settings")
                     onClicked: oobe.openNetworkSettings()
                 }
             }
 
             OobePage {
-                heading: "Maak ECZOS van jou"
-                body: "Kies een lichte, donkere of automatisch wisselende weergave. Achtergronden, pictogrammen, energiebeheer en toegankelijkheid vind je in Systeeminstellingen."
+                heading: qsTr("Make ECZOS yours")
+                body: qsTr("Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in System Settings.")
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 16
-                    OobeButton { text: "Automatisch"; onClicked: oobe.setTheme("auto") }
-                    OobeButton { text: "Licht"; onClicked: oobe.setTheme("light") }
-                    OobeButton { text: "Donker"; onClicked: oobe.setTheme("dark") }
-                    OobeButton { text: "Meer instellingen"; onClicked: oobe.openSystemSettings() }
+                    OobeButton { text: qsTr("Automatic"); onClicked: oobe.setTheme("auto") }
+                    OobeButton { text: qsTr("Light"); onClicked: oobe.setTheme("light") }
+                    OobeButton { text: qsTr("Dark"); onClicked: oobe.setTheme("dark") }
+                    OobeButton { text: qsTr("More settings"); onClicked: oobe.openSystemSettings() }
                 }
             }
 
             OobePage {
-                heading: "Kies je browser"
-                body: "Selecteer waarmee webpagina's standaard worden geopend."
+                heading: qsTr("Choose your browser")
+                body: qsTr("Select which browser should open web pages by default.")
                 detail: window.selectedBrowser === "chrome"
-                    ? "Als Chrome nog niet is geïnstalleerd, opent ECZOS na afloop de officiële downloadpagina."
+                    ? qsTr("If Chrome is not installed yet, ECZOS will open the official download page when setup is complete.")
                     : window.selectedBrowser === "edge-windows"
-                      ? "ECZOS opent de officiële Edge-download en daarna ECZ Windows om de Windows-installer te beheren."
-                      : "Deze browser is al onderdeel van de ECZOS-desktop."
+                      ? qsTr("ECZOS will open the official Edge download and then ECZ Windows to manage the Windows installer.")
+                      : qsTr("This browser is already included with the ECZOS desktop.")
                 GridLayout {
                     Layout.alignment: Qt.AlignHCenter
                     columns: 2
@@ -162,7 +162,7 @@ ApplicationWindow {
                         onClicked: window.selectedBrowser = "chrome"
                     }
                     OobeButton {
-                        text: "Microsoft Edge via ECZ Windows"
+                        text: qsTr("Microsoft Edge through ECZ Windows")
                         checkable: true
                         checked: window.selectedBrowser === "edge-windows"
                         ButtonGroup.group: browserGroup
@@ -179,64 +179,64 @@ ApplicationWindow {
             }
 
             OobePage {
-                heading: "Apps vinden met Ontdekken"
-                body: "In Ontdekken vind je programma's, games, systeemupdates en firmware op één plek. Zoek op naam en klik op Installeren."
-                detail: "ECZOS ondersteunt normale Debian-pakketten en Flatpak-apps."
+                heading: qsTr("Find apps with Discover")
+                body: qsTr("Discover brings apps, games, system updates and firmware together in one place. Search by name and select Install.")
+                detail: qsTr("ECZOS supports regular Debian packages and Flatpak apps.")
                 visual: "file:///usr/share/eczos/branding/screenshots/diagnostics.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "Ontdekken openen"
+                    text: qsTr("Open Discover")
                     onClicked: oobe.openDiscover()
                 }
             }
 
             OobePage {
-                heading: "Bestanden veilig bewaren"
-                body: "Met Plasma Vaults kun je versleutelde kluizen voor privébestanden maken."
-                detail: "Gebruik zoeken in het startmenu om snel apps en bestanden te vinden. Back-ups en herstelmedia beheer je via ECZOS Instellingen."
+                heading: qsTr("Keep your files safe")
+                body: qsTr("Plasma Vaults lets you create encrypted vaults for private files.")
+                detail: qsTr("Use the Start menu search to quickly find apps and files. Manage backups and recovery media in ECZOS Settings.")
             }
 
             OobePage {
-                heading: "Neem je bestanden mee"
-                body: "De migratie-assistent kan Documenten, Afbeeldingen, Muziek en andere persoonlijke mappen vanaf een Windows-schijf overzetten."
-                detail: "Er wordt eerst een voorbeeld getoond. Zonder jouw bevestiging wordt niets gekopieerd."
+                heading: qsTr("Bring your files with you")
+                body: qsTr("The migration assistant can transfer Documents, Pictures, Music and other personal folders from a Windows drive.")
+                detail: qsTr("A preview is shown first. Nothing is copied without your confirmation.")
                 visual: "file:///usr/share/eczos/branding/screenshots/migration.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "Migratie-assistent openen"
+                    text: qsTr("Open migration assistant")
                     onClicked: oobe.openMigration()
                 }
             }
 
             OobePage {
-                heading: "Windows-apps en games"
-                body: "Open .exe- en .msi-bestanden met ECZ Windows. Gamingcontroles helpen met Vulkan, controllers en Windows-games."
-                detail: "Iedere beheerde Windows-app krijgt een eigen omgeving en verschijnt daarna in het startmenu."
+                heading: qsTr("Windows apps and games")
+                body: qsTr("Open .exe and .msi files with ECZ Windows. Gaming checks help with Vulkan, controllers and Windows games.")
+                detail: qsTr("Each managed Windows app gets its own environment and then appears in the Start menu.")
                 visual: "file:///usr/share/eczos/branding/screenshots/gaming.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
-                    text: "ECZOS Instellingen bekijken"
+                    text: qsTr("Open ECZOS Settings")
                     onClicked: oobe.openControlCenter()
                 }
             }
 
             OobePage {
-                heading: "Privacy en gemeenschap"
-                body: "ECZOS verstuurt niet automatisch een supportrapport. Jij bepaalt wat je deelt en wanneer."
-                detail: "ECZOS gebruikt de vrije KDE Plasma-desktop. Via ondersteuning kun je hulp krijgen en problemen melden."
+                heading: qsTr("Privacy and community")
+                body: qsTr("ECZOS never sends a support report automatically. You decide what to share and when.")
+                detail: qsTr("ECZOS uses the free KDE Plasma desktop. Support is available when you need help or want to report a problem.")
                 visual: "file:///usr/share/eczos/branding/screenshots/recovery.png"
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 16
-                    OobeButton { text: "Privacy-instellingen"; onClicked: oobe.openPrivacySettings() }
-                    OobeButton { text: "Over KDE Plasma"; onClicked: oobe.openKdeInformation() }
+                    OobeButton { text: qsTr("Privacy settings"); onClicked: oobe.openPrivacySettings() }
+                    OobeButton { text: qsTr("About KDE Plasma"); onClicked: oobe.openKdeInformation() }
                 }
             }
 
             OobePage {
-                heading: "Alles staat klaar"
-                body: "Welkom bij ECZOS. Klik op Aan de slag om je browserkeuze toe te passen en de configuratie af te ronden."
-                detail: "De ECZOS-welkomstassistent blijft beschikbaar in het startmenu."
+                heading: qsTr("Everything is ready")
+                body: qsTr("Welcome to ECZOS. Select Get started to apply your browser choice and finish setup.")
+                detail: qsTr("The ECZOS welcome assistant remains available from the Start menu.")
             }
         }
 
@@ -244,7 +244,7 @@ ApplicationWindow {
             Layout.fillWidth: true
 
             Label {
-                text: (window.page + 1) + " van " + window.pageCount
+                text: qsTr("%1 of %2").arg(window.page + 1).arg(window.pageCount)
                 color: "#a9c7dc"
             }
 
@@ -263,13 +263,13 @@ ApplicationWindow {
             Item { Layout.fillWidth: true }
 
             OobeButton {
-                text: "Vorige"
+                text: qsTr("Back")
                 enabled: window.page > 0
                 onClicked: window.page--
             }
 
             OobeButton {
-                text: window.page === window.pageCount - 1 ? "Aan de slag" : "Volgende"
+                text: window.page === window.pageCount - 1 ? qsTr("Get started") : qsTr("Next")
                 highlighted: true
                 onClicked: {
                     if (window.page === window.pageCount - 1)

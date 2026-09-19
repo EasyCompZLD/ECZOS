@@ -1,3 +1,11 @@
+eczos-oobe (0.1.0~dev6) UNRELEASED; urgency=medium
+
+  * Mark every first-run OOBE sentence for translation and use English as the
+    source-language fallback.
+  * Compile and install Qt translation catalogues during the Debian build.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 09:00:00 +0200
+
 eczos-oobe (0.1.0~dev5) UNRELEASED; urgency=medium
 
   * Load locale-specific Qt catalogues for translated QML OOBE content.

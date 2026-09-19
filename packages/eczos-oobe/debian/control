@@ -2,7 +2,9 @@ Source: eczos-oobe
 Section: kde
 Priority: optional
 Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
-Build-Depends: debhelper-compat (= 13)
+Build-Depends:
+ debhelper-compat (= 13),
+ qt6-l10n-tools
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
 Homepage: https://easycompzeeland.nl/

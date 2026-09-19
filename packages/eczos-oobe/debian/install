@@ -5,3 +5,4 @@ assets/new-dawn.m4a usr/share/eczos/oobe/assets/
 applications/org.eczos.Oobe.desktop usr/share/applications/
 xdg/org.eczos.OobeFirstRun.desktop etc/xdg/autostart/
 xdg/org.kde.plasma-welcome.desktop etc/xdg/autostart/
+debian/build/i18n/*.qm usr/share/eczos/translations/

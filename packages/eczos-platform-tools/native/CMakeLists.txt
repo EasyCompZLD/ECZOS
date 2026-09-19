@@ -15,6 +15,7 @@ find_package(KF6 6.13 REQUIRED COMPONENTS Auth Config CoreAddons KCMUtils)
 
 add_executable(eczos-system-settings main.cpp)
 qt_add_translations(eczos-system-settings
+    QM_FILES_OUTPUT_VARIABLE translation_qm_files
     TS_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/eczos-system-settings_nl.ts
         ${CMAKE_CURRENT_SOURCE_DIR}/i18n/eczos-system-settings_de.ts
@@ -31,5 +32,4 @@ target_link_libraries(eczos-system-settings PRIVATE
 )
 
 install(TARGETS eczos-system-settings DESTINATION ${KDE_INSTALL_BINDIR})
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ DESTINATION /usr/share/eczos/translations
-        FILES_MATCHING PATTERN "eczos-system-settings_*.qm")
+install(FILES ${translation_qm_files} DESTINATION ${KDE_INSTALL_DATADIR}/eczos/translations)

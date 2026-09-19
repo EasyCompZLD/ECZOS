@@ -15,11 +15,14 @@ test -s /etc/xdg/autostart/org.kde.plasma-welcome.desktop
 grep -Fx 'Hidden=true' /etc/xdg/autostart/org.kde.plasma-welcome.desktop
 grep -Fx '    property bool musicEnabled: true' /usr/share/eczos/oobe/Main.qml
 grep -Fx '    visibility: Window.FullScreen' /usr/share/eczos/oobe/Main.qml
-grep -F 'Muziek uitzetten' /usr/share/eczos/oobe/Main.qml
+grep -F 'qsTr("Turn music off")' /usr/share/eczos/oobe/Main.qml
 grep -F 'branding/screenshots/settings.png' /usr/share/eczos/oobe/Main.qml
 grep -F 'branding/screenshots/recovery.png' /usr/share/eczos/oobe/Main.qml
-for browser in 'Firefox' 'Google Chrome' 'Microsoft Edge via ECZ Windows' 'Konqueror'; do
+for browser in 'Firefox' 'Google Chrome' 'Microsoft Edge through ECZ Windows' 'Konqueror'; do
     grep -F "$browser" /usr/share/eczos/oobe/Main.qml
+done
+for locale in nl de fr; do
+    test -s "/usr/share/eczos/translations/eczos-oobe_${locale}.qm"
 done
 grep -F 'oobe-complete-v1' /usr/bin/eczos-oobe
 grep -F 'browser-choice' /usr/bin/eczos-oobe
