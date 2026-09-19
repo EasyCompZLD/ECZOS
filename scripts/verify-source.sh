@@ -12,6 +12,7 @@ fail() {
 for required in \
     README.md \
     config/debian-extra-components.list \
+    config/supported-languages.tsv \
     docs/architecture.md \
     docs/repository.md \
     docs/security.md \
@@ -117,6 +118,14 @@ for required in \
     scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
 done
+
+LANGUAGE_MATRIX="$ROOT_DIR/config/supported-languages.tsv"
+language_count=$(awk -F '\t' '!/^#/ && NF {count++} END {print count + 0}' "$LANGUAGE_MATRIX")
+[[ "$language_count" -eq 78 ]] || fail "ECZOS language matrix contains $language_count entries instead of 78"
+invalid_language_rows=$(awk -F '\t' '!/^#/ && (NF != 4 || ($4 != "ltr" && $4 != "rtl")) {print NR}' "$LANGUAGE_MATRIX")
+[[ -z "$invalid_language_rows" ]] || fail "invalid ECZOS language matrix rows: $invalid_language_rows"
+duplicate_language_codes=$(awk -F '\t' '!/^#/ {seen[$1]++} END {for (code in seen) if (seen[code] > 1) print code}' "$LANGUAGE_MATRIX" | sort)
+[[ -z "$duplicate_language_codes" ]] || fail "duplicate ECZOS language codes: $duplicate_language_codes"
 
 while IFS= read -r hook; do
     sh -n "$hook" || fail "invalid image hook syntax: ${hook#"$ROOT_DIR/"}"

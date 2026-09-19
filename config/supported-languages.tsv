@@ -1,0 +1,80 @@
+# Debian 13 localechooser 2.112 language matrix used by ECZOS.
+# code	locale	English name	direction
+sq	sq_AL.UTF-8	Albanian	ltr
+am	am_ET	Amharic	ltr
+ar	ar_EG.UTF-8	Arabic	rtl
+ast	ast_ES.UTF-8	Asturian	ltr
+eu	eu_ES.UTF-8	Basque	ltr
+be	be_BY.UTF-8	Belarusian	ltr
+bn	bn_BD	Bangla	ltr
+bs	bs_BA.UTF-8	Bosnian	ltr
+bg	bg_BG.UTF-8	Bulgarian	ltr
+bo	bo_IN	Tibetan	ltr
+C	C	C	ltr
+ca	ca_ES.UTF-8	Catalan	ltr
+zh_CN	zh_CN.UTF-8	Chinese (Simplified)	ltr
+zh_TW	zh_TW.UTF-8	Chinese (Traditional)	ltr
+hr	hr_HR.UTF-8	Croatian	ltr
+cs	cs_CZ.UTF-8	Czech	ltr
+da	da_DK.UTF-8	Danish	ltr
+nl	nl_NL.UTF-8	Dutch	ltr
+dz	dz_BT	Dzongkha	ltr
+en	en_US.UTF-8	English	ltr
+eo	eo.UTF-8	Esperanto	ltr
+et	et_EE.UTF-8	Estonian	ltr
+fi	fi_FI.UTF-8	Finnish	ltr
+fr	fr_FR.UTF-8	French	ltr
+gl	gl_ES.UTF-8	Galician	ltr
+ka	ka_GE.UTF-8	Georgian	ltr
+de	de_DE.UTF-8	German	ltr
+el	el_GR.UTF-8	Greek	ltr
+gu	gu_IN	Gujarati	ltr
+he	he_IL.UTF-8	Hebrew	rtl
+hi	hi_IN	Hindi	ltr
+hu	hu_HU.UTF-8	Hungarian	ltr
+is	is_IS.UTF-8	Icelandic	ltr
+id	id_ID.UTF-8	Indonesian	ltr
+ga	ga_IE.UTF-8	Irish	ltr
+it	it_IT.UTF-8	Italian	ltr
+ja	ja_JP.UTF-8	Japanese	ltr
+kab	kab_DZ	Kabyle	ltr
+kk	kk_KZ.UTF-8	Kazakh	ltr
+km	km_KH	Khmer	ltr
+kn	kn_IN	Kannada	ltr
+ko	ko_KR.UTF-8	Korean	ltr
+ku	ku_TR.UTF-8	Kurdish	ltr
+lo	lo_LA	Lao	ltr
+lv	lv_LV.UTF-8	Latvian	ltr
+lt	lt_LT.UTF-8	Lithuanian	ltr
+ml	ml_IN	Malayalam	ltr
+mr	mr_IN	Marathi	ltr
+mk	mk_MK.UTF-8	Macedonian	ltr
+my	my_MM	Burmese	ltr
+ne	ne_NP	Nepali	ltr
+se_NO	se_NO	Northern Sami	ltr
+nb_NO	nb_NO.UTF-8	Norwegian Bokmaal	ltr
+nn_NO	nn_NO.UTF-8	Norwegian Nynorsk	ltr
+oc	oc_FR.UTF-8	Occitan	ltr
+fa	fa_IR	Persian	rtl
+pl	pl_PL.UTF-8	Polish	ltr
+pt	pt_PT.UTF-8	Portuguese	ltr
+pt_BR	pt_BR.UTF-8	Portuguese (Brazil)	ltr
+pa	pa_IN	Punjabi (Gurmukhi)	ltr
+ro	ro_RO.UTF-8	Romanian	ltr
+ru	ru_RU.UTF-8	Russian	ltr
+si	si_LK	Sinhala	ltr
+sr	sr_RS	Serbian (Cyrillic)	ltr
+sk	sk_SK.UTF-8	Slovak	ltr
+sl	sl_SI.UTF-8	Slovenian	ltr
+es	es_ES.UTF-8	Spanish	ltr
+sv	sv_SE.UTF-8	Swedish	ltr
+tl	tl_PH.UTF-8	Tagalog	ltr
+ta	ta_IN	Tamil	ltr
+te	te_IN	Telugu	ltr
+tg	tg_TJ.UTF-8	Tajik	ltr
+th	th_TH.UTF-8	Thai	ltr
+tr	tr_TR.UTF-8	Turkish	ltr
+ug	ug_CN	Uyghur	rtl
+uk	uk_UA.UTF-8	Ukrainian	ltr
+vi	vi_VN	Vietnamese	ltr
+cy	cy_GB.UTF-8	Welsh	ltr
