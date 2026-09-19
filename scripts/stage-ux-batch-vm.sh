@@ -18,10 +18,12 @@ PACKAGES=(
     eczos-archive-keyring
     eczos-release
     eczos-branding
+    eczos-desktop-defaults
     eczos-platform-tools
     eczos-windows-core
     eczos-gaming-core
     eczos-recovery-media
+    eczos-desktop-apps
     eczos-installer
     eczos-oobe
     eczos-desktop
@@ -66,12 +68,14 @@ apt-get install -y "${debs[@]}"
 "$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
 "$ROOT_DIR/tests/smoke/release-package.sh"
 "$ROOT_DIR/tests/smoke/branding-package.sh"
+"$ROOT_DIR/tests/smoke/desktop-defaults-package.sh"
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
 "$ROOT_DIR/tests/smoke/windows-core-package.sh"
 "$ROOT_DIR/tests/smoke/gaming-core-package.sh"
 "$ROOT_DIR/tests/smoke/recovery-media-package.sh"
 "$ROOT_DIR/tests/smoke/installer-package.sh"
 "$ROOT_DIR/tests/smoke/oobe-package.sh"
+"$ROOT_DIR/tests/smoke/desktop-apps-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-metapackage.sh"
 
 printf '\nECZOS interface, recovery, OOBE and installer UX batch passed.\n'

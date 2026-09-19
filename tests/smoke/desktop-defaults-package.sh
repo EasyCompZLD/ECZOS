@@ -26,6 +26,8 @@ grep -F 'desktop-defaults-v5' /usr/lib/eczos/apply-desktop-defaults
 grep -F 'timeout 12s plasma-apply-wallpaperimage' /usr/bin/eczos-theme-switch
 grep -F 'kscreenlockerrc' /usr/bin/eczos-theme-switch
 grep -F 'org.eczos.desktop' /usr/bin/eczos-theme-switch
+grep -F 'LookAndFeelPackage' /usr/bin/eczos-theme-switch
+grep -F 'org.kde.KGlobalSettings.notifyChange' /usr/bin/eczos-theme-switch
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/metadata.json
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/Splash.qml
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/eczos-startup.mp4

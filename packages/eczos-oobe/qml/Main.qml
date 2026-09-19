@@ -14,6 +14,7 @@ ApplicationWindow {
     color: "#030812"
 
     property int page: 0
+    property string selectedTheme: "auto"
     property int pageCount: 10
     property bool musicEnabled: true
     property string selectedBrowser: "firefox"
@@ -113,6 +114,7 @@ ApplicationWindow {
                 heading: qsTr("Connect to a network")
                 body: qsTr("An internet connection is needed for updates, new apps, browsers and online services.")
                 detail: qsTr("Manage Wi-Fi and wired connections from the network icon or System Settings.")
+                visual: "file:///usr/share/eczos/branding/screenshots/system-network.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: qsTr("Open network settings")
@@ -123,12 +125,15 @@ ApplicationWindow {
             OobePage {
                 heading: qsTr("Make ECZOS yours")
                 body: qsTr("Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in System Settings.")
+                visual: window.selectedTheme === "dark"
+                    ? "file:///usr/share/eczos/branding/screenshots/desktop-dark.png"
+                    : "file:///usr/share/eczos/branding/screenshots/desktop-light.png"
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 16
-                    OobeButton { text: qsTr("Automatic"); onClicked: oobe.setTheme("auto") }
-                    OobeButton { text: qsTr("Light"); onClicked: oobe.setTheme("light") }
-                    OobeButton { text: qsTr("Dark"); onClicked: oobe.setTheme("dark") }
+                    OobeButton { text: qsTr("Automatic"); checkable: true; checked: window.selectedTheme === "auto"; onClicked: { window.selectedTheme = "auto"; oobe.setTheme("auto") } }
+                    OobeButton { text: qsTr("Light"); checkable: true; checked: window.selectedTheme === "light"; onClicked: { window.selectedTheme = "light"; oobe.setTheme("light") } }
+                    OobeButton { text: qsTr("Dark"); checkable: true; checked: window.selectedTheme === "dark"; onClicked: { window.selectedTheme = "dark"; oobe.setTheme("dark") } }
                     OobeButton { text: qsTr("More settings"); onClicked: oobe.openSystemSettings() }
                 }
             }
@@ -182,7 +187,7 @@ ApplicationWindow {
                 heading: qsTr("Find apps with Discover")
                 body: qsTr("Discover brings apps, games, system updates and firmware together in one place. Search by name and select Install.")
                 detail: qsTr("ECZOS supports regular Debian packages and Flatpak apps.")
-                visual: "file:///usr/share/eczos/branding/screenshots/diagnostics.png"
+                visual: "file:///usr/share/eczos/branding/screenshots/application-menu.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: qsTr("Open Discover")
@@ -194,6 +199,7 @@ ApplicationWindow {
                 heading: qsTr("Keep your files safe")
                 body: qsTr("Plasma Vaults lets you create encrypted vaults for private files.")
                 detail: qsTr("Use the Start menu search to quickly find apps and files. Manage backups and recovery media in ECZOS Settings.")
+                visual: "file:///usr/share/eczos/branding/screenshots/desktop-clean.png"
             }
 
             OobePage {
@@ -212,7 +218,7 @@ ApplicationWindow {
                 heading: qsTr("Windows apps and games")
                 body: qsTr("Open .exe and .msi files with ECZ Windows. Gaming checks help with Vulkan, controllers and Windows games.")
                 detail: qsTr("Each managed Windows app gets its own environment and then appears in the Start menu.")
-                visual: "file:///usr/share/eczos/branding/screenshots/gaming.png"
+                visual: "file:///usr/share/eczos/branding/screenshots/game-running.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: qsTr("Open ECZOS Settings")
@@ -224,7 +230,7 @@ ApplicationWindow {
                 heading: qsTr("Privacy and community")
                 body: qsTr("ECZOS never sends a support report automatically. You decide what to share and when.")
                 detail: qsTr("ECZOS uses the free KDE Plasma desktop. Support is available when you need help or want to report a problem.")
-                visual: "file:///usr/share/eczos/branding/screenshots/recovery.png"
+                visual: "file:///usr/share/eczos/branding/screenshots/about-system.png"
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 16
@@ -237,6 +243,7 @@ ApplicationWindow {
                 heading: qsTr("Everything is ready")
                 body: qsTr("Welcome to ECZOS. Select Get started to apply your browser choice and finish setup.")
                 detail: qsTr("The ECZOS welcome assistant remains available from the Start menu.")
+                visual: "file:///usr/share/eczos/branding/screenshots/desktop-dark.png"
             }
         }
 

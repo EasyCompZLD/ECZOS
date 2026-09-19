@@ -54,7 +54,7 @@ Presentation {
             anchors.fill: parent
             heading: qsTr("Welcome to ECZOS")
             body: qsTr("A familiar desktop from EasyComp Zeeland. Everything you need every day will be ready for you.")
-            screenshot: "file:///usr/share/eczos/branding/screenshots/settings.png"
+            screenshot: "file:///usr/share/eczos/branding/screenshots/oobe-welcome.png"
         }
     }
     Slide {
@@ -70,7 +70,7 @@ Presentation {
             anchors.fill: parent
             heading: qsTr("Ready for work and school")
             body: qsTr("FreeOffice, Firefox, email, video and useful file utilities make ECZOS ready to use.")
-            screenshot: "file:///usr/share/eczos/branding/screenshots/diagnostics.png"
+            screenshot: "file:///usr/share/eczos/branding/screenshots/application-menu.png"
         }
     }
     Slide {
@@ -78,7 +78,7 @@ Presentation {
             anchors.fill: parent
             heading: qsTr("Made for gaming too")
             body: qsTr("Steam is ready for you. Many Windows games work through the built-in compatibility layer.")
-            screenshot: "file:///usr/share/eczos/branding/screenshots/gaming.png"
+            screenshot: "file:///usr/share/eczos/branding/screenshots/steam-library-content.png"
         }
     }
     Slide {

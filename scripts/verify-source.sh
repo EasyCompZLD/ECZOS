@@ -234,7 +234,9 @@ for asset in \
     [[ -s "$ROOT_DIR/packages/eczos-branding/$asset" ]] || fail "missing or empty branding asset: $asset"
 done
 
-for screenshot in settings windows-apps gaming migration recovery diagnostics; do
+for screenshot in settings windows-apps gaming migration recovery diagnostics \
+    system-appearance system-display system-network application-menu desktop-clean \
+    desktop-dark desktop-light game-running about-system steam-library-content; do
     [[ -s "$ROOT_DIR/packages/eczos-branding/assets/screenshots/$screenshot.png" ]] || \
         fail "missing product screenshot: $screenshot.png"
 done
@@ -244,6 +246,18 @@ grep -Fq 'branding/screenshots/settings.png' \
 grep -Fq 'branding/screenshots/windows-apps.png' \
     "$ROOT_DIR/packages/eczos-installer/branding/eczos/show.qml" || \
     fail 'ECZOS installer does not use product screenshots'
+grep -Fq 'branding/screenshots/steam-library-content.png' \
+    "$ROOT_DIR/packages/eczos-installer/branding/eczos/show.qml" || \
+    fail 'ECZOS installer does not use the current Steam screenshot'
+grep -Fq 'branding/screenshots/oobe-welcome.png' \
+    "$ROOT_DIR/packages/eczos-installer/branding/eczos/show.qml" || \
+    fail 'ECZOS installer does not preview the current first-run experience'
+grep -Fq 'eczos-system-settings.sock' \
+    "$ROOT_DIR/packages/eczos-platform-tools/native/main.cpp" || \
+    fail 'ECZOS Settings is not single-instance'
+grep -Fq 'LookAndFeelPackage' \
+    "$ROOT_DIR/packages/eczos-desktop-defaults/bin/eczos-theme-switch" || \
+    fail 'ECZOS appearance selection does not persist its global theme'
 
 while IFS= read -r script; do
     # Debian package builds leave native ELF binaries below debian/*/usr/bin

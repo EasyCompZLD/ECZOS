@@ -15,7 +15,7 @@ Depends:
  ${misc:Depends},
  calamares,
  calamares-settings-debian,
- eczos-branding (>= 0.1.0~dev6),
+ eczos-branding (>= 0.1.0~dev8),
  pkexec,
  polkitd,
  x11-xserver-utils,

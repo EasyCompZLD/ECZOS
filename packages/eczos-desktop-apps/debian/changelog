@@ -1,3 +1,9 @@
+eczos-desktop-apps (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Require the current integrated settings, gaming and recovery tools.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 18:00:00 +0200
+
 eczos-desktop-apps (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Include the ECZOS recovery media creator.

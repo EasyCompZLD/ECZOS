@@ -4,12 +4,15 @@ set -Eeuo pipefail
 CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
 MODE_FILE="$CONFIG_HOME/eczos/theme-mode"
 REQUESTED_MODE=${1:-}
+mkdir -p "$CONFIG_HOME/eczos"
+exec 9>"$CONFIG_HOME/eczos/theme-switch.lock"
+flock 9
 
 if [[ -n "$REQUESTED_MODE" ]]; then
     case "$REQUESTED_MODE" in
         default|auto|light|dark)
-            mkdir -p "$(dirname "$MODE_FILE")"
             printf '%s\n' "$REQUESTED_MODE" > "$MODE_FILE"
+            chmod 0600 "$MODE_FILE"
             ;;
         *)
             printf 'Usage: eczos-theme-switch [default|auto|light|dark]\n' >&2
@@ -65,6 +68,8 @@ lookandfeeltool -a "$LOOK_AND_FEEL" || \
     printf 'ECZOS warning: Plasma look-and-feel was not ready yet.\n' >&2
 plasma-apply-colorscheme "$COLOR_SCHEME" || \
     printf 'ECZOS warning: Plasma colors were not ready yet.\n' >&2
+kwriteconfig6 --file kdeglobals --group KDE --key LookAndFeelPackage "$LOOK_AND_FEEL"
+kwriteconfig6 --file kdeglobals --group General --key ColorScheme "$COLOR_SCHEME"
 if ! timeout 12s plasma-apply-wallpaperimage --fill-mode preserveAspectCrop "$WALLPAPER"; then
     sleep 2
     timeout 12s plasma-apply-wallpaperimage --fill-mode preserveAspectCrop "$WALLPAPER" || \
@@ -82,6 +87,11 @@ kwriteconfig6 --file kscreenlockerrc \
 kwriteconfig6 --file kscreenlockerrc \
     --group Greeter --group Wallpaper --group org.kde.image --group General \
     --key PreviewImage "$WALLPAPER_URL"
+
+# Notify already-running KDE and Qt applications after both the global theme
+# and explicit colour scheme have been committed.
+dbus-send --session --type=signal /KGlobalSettings \
+    org.kde.KGlobalSettings.notifyChange int32:0 int32:0 2>/dev/null || true
 
 if ! timeout 12s qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
 var allPanels = panels();

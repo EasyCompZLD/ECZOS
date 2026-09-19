@@ -1,3 +1,10 @@
+eczos-oobe (0.1.0~dev7) UNRELEASED; urgency=medium
+
+  * Add current screenshots to every relevant first-run page.
+  * Show and retain the selected automatic, light or dark appearance.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 18:00:00 +0200
+
 eczos-oobe (0.1.0~dev6) UNRELEASED; urgency=medium
 
   * Mark every first-run OOBE sentence for translation and use English as the

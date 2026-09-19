@@ -1070,5 +1070,9 @@
         <source>This module contains changes that have not been saved yet.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The settings window could not be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

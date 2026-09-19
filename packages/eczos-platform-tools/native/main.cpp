@@ -21,6 +21,8 @@
 #include <QJsonObject>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QMainWindow>
 #include <QMap>
 #include <QMessageBox>
@@ -1252,8 +1254,8 @@ int main(int argc, char **argv)
     parser.addOption(moduleOption);
     parser.process(app);
 
-    const QList<KPluginMetaData> modules = availableModules();
     if (parser.isSet(listOption)) {
+        const QList<KPluginMetaData> modules = availableModules();
         QFile output;
         output.open(stdout, QIODevice::WriteOnly);
         output.write(moduleInventory(modules).toJson(QJsonDocument::Compact));
@@ -1261,10 +1263,53 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    const QString runtimeDirectory = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+    const QString socketPath = QDir(runtimeDirectory).filePath(QStringLiteral("eczos-system-settings.sock"));
+    QLocalSocket existingInstance;
+    existingInstance.connectToServer(socketPath);
+    if (existingInstance.waitForConnected(250)) {
+        existingInstance.write((parser.isSet(moduleOption) ? parser.value(moduleOption).toUtf8() : QByteArray()) + '\n');
+        existingInstance.waitForBytesWritten(500);
+        return 0;
+    }
+
+    QLocalServer::removeServer(socketPath);
+    QLocalServer instanceServer;
+    if (!instanceServer.listen(socketPath)) {
+        QMessageBox::critical(nullptr, QObject::tr("ECZOS Settings"), QObject::tr("The settings window could not be started."));
+        return 1;
+    }
+
+    const QList<KPluginMetaData> modules = availableModules();
     SettingsWindow window(modules);
     if (parser.isSet(moduleOption) && !window.openEntry(parser.value(moduleOption))) {
         return 2;
     }
+    QObject::connect(&instanceServer, &QLocalServer::newConnection, &window, [&instanceServer, &window] {
+        while (QLocalSocket *connection = instanceServer.nextPendingConnection()) {
+            QObject::connect(connection, &QLocalSocket::disconnected, connection, &QObject::deleteLater);
+            QObject::connect(connection, &QLocalSocket::readyRead, &window, [connection, &window] {
+                const QString entry = QString::fromUtf8(connection->readAll()).trimmed();
+                if (!entry.isEmpty()) {
+                    window.openEntry(entry);
+                }
+                window.showNormal();
+                window.raise();
+                window.activateWindow();
+                connection->disconnectFromServer();
+            });
+            if (connection->bytesAvailable() > 0) {
+                const QString entry = QString::fromUtf8(connection->readAll()).trimmed();
+                if (!entry.isEmpty()) {
+                    window.openEntry(entry);
+                }
+                window.showNormal();
+                window.raise();
+                window.activateWindow();
+                connection->disconnectFromServer();
+            }
+        }
+    });
     window.show();
     return app.exec();
 }

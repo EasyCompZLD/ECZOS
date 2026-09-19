@@ -9,6 +9,7 @@ for command in eczos-control-center eczos-doctor eczos-migrate eczos-support-rep
 done
 test -x /usr/bin/eczos-ui
 test -x /usr/bin/eczos-system-settings
+grep -F 'eczos-system-settings.sock' /usr/bin/eczos-system-settings >/dev/null
 test -x /usr/bin/systemsettings
 test -x /usr/bin/kcmshell6
 test -x /usr/bin/systemsettings.eczos-distrib

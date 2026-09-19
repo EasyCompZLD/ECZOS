@@ -1070,5 +1070,9 @@
       <source>This module contains changes that have not been saved yet.</source>
       <translation>Dit onderdeel bevat wijzigingen die nog niet zijn opgeslagen.</translation>
     </message>
+    <message>
+      <source>The settings window could not be started.</source>
+      <translation>Het instellingenvenster kon niet worden gestart.</translation>
+    </message>
   </context>
 </TS>

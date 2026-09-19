@@ -10,7 +10,7 @@ find_package(ECM 6.13 REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 include(KDEInstallDirs)
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets Qml QuickWidgets LinguistTools)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets Network Qml QuickWidgets LinguistTools)
 find_package(KF6 6.13 REQUIRED COMPONENTS Auth Config CoreAddons KCMUtils)
 
 set(ECZOS_SETTINGS_QML ${CMAKE_CURRENT_SOURCE_DIR}/../qml/Main.qml)
@@ -25,6 +25,7 @@ qt_add_translations(eczos-system-settings
 )
 target_link_libraries(eczos-system-settings PRIVATE
     Qt6::Widgets
+    Qt6::Network
     Qt6::Qml
     Qt6::QuickWidgets
     KF6::AuthCore

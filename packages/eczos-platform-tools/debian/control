@@ -24,7 +24,7 @@ Architecture: amd64
 Depends:
  ${misc:Depends},
  ${shlibs:Depends},
- eczos-branding (>= 0.1.0~dev7),
+ eczos-branding (>= 0.1.0~dev8),
  gettext-base,
  jq,
  pciutils,
