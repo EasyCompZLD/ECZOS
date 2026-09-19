@@ -14,6 +14,46 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+SMOKE_TESTS=(
+    archive-keyring
+    release
+    branding
+    desktop-defaults
+    platform-tools
+    windows-core
+    gaming-core
+    recovery-media
+    installer
+    oobe
+    desktop-apps
+    desktop-metapackage
+)
+
+run_smoke_tests() {
+    local test_name
+    for test_name in "${SMOKE_TESTS[@]}"; do
+        # Invoke through Bash so a checkout on an SMB share cannot break the
+        # test run merely by dropping the executable bit.
+        bash "$ROOT_DIR/tests/smoke/${test_name}-package.sh"
+    done
+}
+
+case ${1:-} in
+    --tests-only)
+        bash "$ROOT_DIR/scripts/verify-source.sh"
+        run_smoke_tests
+        printf '\nECZOS interface, recovery, OOBE and installer UX batch passed.\n'
+        printf 'Open ECZOS Instellingen and ECZOS Herstelmedium for the visual check.\n'
+        exit 0
+        ;;
+    '')
+        ;;
+    *)
+        printf 'Usage: %s [--tests-only]\n' "$0" >&2
+        exit 2
+        ;;
+esac
+
 PACKAGES=(
     eczos-archive-keyring
     eczos-release
@@ -30,8 +70,8 @@ PACKAGES=(
 )
 
 export DEBIAN_FRONTEND=noninteractive
-"$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
-"$ROOT_DIR/scripts/verify-source.sh"
+bash "$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
+bash "$ROOT_DIR/scripts/verify-source.sh"
 
 for package in "${PACKAGES[@]}"; do
     package_dir="$ROOT_DIR/packages/$package"
@@ -65,18 +105,7 @@ for package in "${PACKAGES[@]}"; do
 done
 apt-get install -y "${debs[@]}"
 
-"$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
-"$ROOT_DIR/tests/smoke/release-package.sh"
-"$ROOT_DIR/tests/smoke/branding-package.sh"
-"$ROOT_DIR/tests/smoke/desktop-defaults-package.sh"
-"$ROOT_DIR/tests/smoke/platform-tools-package.sh"
-"$ROOT_DIR/tests/smoke/windows-core-package.sh"
-"$ROOT_DIR/tests/smoke/gaming-core-package.sh"
-"$ROOT_DIR/tests/smoke/recovery-media-package.sh"
-"$ROOT_DIR/tests/smoke/installer-package.sh"
-"$ROOT_DIR/tests/smoke/oobe-package.sh"
-"$ROOT_DIR/tests/smoke/desktop-apps-package.sh"
-"$ROOT_DIR/tests/smoke/desktop-metapackage.sh"
+run_smoke_tests
 
 printf '\nECZOS interface, recovery, OOBE and installer UX batch passed.\n'
 printf 'Open ECZOS Instellingen and ECZOS Herstelmedium for the visual check.\n'
