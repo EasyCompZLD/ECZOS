@@ -13,7 +13,9 @@ include(KDEInstallDirs)
 find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets Qml QuickWidgets LinguistTools)
 find_package(KF6 6.13 REQUIRED COMPONENTS Auth Config CoreAddons KCMUtils)
 
-add_executable(eczos-system-settings main.cpp)
+set(ECZOS_SETTINGS_QML ${CMAKE_CURRENT_SOURCE_DIR}/../qml/Main.qml)
+set_source_files_properties(${ECZOS_SETTINGS_QML} PROPERTIES HEADER_FILE_ONLY TRUE)
+add_executable(eczos-system-settings main.cpp ${ECZOS_SETTINGS_QML})
 qt_add_translations(eczos-system-settings
     QM_FILES_OUTPUT_VARIABLE translation_qm_files
     TS_FILES

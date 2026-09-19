@@ -1,3 +1,11 @@
+eczos-platform-tools (0.1.0~dev12) UNRELEASED; urgency=medium
+
+  * Convert every visible native and QML Settings label to an English source
+    string with a complete Dutch Qt translation catalogue.
+  * Include the installed QML interface in automatic translation extraction.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 14:30:00 +0200
+
 eczos-platform-tools (0.1.0~dev11) UNRELEASED; urgency=medium
 
   * Add Qt Linguist translation loading and initial Dutch, German and French

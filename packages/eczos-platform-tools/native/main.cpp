@@ -186,7 +186,7 @@ public:
         : m_modules(modules)
         , m_engine(std::make_shared<QQmlEngine>())
     {
-        setWindowTitle(QStringLiteral("ECZOS Instellingen"));
+        setWindowTitle(tr("ECZOS Settings"));
         setWindowIcon(QIcon::fromTheme(QStringLiteral("preferences-system")));
         resize(1180, 760);
         setMinimumSize(920, 620);
@@ -211,7 +211,7 @@ public:
         sideLayout->addWidget(logo);
 
         m_search = new QLineEdit(sidebar);
-        m_search->setPlaceholderText(QStringLiteral("Zoek in alle instellingen…"));
+        m_search->setPlaceholderText(tr("Search all settings…"));
         m_search->setClearButtonEnabled(true);
         sideLayout->addWidget(m_search);
 
@@ -231,9 +231,9 @@ public:
         m_contentLayout = new QVBoxLayout(m_content);
         m_contentLayout->setContentsMargins(22, 18, 22, 16);
         m_contentLayout->setSpacing(12);
-        m_heading = new QLabel(QStringLiteral("Systeemvoorkeuren"), m_content);
+        m_heading = new QLabel(tr("System settings"), m_content);
         m_heading->setObjectName(QStringLiteral("pageHeading"));
-        m_description = new QLabel(QStringLiteral("Kies links een onderdeel. Alle instellingen blijven in dit venster."), m_content);
+        m_description = new QLabel(tr("Choose a module on the left. All settings remain in this window."), m_content);
         m_description->setObjectName(QStringLiteral("pageDescription"));
         m_description->setWordWrap(true);
         m_contentLayout->addWidget(m_heading);
@@ -245,10 +245,10 @@ public:
         m_contentLayout->addWidget(m_moduleArea, 1);
 
         m_buttons = new QDialogButtonBox(m_content);
-        m_apply = m_buttons->addButton(QStringLiteral("Opslaan"), QDialogButtonBox::ApplyRole);
-        m_reset = m_buttons->addButton(QStringLiteral("Wijzigingen ongedaan maken"), QDialogButtonBox::ResetRole);
-        m_defaults = m_buttons->addButton(QStringLiteral("Standaardinstellingen"), QDialogButtonBox::ResetRole);
-        m_help = m_buttons->addButton(QStringLiteral("Hulp"), QDialogButtonBox::HelpRole);
+        m_apply = m_buttons->addButton(tr("Save"), QDialogButtonBox::ApplyRole);
+        m_reset = m_buttons->addButton(tr("Undo changes"), QDialogButtonBox::ResetRole);
+        m_defaults = m_buttons->addButton(tr("Defaults"), QDialogButtonBox::ResetRole);
+        m_help = m_buttons->addButton(tr("Help"), QDialogButtonBox::HelpRole);
         m_contentLayout->addWidget(m_buttons);
         outer->addWidget(m_content, 1);
 
@@ -461,13 +461,13 @@ private:
     {
         if (m_task && m_task->state() != QProcess::NotRunning) {
             if (m_taskStatus) {
-                m_taskStatus->setText(QStringLiteral("Er is al een taak bezig."));
+                m_taskStatus->setText(tr("A task is already running."));
             }
             return;
         }
         if (!QFileInfo::exists(program)) {
             if (m_taskStatus) {
-                m_taskStatus->setText(QStringLiteral("Dit ECZOS-onderdeel is niet geïnstalleerd."));
+                m_taskStatus->setText(tr("This ECZOS component is not installed."));
             }
             return;
         }
@@ -524,8 +524,8 @@ private:
                         callback(exitCode, output, errors);
                     } else if (m_taskStatus) {
                         const QString detail = QString::fromUtf8(exitCode == 0 ? output : errors).trimmed();
-                        m_taskStatus->setText(exitCode == 0 ? QStringLiteral("Klaar")
-                                                           : (detail.isEmpty() ? QStringLiteral("De taak is mislukt.") : detail.section('\n', -1)));
+                        m_taskStatus->setText(exitCode == 0 ? tr("Done")
+                                                           : (detail.isEmpty() ? tr("The task failed.") : detail.section('\n', -1)));
                     }
                 });
         m_task->start(program, arguments);
@@ -535,7 +535,7 @@ private:
     {
         auto *page = new QWidget;
         auto *layout = pageLayout(page);
-        auto *intro = new QLabel(QStringLiteral("Beheer ECZOS en alle systeemonderdelen vanuit één venster."), page);
+        auto *intro = new QLabel(tr("Manage ECZOS and all system components from one window."), page);
         intro->setStyleSheet(QStringLiteral("font-size: 18px; font-weight: 600; padding: 8px;"));
         intro->setWordWrap(true);
         layout->addWidget(intro);
@@ -563,17 +563,17 @@ private:
             grid->addWidget(button, index / 2, index % 2);
             ++index;
         };
-        addAction(QStringLiteral("Apps"), QStringLiteral("Programma's installeren en bijwerken"), QStringLiteral("plasmadiscover"),
+        addAction(tr("Apps"), tr("Install and update applications"), QStringLiteral("plasmadiscover"),
                   [] { QProcess::startDetached(QStringLiteral("plasma-discover"), {}); });
-        addAction(QStringLiteral("Back-up"), QStringLiteral("Persoonlijke bestanden beschermen"), QStringLiteral("kup"),
+        addAction(tr("Backup"), tr("Protect your personal files"), QStringLiteral("kup"),
                   [this] { openEntry(QStringLiteral("kcm_kup")); }, m_byId.contains(QStringLiteral("kcm_kup")));
-        addAction(QStringLiteral("Telefoon"), QStringLiteral("Je telefoon met ECZOS verbinden"), QStringLiteral("kdeconnect"),
+        addAction(tr("Phone"), tr("Connect your phone to ECZOS"), QStringLiteral("kdeconnect"),
                   [this] { openEntry(QStringLiteral("kcm_kdeconnect")); }, m_byId.contains(QStringLiteral("kcm_kdeconnect")));
-        addAction(QStringLiteral("Over deze computer"), QStringLiteral("Hardware en systeeminformatie bekijken"), QStringLiteral("help-about"),
+        addAction(tr("About this computer"), tr("View hardware and system information"), QStringLiteral("help-about"),
                   [this] { openEntry(QStringLiteral("kcm_about-distro")); }, m_byId.contains(QStringLiteral("kcm_about-distro")));
         layout->addLayout(grid);
         layout->addStretch(1);
-        setCustomContent(page, QStringLiteral("Alles voor je computer"), QStringLiteral("ECZOS-functies en systeeminstellingen op één plek."));
+        setCustomContent(page, tr("Everything for your computer"), tr("ECZOS features and system settings in one place."));
     }
 
     void showWindowsPage()
@@ -581,9 +581,9 @@ private:
         auto *page = new QWidget;
         auto *layout = pageLayout(page);
         auto *toolbar = new QHBoxLayout;
-        auto *summary = new QLabel(QStringLiteral("Windows-programma's worden ieder in hun eigen veilige omgeving beheerd."), page);
+        auto *summary = new QLabel(tr("Each Windows program is managed in its own separate environment."), page);
         summary->setWordWrap(true);
-        auto *refresh = new QPushButton(QStringLiteral("Lijst bijwerken"), page);
+        auto *refresh = new QPushButton(tr("Refresh list"), page);
         toolbar->addWidget(summary, 1);
         toolbar->addWidget(refresh);
         layout->addLayout(toolbar);
@@ -607,14 +607,14 @@ private:
             auto *card = new QGroupBox(record.value(QStringLiteral("name")).toString(id), page);
             auto *row = new QHBoxLayout(card);
             const QString appStatus = record.value(QStringLiteral("status")).toString();
-            auto *detail = new QLabel(appStatus == QStringLiteral("installed") ? QStringLiteral("Geïnstalleerd en klaar")
-                                                                                 : QStringLiteral("Status: %1").arg(appStatus), card);
+            auto *detail = new QLabel(appStatus == QStringLiteral("installed") ? tr("Installed and ready")
+                                                                                 : tr("Status: %1").arg(appStatus), card);
             row->addWidget(detail, 1);
             for (const auto &[label, action] : QList<QPair<QString, QString>>{
-                     {QStringLiteral("Starten"), QStringLiteral("run")},
-                     {QStringLiteral("Opnieuw zoeken"), QStringLiteral("rescan")},
-                     {QStringLiteral("Herstellen"), QStringLiteral("repair")},
-                     {QStringLiteral("Verwijderen"), QStringLiteral("remove")}}) {
+                     {tr("Start"), QStringLiteral("run")},
+                     {tr("Search again"), QStringLiteral("rescan")},
+                     {tr("Repair"), QStringLiteral("repair")},
+                     {tr("Remove"), QStringLiteral("remove")}}) {
                 auto *button = new QPushButton(label, card);
                 button->setEnabled(action != QStringLiteral("run") || appStatus == QStringLiteral("installed"));
                 connect(button, &QPushButton::clicked, this, [this, id, action, name = card->title(), status] {
@@ -623,8 +623,8 @@ private:
                         return;
                     }
                     if (action == QStringLiteral("remove")
-                        && QMessageBox::question(this, QStringLiteral("Windows-app verwijderen"),
-                                                 QStringLiteral("‘%1’ en de aparte Windows-omgeving verwijderen?").arg(name)) != QMessageBox::Yes) {
+                        && QMessageBox::question(this, tr("Remove Windows app"),
+                                                 tr("Remove ‘%1’ and its separate Windows environment?").arg(name)) != QMessageBox::Yes) {
                         return;
                     }
                     setTaskFeedback(status);
@@ -633,7 +633,7 @@ private:
                         arguments << QStringLiteral("--yes");
                     }
                     arguments << id;
-                    startTask(QStringLiteral("windows"), QStringLiteral("/usr/bin/eczos-windows"), arguments, QStringLiteral("Bezig…"),
+                    startTask(QStringLiteral("windows"), QStringLiteral("/usr/bin/eczos-windows"), arguments, tr("Working…"),
                               [this](int code, const QByteArray &, const QByteArray &errors) {
                                   if (code == 0) {
                                       showWindowsPage();
@@ -647,7 +647,7 @@ private:
             layout->addWidget(card);
         }
         if (count == 0) {
-            auto *empty = new QLabel(QStringLiteral("Nog geen Windows-apps. Open een .exe- of .msi-bestand om een app toe te voegen."), page);
+            auto *empty = new QLabel(tr("No Windows apps yet. Open an .exe or .msi file to add an app."), page);
             empty->setAlignment(Qt::AlignCenter);
             empty->setMinimumHeight(130);
             layout->addWidget(empty);
@@ -655,7 +655,7 @@ private:
         layout->addWidget(status);
         layout->addStretch(1);
         connect(refresh, &QPushButton::clicked, this, [this] { showWindowsPage(); });
-        setCustomContent(page, QStringLiteral("Windows-apps"), QStringLiteral("Windows-programma's starten, herstellen en verwijderen zonder een los beheerprogramma."));
+        setCustomContent(page, tr("Windows apps"), tr("Start, repair and remove Windows programs without a separate management app."));
     }
 
     void showGamingPage()
@@ -666,14 +666,14 @@ private:
         layout->addLayout(cards);
         auto *progress = new QProgressBar(page);
         progress->hide();
-        auto *status = new QLabel(QStringLiteral("Gaming-ondersteuning controleren…"), page);
+        auto *status = new QLabel(tr("Checking gaming support…"), page);
         status->setWordWrap(true);
         layout->addWidget(progress);
         layout->addWidget(status);
         auto *actions = new QHBoxLayout;
-        auto *repair = new QPushButton(QStringLiteral("Ontbrekende onderdelen installeren"), page);
-        auto *check = new QPushButton(QStringLiteral("Opnieuw controleren"), page);
-        auto *steam = new QPushButton(QStringLiteral("Steam openen"), page);
+        auto *repair = new QPushButton(tr("Install missing components"), page);
+        auto *check = new QPushButton(tr("Check again"), page);
+        auto *steam = new QPushButton(tr("Open Steam"), page);
         actions->addWidget(repair);
         actions->addWidget(check);
         actions->addStretch(1);
@@ -687,7 +687,7 @@ private:
             }
             setTaskFeedback(status, progress);
             startTask(QStringLiteral("gaming"), QStringLiteral("/usr/bin/eczos-gaming"),
-                      {QStringLiteral("doctor"), QStringLiteral("--json")}, QStringLiteral("Gaming-ondersteuning controleren…"),
+                      {QStringLiteral("doctor"), QStringLiteral("--json")}, tr("Checking gaming support…"),
                       [this, cards, status, progress, repair](int code, const QByteArray &output, const QByteArray &errors) {
                           progress->hide();
                           const QJsonObject data = QJsonDocument::fromJson(output).object();
@@ -698,13 +698,13 @@ private:
                           const QString verdict = data.value(QStringLiteral("verdict")).toString();
                           const QJsonObject vulkan = data.value(QStringLiteral("vulkan")).toObject();
                           const QJsonObject runtime = data.value(QStringLiteral("runtime")).toObject();
-                          cards->addWidget(statusCard(QStringLiteral("Algemene status"), data.value(QStringLiteral("summary")).toString(), verdict == QStringLiteral("ready"), cards->parentWidget()));
-                          cards->addWidget(statusCard(QStringLiteral("Grafische kaart"), data.value(QStringLiteral("gpu")).toString(QStringLiteral("Niet herkend")), vulkan.value(QStringLiteral("hardware")).toBool(), cards->parentWidget()));
-                          cards->addWidget(statusCard(QStringLiteral("32-bit Vulkan-driver"), vulkan.value(QStringLiteral("driver32Bit")).toBool() ? QStringLiteral("Aanwezig") : QStringLiteral("Ontbreekt"), vulkan.value(QStringLiteral("driver32Bit")).toBool(), cards->parentWidget()));
-                          cards->addWidget(statusCard(QStringLiteral("UMU/Proton"), runtime.value(QStringLiteral("umu")).toBool() ? QStringLiteral("Aanwezig") : QStringLiteral("Ontbreekt"), runtime.value(QStringLiteral("umu")).toBool(), cards->parentWidget()));
-                          cards->addWidget(statusCard(QStringLiteral("GameMode"), runtime.value(QStringLiteral("gameMode")).toBool() ? QStringLiteral("Aanwezig") : QStringLiteral("Ontbreekt"), runtime.value(QStringLiteral("gameMode")).toBool(), cards->parentWidget()));
+                          cards->addWidget(statusCard(tr("Overall status"), data.value(QStringLiteral("summary")).toString(), verdict == QStringLiteral("ready"), cards->parentWidget()));
+                          cards->addWidget(statusCard(tr("Graphics card"), data.value(QStringLiteral("gpu")).toString(tr("Not recognised")), vulkan.value(QStringLiteral("hardware")).toBool(), cards->parentWidget()));
+                          cards->addWidget(statusCard(tr("32-bit Vulkan driver"), vulkan.value(QStringLiteral("driver32Bit")).toBool() ? tr("Available") : tr("Missing"), vulkan.value(QStringLiteral("driver32Bit")).toBool(), cards->parentWidget()));
+                          cards->addWidget(statusCard(QStringLiteral("UMU/Proton"), runtime.value(QStringLiteral("umu")).toBool() ? tr("Available") : tr("Missing"), runtime.value(QStringLiteral("umu")).toBool(), cards->parentWidget()));
+                          cards->addWidget(statusCard(QStringLiteral("GameMode"), runtime.value(QStringLiteral("gameMode")).toBool() ? tr("Available") : tr("Missing"), runtime.value(QStringLiteral("gameMode")).toBool(), cards->parentWidget()));
                           repair->setVisible(verdict == QStringLiteral("setup-required"));
-                          status->setText(QStringLiteral("Controle voltooid"));
+                          status->setText(tr("Check complete"));
                       });
         };
         connect(check, &QPushButton::clicked, this, checkGaming);
@@ -712,7 +712,7 @@ private:
         connect(repair, &QPushButton::clicked, this, [this, status, progress, checkGaming] {
             setTaskFeedback(status, progress);
             startTask(QStringLiteral("gaming-repair"), QStringLiteral("/usr/bin/pkexec"),
-                      {QStringLiteral("/usr/lib/eczos/gaming/repair-runtime")}, QStringLiteral("Gaming-ondersteuning installeren…"),
+                      {QStringLiteral("/usr/lib/eczos/gaming/repair-runtime")}, tr("Installing gaming support…"),
                       [checkGaming, status](int code, const QByteArray &, const QByteArray &errors) {
                           if (code == 0) {
                               checkGaming();
@@ -721,7 +721,7 @@ private:
                           }
                       });
         });
-        setCustomContent(page, QStringLiteral("ECZ Gaming"), QStringLiteral("Steam, Vulkan, oudere games en Proton-ondersteuning controleren en herstellen."));
+        setCustomContent(page, QStringLiteral("ECZ Gaming"), tr("Check and repair Steam, Vulkan, classic games and Proton support."));
         checkGaming();
     }
 
@@ -731,9 +731,9 @@ private:
         auto *layout = pageLayout(page);
         auto *grid = new QGridLayout;
         layout->addLayout(grid);
-        auto *status = new QLabel(QStringLiteral("De computer controleren…"), page);
+        auto *status = new QLabel(tr("Checking the computer…"), page);
         status->setWordWrap(true);
-        auto *refresh = new QPushButton(QStringLiteral("Opnieuw controleren"), page);
+        auto *refresh = new QPushButton(tr("Check again"), page);
         layout->addWidget(status);
         layout->addWidget(refresh, 0, Qt::AlignLeft);
         layout->addStretch(1);
@@ -743,7 +743,7 @@ private:
                 delete item;
             }
             setTaskFeedback(status);
-            startTask(QStringLiteral("diagnostics"), QStringLiteral("/usr/bin/eczos-doctor"), {QStringLiteral("--json")}, QStringLiteral("De computer controleren…"),
+            startTask(QStringLiteral("diagnostics"), QStringLiteral("/usr/bin/eczos-doctor"), {QStringLiteral("--json")}, tr("Checking the computer…"),
                       [this, grid, status](int code, const QByteArray &output, const QByteArray &errors) {
                           const QJsonObject data = QJsonDocument::fromJson(output).object();
                           if (code != 0 || data.isEmpty()) {
@@ -755,20 +755,20 @@ private:
                           };
                           const QJsonObject apps = data.value(QStringLiteral("applications")).toObject();
                           const QJsonObject devices = data.value(QStringLiteral("devices")).toObject();
-                          add(0, QStringLiteral("Windows-apps"), data.value(QStringLiteral("windows")).toBool(), QStringLiteral("Compatibiliteitslaag"));
-                          add(1, QStringLiteral("Gaming"), data.value(QStringLiteral("gaming")).toString() == QStringLiteral("ready"), data.value(QStringLiteral("gaming")).toString());
-                          add(2, QStringLiteral("Apps en Flatpak"), apps.value(QStringLiteral("discover")).toBool() && apps.value(QStringLiteral("flatpak")).toBool(), QStringLiteral("Softwarebeheer"));
-                          add(3, QStringLiteral("Back-up"), data.value(QStringLiteral("backup")).toBool(), QStringLiteral("Persoonlijke bestanden"));
-                          add(4, QStringLiteral("Telefoonkoppeling"), data.value(QStringLiteral("phone")).toBool(), QStringLiteral("KDE Connect"));
-                          add(5, QStringLiteral("Printers en scanners"), devices.value(QStringLiteral("printer")).toBool() && devices.value(QStringLiteral("scanner")).toBool(), QStringLiteral("Apparaatondersteuning"));
+                          add(0, tr("Windows apps"), data.value(QStringLiteral("windows")).toBool(), tr("Compatibility layer"));
+                          add(1, tr("Gaming"), data.value(QStringLiteral("gaming")).toString() == QStringLiteral("ready"), data.value(QStringLiteral("gaming")).toString());
+                          add(2, tr("Apps and Flatpak"), apps.value(QStringLiteral("discover")).toBool() && apps.value(QStringLiteral("flatpak")).toBool(), tr("Software management"));
+                          add(3, tr("Backup"), data.value(QStringLiteral("backup")).toBool(), tr("Personal files"));
+                          add(4, tr("Phone connection"), data.value(QStringLiteral("phone")).toBool(), QStringLiteral("KDE Connect"));
+                          add(5, tr("Printers and scanners"), devices.value(QStringLiteral("printer")).toBool() && devices.value(QStringLiteral("scanner")).toBool(), tr("Device support"));
                           const int failed = data.value(QStringLiteral("failedUnits")).toInt();
-                          add(6, QStringLiteral("Systeemdiensten"), failed == 0, failed == 0 ? QStringLiteral("Geen fouten gevonden") : QStringLiteral("%1 dienst(en) vragen aandacht").arg(failed));
+                          add(6, tr("System services"), failed == 0, failed == 0 ? tr("No errors found") : tr("%1 service(s) need attention").arg(failed));
                           add(7, QStringLiteral("FreeOffice"), data.value(QStringLiteral("office")).toString() == QStringLiteral("installed"), data.value(QStringLiteral("office")).toString());
-                          status->setText(QStringLiteral("Controle voltooid"));
+                          status->setText(tr("Check complete"));
                       });
         };
         connect(refresh, &QPushButton::clicked, this, run);
-        setCustomContent(page, QStringLiteral("Diagnose"), QStringLiteral("Een controle in gewone taal die niets aan de computer verandert."));
+        setCustomContent(page, tr("Diagnostics"), tr("A plain-language check that does not change the computer."));
         run();
     }
 
@@ -778,17 +778,17 @@ private:
         auto *layout = pageLayout(page);
         auto *source = new QLineEdit(page);
         source->setReadOnly(true);
-        source->setPlaceholderText(QStringLiteral("Kies bijvoorbeeld C:\\Users\\jouwnaam op een aangekoppelde Windows-schijf"));
-        auto *choose = new QPushButton(QStringLiteral("Windows-gebruikersmap kiezen"), page);
+        source->setPlaceholderText(tr("For example, select %1 on a mounted Windows drive").arg(QStringLiteral("C:\\Users\\yourname")));
+        auto *choose = new QPushButton(tr("Select Windows user folder"), page);
         auto *row = new QHBoxLayout;
         row->addWidget(source, 1);
         row->addWidget(choose);
         layout->addLayout(row);
-        auto *status = new QLabel(QStringLiteral("Bestaande bestanden worden niet overschreven."), page);
+        auto *status = new QLabel(tr("Existing files are not overwritten."), page);
         status->setWordWrap(true);
         auto *actions = new QHBoxLayout;
-        auto *preview = new QPushButton(QStringLiteral("Eerst bekijken"), page);
-        auto *apply = new QPushButton(QStringLiteral("Bestanden overzetten"), page);
+        auto *preview = new QPushButton(tr("Preview first"), page);
+        auto *apply = new QPushButton(tr("Transfer files"), page);
         actions->addWidget(preview);
         actions->addWidget(apply);
         actions->addStretch(1);
@@ -796,46 +796,46 @@ private:
         layout->addWidget(status);
         layout->addStretch(1);
         connect(choose, &QPushButton::clicked, this, [this, source] {
-            const QString selected = QFileDialog::getExistingDirectory(this, QStringLiteral("Kies de Windows-gebruikersmap"));
+            const QString selected = QFileDialog::getExistingDirectory(this, tr("Select the Windows user folder"));
             if (!selected.isEmpty()) {
                 source->setText(selected);
             }
         });
         const auto migrate = [this, source, status](bool applyChanges) {
             if (source->text().isEmpty()) {
-                status->setText(QStringLiteral("Kies eerst een Windows-gebruikersmap."));
+                status->setText(tr("Select a Windows user folder first."));
                 return;
             }
             if (applyChanges
-                && QMessageBox::question(this, QStringLiteral("Bestanden overzetten"),
-                                         QStringLiteral("Bekende persoonlijke mappen kopiëren? Bestaande bestanden blijven behouden.")) != QMessageBox::Yes) {
+                && QMessageBox::question(this, tr("Transfer files"),
+                                         tr("Copy known personal folders? Existing files will be preserved.")) != QMessageBox::Yes) {
                 return;
             }
             setTaskFeedback(status);
             startTask(applyChanges ? QStringLiteral("migration-apply") : QStringLiteral("migration-preview"),
                       QStringLiteral("/usr/bin/eczos-migrate"),
                       {applyChanges ? QStringLiteral("--apply") : QStringLiteral("--dry-run"), QStringLiteral("--source"), source->text(), QStringLiteral("--no-gui")},
-                      applyChanges ? QStringLiteral("Bestanden overzetten…") : QStringLiteral("Voorbeeld maken…"),
+                      applyChanges ? tr("Transferring files…") : tr("Creating preview…"),
                       [status, applyChanges](int code, const QByteArray &output, const QByteArray &errors) {
                           const QString detail = QString::fromUtf8(code == 0 ? output : errors).trimmed();
-                          status->setText(code == 0 ? (applyChanges ? QStringLiteral("Bestanden overzetten voltooid") : QStringLiteral("Voorbeeld voltooid\n%1").arg(detail))
+                          status->setText(code == 0 ? (applyChanges ? tr("File transfer complete") : tr("Preview complete\n%1").arg(detail))
                                                     : detail.section('\n', -1));
                       });
         };
         connect(preview, &QPushButton::clicked, this, [migrate] { migrate(false); });
         connect(apply, &QPushButton::clicked, this, [migrate] { migrate(true); });
-        setCustomContent(page, QStringLiteral("Bestanden overzetten"), QStringLiteral("Documenten, foto's, muziek en andere persoonlijke bestanden uit een Windows-profiel meenemen."));
+        setCustomContent(page, tr("Transfer files"), tr("Bring documents, photos, music and other personal files over from a Windows profile."));
     }
 
     void showSupportPage()
     {
         auto *page = new QWidget;
         auto *layout = pageLayout(page);
-        auto *privacy = new QLabel(QStringLiteral("Het rapport bevat systeeminformatie, hardware, opslag en mislukte diensten. Persoonlijke documenten, wachtwoorden en browsergeschiedenis worden niet opgenomen. Het bestand blijft lokaal."), page);
+        auto *privacy = new QLabel(tr("The report contains system information, hardware, storage and failed services. Personal documents, passwords and browser history are not included. The file remains local."), page);
         privacy->setWordWrap(true);
         privacy->setMinimumHeight(100);
         layout->addWidget(privacy);
-        auto *button = new QPushButton(QStringLiteral("Supportrapport maken"), page);
+        auto *button = new QPushButton(tr("Create support report"), page);
         auto *status = new QLabel(page);
         status->setWordWrap(true);
         layout->addWidget(button, 0, Qt::AlignLeft);
@@ -843,13 +843,13 @@ private:
         layout->addStretch(1);
         connect(button, &QPushButton::clicked, this, [this, status] {
             setTaskFeedback(status);
-            startTask(QStringLiteral("support"), QStringLiteral("/usr/bin/eczos-support-report"), {QStringLiteral("--no-gui")}, QStringLiteral("Supportrapport maken…"),
+            startTask(QStringLiteral("support"), QStringLiteral("/usr/bin/eczos-support-report"), {QStringLiteral("--no-gui")}, tr("Creating support report…"),
                       [status](int code, const QByteArray &output, const QByteArray &errors) {
                           const QString detail = QString::fromUtf8(code == 0 ? output : errors).trimmed();
-                          status->setText(detail.isEmpty() ? (code == 0 ? QStringLiteral("Supportrapport gemaakt") : QStringLiteral("Maken mislukt")) : detail.section('\n', -1));
+                          status->setText(detail.isEmpty() ? (code == 0 ? tr("Support report created") : tr("Creation failed")) : detail.section('\n', -1));
                       });
         });
-        setCustomContent(page, QStringLiteral("Ondersteuning"), QStringLiteral("Maak een privacyvriendelijk technisch rapport voor EasyComp Zeeland."));
+        setCustomContent(page, tr("Support"), tr("Create a privacy-conscious technical report for EasyComp Zeeland."));
     }
 
     void showRecoveryPage()
@@ -859,17 +859,17 @@ private:
         auto *form = new QFormLayout;
         auto *imagePath = new QLineEdit(m_recoveryImage, page);
         imagePath->setReadOnly(true);
-        imagePath->setPlaceholderText(QStringLiteral("Geen ISO- of IMG-bestand gekozen"));
-        auto *chooseImage = new QPushButton(QStringLiteral("Lokaal bestand kiezen"), page);
+        imagePath->setPlaceholderText(tr("No ISO or IMG selected"));
+        auto *chooseImage = new QPushButton(tr("Select local file"), page);
         auto *imageRow = new QHBoxLayout;
         imageRow->addWidget(imagePath, 1);
         imageRow->addWidget(chooseImage);
-        form->addRow(QStringLiteral("1  Installatiekopie"), imageRow);
+        form->addRow(tr("1  Installation image"), imageRow);
 
         auto *releaseBox = new QComboBox(page);
-        releaseBox->setPlaceholderText(QStringLiteral("Online ECZOS-versies"));
-        auto *catalogButton = new QPushButton(QStringLiteral("Online versies ophalen"), page);
-        auto *downloadButton = new QPushButton(QStringLiteral("Downloaden"), page);
+        releaseBox->setPlaceholderText(tr("Online ECZOS versions"));
+        auto *catalogButton = new QPushButton(tr("Load online versions"), page);
+        auto *downloadButton = new QPushButton(tr("Download"), page);
         downloadButton->setEnabled(false);
         auto *releaseRow = new QHBoxLayout;
         releaseRow->addWidget(releaseBox, 1);
@@ -878,28 +878,28 @@ private:
         form->addRow(QString(), releaseRow);
 
         auto *mode = new QComboBox(page);
-        mode->addItem(QStringLiteral("USB-stick of SD-kaart"), QStringLiteral("disk"));
-        mode->addItem(QStringLiteral("Dvd of blu-ray"), QStringLiteral("dvd"));
-        form->addRow(QStringLiteral("2  Medium"), mode);
+        mode->addItem(tr("USB drive or SD card"), QStringLiteral("disk"));
+        mode->addItem(tr("DVD or Blu-ray"), QStringLiteral("dvd"));
+        form->addRow(tr("2  Media type"), mode);
 
         auto *target = new QComboBox(page);
-        target->setPlaceholderText(QStringLiteral("Kies een verwisselbaar apparaat"));
-        auto *refresh = new QPushButton(QStringLiteral("Vernieuwen"), page);
+        target->setPlaceholderText(tr("Select a removable device"));
+        auto *refresh = new QPushButton(tr("Refresh"), page);
         auto *targetRow = new QHBoxLayout;
         targetRow->addWidget(target, 1);
         targetRow->addWidget(refresh);
-        form->addRow(QStringLiteral("3  Doelapparaat"), targetRow);
+        form->addRow(tr("3  Target device"), targetRow);
         layout->addLayout(form);
 
-        auto *warning = new QLabel(QStringLiteral("⚠  Alle gegevens op het gekozen medium worden gewist. De interne systeemschijf wordt altijd geblokkeerd."), page);
+        auto *warning = new QLabel(tr("⚠  All data on the selected medium will be erased. The internal system drive is always blocked."), page);
         warning->setWordWrap(true);
         warning->setStyleSheet(QStringLiteral("background: #342a16; color: #ffe4a8; border: 1px solid #6d5420; border-radius: 10px; padding: 16px;"));
         layout->addWidget(warning);
         auto *progress = new QProgressBar(page);
         progress->hide();
-        auto *status = new QLabel(QStringLiteral("Klaar om te beginnen"), page);
+        auto *status = new QLabel(tr("Ready to begin"), page);
         status->setWordWrap(true);
-        auto *write = new QPushButton(QStringLiteral("Medium maken"), page);
+        auto *write = new QPushButton(tr("Create media"), page);
         layout->addWidget(progress);
         auto *bottom = new QHBoxLayout;
         bottom->addWidget(status, 1);
@@ -912,7 +912,7 @@ private:
             QProcess lsblk;
             lsblk.start(QStringLiteral("/usr/bin/lsblk"), {QStringLiteral("-Jpo"), QStringLiteral("NAME,TYPE,SIZE,MODEL,TRAN,RM")});
             if (!lsblk.waitForFinished(10000)) {
-                status->setText(QStringLiteral("Apparaten konden niet worden gelezen."));
+                status->setText(tr("Devices could not be read."));
                 return;
             }
             const QJsonArray devices = QJsonDocument::fromJson(lsblk.readAllStandardOutput()).object().value(QStringLiteral("blockdevices")).toArray();
@@ -931,16 +931,16 @@ private:
                 }
                 QString modelName = item.value(QStringLiteral("model")).toString().trimmed();
                 if (modelName.isEmpty()) {
-                    modelName = type == QStringLiteral("rom") ? QStringLiteral("Optisch station") : QStringLiteral("Verwisselbaar medium");
+                    modelName = type == QStringLiteral("rom") ? tr("Optical drive") : tr("Removable medium");
                 }
                 target->addItem(QStringLiteral("%1  •  %2  •  %3").arg(modelName, item.value(QStringLiteral("size")).toString(QStringLiteral("?")), name), name);
             }
-            status->setText(target->count() ? QStringLiteral("Apparaten bijgewerkt") : QStringLiteral("Geen geschikt verwisselbaar medium gevonden."));
+            status->setText(target->count() ? tr("Devices refreshed") : tr("No suitable removable medium found."));
         };
         connect(refresh, &QPushButton::clicked, this, refreshDevices);
         connect(mode, &QComboBox::currentIndexChanged, this, [refreshDevices] { refreshDevices(); });
         connect(chooseImage, &QPushButton::clicked, this, [this, imagePath] {
-            const QString selected = QFileDialog::getOpenFileName(this, QStringLiteral("Kies een ECZOS-installatiekopie"), QString(), QStringLiteral("Installatiekopieën (*.iso *.img)"));
+            const QString selected = QFileDialog::getOpenFileName(this, tr("Select an ECZOS installation image"), QString(), tr("Installation images (*.iso *.img)"));
             if (!selected.isEmpty()) {
                 m_recoveryImage = selected;
                 imagePath->setText(selected);
@@ -957,18 +957,18 @@ private:
                 }
             }
             if (!url.startsWith(QStringLiteral("https://"))) {
-                status->setText(QStringLiteral("De ECZOS-downloadcatalogus is nog niet ingesteld. Kies een lokale ISO."));
+                status->setText(tr("The ECZOS download catalogue is not configured yet. Select a local ISO."));
                 return;
             }
             setTaskFeedback(status, progress);
             startTask(QStringLiteral("recovery-catalog"), QStringLiteral("/usr/bin/curl"),
                       {QStringLiteral("--fail"), QStringLiteral("--silent"), QStringLiteral("--show-error"), QStringLiteral("--location"), QStringLiteral("--proto"), QStringLiteral("=https"), QStringLiteral("--tlsv1.2"), url},
-                      QStringLiteral("Beschikbare ECZOS-versies ophalen…"),
+                      tr("Loading available ECZOS versions…"),
                       [releaseBox, downloadButton, status](int code, const QByteArray &output, const QByteArray &errors) {
                           releaseBox->clear();
                           const QJsonObject catalog = QJsonDocument::fromJson(output).object();
                           if (code != 0 || catalog.value(QStringLiteral("schema")).toInt() != 1) {
-                              status->setText(code == 0 ? QStringLiteral("De downloadcatalogus heeft een ongeldig formaat.") : QString::fromUtf8(errors).trimmed().section('\n', -1));
+                              status->setText(code == 0 ? tr("The download catalogue has an invalid format.") : QString::fromUtf8(errors).trimmed().section('\n', -1));
                               return;
                           }
                           const QRegularExpression checksum(QStringLiteral("^[0-9a-fA-F]{64}$"));
@@ -978,11 +978,11 @@ private:
                               const QString sha = release.value(QStringLiteral("sha256")).toString();
                               const QString version = release.value(QStringLiteral("version")).toVariant().toString();
                               if (!version.isEmpty() && url.startsWith(QStringLiteral("https://")) && checksum.match(sha).hasMatch()) {
-                                  releaseBox->addItem(QStringLiteral("ECZOS %1  •  %2  •  %3").arg(version, release.value(QStringLiteral("channel")).toString(QStringLiteral("release")), release.value(QStringLiteral("published")).toString(QStringLiteral("datum onbekend"))), release);
+                                  releaseBox->addItem(QStringLiteral("ECZOS %1  •  %2  •  %3").arg(version, release.value(QStringLiteral("channel")).toString(QStringLiteral("release")), release.value(QStringLiteral("published")).toString(tr("date unknown"))), release);
                               }
                           }
                           downloadButton->setEnabled(releaseBox->count() > 0);
-                          status->setText(releaseBox->count() ? QStringLiteral("Beschikbare versies bijgewerkt") : QStringLiteral("Er zijn nog geen downloadbare versies."));
+                          status->setText(releaseBox->count() ? tr("Available versions refreshed") : tr("No downloadable versions are available yet."));
                       });
         });
         connect(downloadButton, &QPushButton::clicked, this, [this, releaseBox, imagePath, status, progress] {
@@ -1001,7 +1001,7 @@ private:
             setTaskFeedback(status, progress);
             startTask(QStringLiteral("recovery-download"), QStringLiteral("/usr/bin/curl"),
                       {QStringLiteral("--fail"), QStringLiteral("--location"), QStringLiteral("--proto"), QStringLiteral("=https"), QStringLiteral("--tlsv1.2"), QStringLiteral("--output"), partPath, release.value(QStringLiteral("url")).toString()},
-                      QStringLiteral("ECZOS %1 downloaden…").arg(version),
+                      tr("Downloading ECZOS %1…").arg(version),
                       [this, partPath, finalPath, expected = release.value(QStringLiteral("sha256")).toString().toLower(), imagePath, status, progress](int code, const QByteArray &, const QByteArray &errors) {
                           if (code != 0) {
                               QFile::remove(partPath);
@@ -1009,45 +1009,45 @@ private:
                               return;
                           }
                           setTaskFeedback(status, progress);
-                          startTask(QStringLiteral("recovery-verify"), QStringLiteral("/usr/bin/sha256sum"), {partPath}, QStringLiteral("Download veilig controleren…"),
+                          startTask(QStringLiteral("recovery-verify"), QStringLiteral("/usr/bin/sha256sum"), {partPath}, tr("Verifying download…"),
                                     [this, partPath, finalPath, expected, imagePath, status](int verifyCode, const QByteArray &output, const QByteArray &) {
                                         const QString actual = QString::fromUtf8(output).section(' ', 0, 0).trimmed().toLower();
                                         if (verifyCode != 0 || actual != expected) {
                                             QFile::remove(partPath);
-                                            status->setText(QStringLiteral("De veiligheidscontrole van de download is mislukt."));
+                                            status->setText(tr("The download verification failed."));
                                             return;
                                         }
                                         QFile::remove(finalPath);
                                         if (!QFile::rename(partPath, finalPath)) {
-                                            status->setText(QStringLiteral("De installatiekopie kon niet worden opgeslagen."));
+                                            status->setText(tr("The installation image could not be saved."));
                                             return;
                                         }
                                         m_recoveryImage = finalPath;
                                         imagePath->setText(finalPath);
-                                        status->setText(QStringLiteral("Installatiekopie gedownload en gecontroleerd"));
+                                        status->setText(tr("Installation image downloaded and verified"));
                                     });
                       });
         });
         connect(write, &QPushButton::clicked, this, [this, imagePath, mode, target, status, progress] {
             if (imagePath->text().isEmpty() || target->currentData().toString().isEmpty()) {
-                status->setText(QStringLiteral("Kies eerst een installatiekopie en doelapparaat."));
+                status->setText(tr("Select an installation image and target device first."));
                 return;
             }
-            if (QMessageBox::warning(this, QStringLiteral("Medium volledig wissen?"),
-                                     QStringLiteral("Alle gegevens op %1 worden gewist. Dit kan niet ongedaan worden gemaakt.").arg(target->currentText()),
+            if (QMessageBox::warning(this, tr("Erase the entire medium?"),
+                                     tr("All data on %1 will be erased. This cannot be undone.").arg(target->currentText()),
                                      QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) != QMessageBox::Ok) {
                 return;
             }
             setTaskFeedback(status, progress);
             startTask(QStringLiteral("recovery-write"), QStringLiteral("/usr/bin/pkexec"),
                       {QStringLiteral("/usr/lib/eczos-recovery-media/write-media"), mode->currentData().toString(), imagePath->text(), target->currentData().toString(), QStringLiteral("--json-progress")},
-                      QStringLiteral("Herstelmedium voorbereiden…"),
+                      tr("Preparing recovery media…"),
                       [status](int code, const QByteArray &, const QByteArray &errors) {
-                          status->setText(code == 0 ? QStringLiteral("Klaar. Het herstelmedium kan veilig worden verwijderd.")
+                          status->setText(code == 0 ? tr("Done. The recovery medium can be removed safely.")
                                                     : QString::fromUtf8(errors).trimmed().section('\n', -1));
                       });
         });
-        setCustomContent(page, QStringLiteral("Herstelmedium maken"), QStringLiteral("Schrijf een ECZOS-installatiekopie naar USB, SD-kaart of een optische schijf met zichtbare voortgang."));
+        setCustomContent(page, tr("Create recovery media"), tr("Write an ECZOS installation image to USB, SD card or optical media with visible progress."));
         refreshDevices();
     }
 
@@ -1077,15 +1077,15 @@ private:
     {
         auto *landing = new QWidget;
         auto *layout = new QVBoxLayout(landing);
-        auto *intro = new QLabel(QStringLiteral("Alle %1 geïnstalleerde systeemonderdelen zijn vanuit de zijbalk bereikbaar.").arg(m_modules.size()), landing);
+        auto *intro = new QLabel(tr("All %1 installed system modules are available from the sidebar.").arg(m_modules.size()), landing);
         intro->setWordWrap(true);
         intro->setStyleSheet(QStringLiteral("font-size: 18px; font-weight: 600; margin: 12px;"));
         layout->addWidget(intro);
         auto *images = new QHBoxLayout;
         const QList<QPair<QString, QString>> cards = {
-            {QStringLiteral("Uiterlijk"), QStringLiteral("system-appearance.png")},
-            {QStringLiteral("Beeldschermen"), QStringLiteral("system-display.png")},
-            {QStringLiteral("Netwerk"), QStringLiteral("system-network.png")},
+            {tr("Appearance"), QStringLiteral("system-appearance.png")},
+            {tr("Displays"), QStringLiteral("system-display.png")},
+            {tr("Network"), QStringLiteral("system-network.png")},
         };
         for (const auto &[title, file] : cards) {
             auto *column = new QVBoxLayout;
@@ -1113,8 +1113,8 @@ private:
         }
         const QMessageBox::StandardButton answer = QMessageBox::warning(
             this,
-            QStringLiteral("Wijzigingen opslaan?"),
-            QStringLiteral("Dit onderdeel bevat wijzigingen die nog niet zijn opgeslagen."),
+            tr("Save changes?"),
+            tr("This module contains changes that have not been saved yet."),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
             QMessageBox::Save);
         if (answer == QMessageBox::Cancel) {

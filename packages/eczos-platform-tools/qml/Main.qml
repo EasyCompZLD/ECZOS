@@ -243,14 +243,14 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter
                 }
                 Item { Layout.preferredHeight: 13 }
-                NavButton { routeName: "settings"; symbol: "⌂"; text: "Instellingen" }
-                NavButton { routeName: "system"; symbol: "⚙"; text: "Systeeminstellingen" }
-                NavButton { routeName: "windows"; symbol: "▦"; text: "Windows-apps" }
-                NavButton { routeName: "gaming"; symbol: "◆"; text: "Gaming" }
-                NavButton { routeName: "migration"; symbol: "⇢"; text: "Bestanden overzetten" }
-                NavButton { routeName: "diagnostics"; symbol: "✓"; text: "Diagnose" }
-                NavButton { routeName: "recovery"; symbol: "↻"; text: "Herstelmedium" }
-                NavButton { routeName: "support"; symbol: "?"; text: "Ondersteuning" }
+                NavButton { routeName: "settings"; symbol: "⌂"; text: qsTr("Settings") }
+                NavButton { routeName: "system"; symbol: "⚙"; text: qsTr("System settings") }
+                NavButton { routeName: "windows"; symbol: "▦"; text: qsTr("Windows apps") }
+                NavButton { routeName: "gaming"; symbol: "◆"; text: qsTr("Gaming") }
+                NavButton { routeName: "migration"; symbol: "⇢"; text: qsTr("Transfer files") }
+                NavButton { routeName: "diagnostics"; symbol: "✓"; text: qsTr("Diagnostics") }
+                NavButton { routeName: "recovery"; symbol: "↻"; text: qsTr("Recovery media") }
+                NavButton { routeName: "support"; symbol: "?"; text: qsTr("Support") }
                 Item { Layout.fillHeight: true }
                 Text { text: "EasyComp Zeeland\nOperating System"; color: "#6f8da2"; font.pixelSize: 11; lineHeight: 1.25 }
             }
@@ -275,20 +275,20 @@ ApplicationWindow {
             ColumnLayout {
                 width: parent.width; spacing: 20
                 anchors.margins: 34
-                PageHeading { heading: "Alles voor je computer"; subtitle: "Duidelijke snelkoppelingen naar apps, apparaten, back-ups, herstel en ondersteuning." }
+                PageHeading { heading: qsTr("Everything for your computer"); subtitle: qsTr("Clear shortcuts to apps, devices, backups, recovery and support.") }
                 GridLayout {
                     Layout.fillWidth: true; columns: width > 760 ? 3 : 2; columnSpacing: 14; rowSpacing: 14
-                    ActionCard { Layout.fillWidth: true; heading: "Apps"; description: "Programma’s installeren en bijwerken"; symbol: "+"; onActivated: backend.launch("apps") }
-                    ActionCard { Layout.fillWidth: true; heading: "Windows-apps"; description: "Geïnstalleerde Windows-programma’s beheren"; symbol: "▦"; onActivated: backend.navigate("windows") }
-                    ActionCard { Layout.fillWidth: true; heading: "Gaming"; description: "Steam en game-ondersteuning controleren"; symbol: "◆"; onActivated: backend.navigate("gaming") }
-                    ActionCard { Layout.fillWidth: true; heading: "Systeeminstellingen"; description: "Uiterlijk, scherm, geluid, netwerk en alle apparaten"; symbol: "⚙"; onActivated: backend.navigate("system") }
-                    ActionCard { Layout.fillWidth: true; heading: "Back-up"; description: "Persoonlijke bestanden beschermen"; symbol: "◴"; onActivated: backend.launch("backup") }
-                    ActionCard { Layout.fillWidth: true; heading: "Herstelmedium"; description: "Een opstartbare USB, SD-kaart of dvd maken"; symbol: "↻"; onActivated: backend.navigate("recovery") }
-                    ActionCard { Layout.fillWidth: true; heading: "Telefoon"; description: "Je telefoon met ECZOS verbinden"; symbol: "▯"; onActivated: backend.launch("phone") }
-                    ActionCard { Layout.fillWidth: true; heading: "Overstappen"; description: "Bestanden uit een Windows-profiel meenemen"; symbol: "⇢"; onActivated: backend.navigate("migration") }
-                    ActionCard { Layout.fillWidth: true; heading: "Diagnose"; description: "Belangrijke onderdelen snel controleren"; symbol: "✓"; onActivated: backend.navigate("diagnostics") }
-                    ActionCard { Layout.fillWidth: true; heading: "Ondersteuning"; description: "Een privacyvriendelijk supportrapport maken"; symbol: "?"; onActivated: backend.navigate("support") }
-                    ActionCard { Layout.fillWidth: true; heading: "Over deze computer"; description: "Hardware en systeeminformatie bekijken"; symbol: "i"; onActivated: backend.launch("about") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Apps"); description: qsTr("Install and update applications"); symbol: "+"; onActivated: backend.launch("apps") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Windows apps"); description: qsTr("Manage installed Windows programs"); symbol: "▦"; onActivated: backend.navigate("windows") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Gaming"); description: qsTr("Check Steam and gaming support"); symbol: "◆"; onActivated: backend.navigate("gaming") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("System settings"); description: qsTr("Appearance, displays, sound, network and devices"); symbol: "⚙"; onActivated: backend.navigate("system") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Backup"); description: qsTr("Protect your personal files"); symbol: "◴"; onActivated: backend.launch("backup") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Recovery media"); description: qsTr("Create a bootable USB drive, SD card or DVD"); symbol: "↻"; onActivated: backend.navigate("recovery") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Phone"); description: qsTr("Connect your phone to ECZOS"); symbol: "▯"; onActivated: backend.launch("phone") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Migration"); description: qsTr("Bring files over from a Windows profile"); symbol: "⇢"; onActivated: backend.navigate("migration") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Diagnostics"); description: qsTr("Quickly check important components"); symbol: "✓"; onActivated: backend.navigate("diagnostics") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("Support"); description: qsTr("Create a privacy-conscious support report"); symbol: "?"; onActivated: backend.navigate("support") }
+                    ActionCard { Layout.fillWidth: true; heading: qsTr("About this computer"); description: qsTr("View hardware and system information"); symbol: "i"; onActivated: backend.launch("about") }
                 }
                 Item { Layout.preferredHeight: 30 }
             }
@@ -306,13 +306,13 @@ ApplicationWindow {
                 anchors.fill: parent; anchors.margins: 34; spacing: 18
                 RowLayout {
                     Layout.fillWidth: true
-                    PageHeading { Layout.fillWidth: true; heading: "Systeeminstellingen"; subtitle: "Alle aanwezige KDE-instellingen, gegroepeerd en doorzoekbaar vanuit ECZOS." }
-                    FlatButton { text: "Onderdelen vernieuwen"; onClicked: backend.refresh("system") }
+                    PageHeading { Layout.fillWidth: true; heading: qsTr("System settings"); subtitle: qsTr("All available KDE settings, grouped and searchable from ECZOS.") }
+                    FlatButton { text: qsTr("Refresh modules"); onClicked: backend.refresh("system") }
                 }
                 TextField {
                     id: systemSearch
                     Layout.fillWidth: true; implicitHeight: 46
-                    placeholderText: "Zoek bijvoorbeeld scherm, muis, wifi, uiterlijk of gebruikers…"
+                    placeholderText: qsTr("Search for displays, mouse, Wi-Fi, appearance or users…")
                     color: root.textPrimary; placeholderTextColor: root.textMuted
                     leftPadding: 15; rightPadding: 15; font.pixelSize: 14
                     background: Rectangle { radius: 10; color: root.panelRaised; border.color: systemSearch.activeFocus ? root.accent : root.border }
@@ -321,27 +321,27 @@ ApplicationWindow {
                     Layout.fillWidth: true; columns: 3; columnSpacing: 12
                     VisualModuleCard {
                         Layout.fillWidth: true
-                        heading: "Uiterlijk"
-                        description: "Thema, kleuren, pictogrammen en lettertypen"
+                        heading: qsTr("Appearance")
+                        description: qsTr("Theme, colours, icons and fonts")
                         imageSource: "file:///usr/share/eczos/branding/screenshots/system-appearance.png"
                         moduleId: "kcm_lookandfeel"
                     }
                     VisualModuleCard {
                         Layout.fillWidth: true
-                        heading: "Beeldschermen"
-                        description: "Resolutie, positie, schaal en vernieuwingsfrequentie"
+                        heading: qsTr("Displays")
+                        description: qsTr("Resolution, position, scale and refresh rate")
                         imageSource: "file:///usr/share/eczos/branding/screenshots/system-display.png"
                         moduleId: "kcm_kscreen"
                     }
                     VisualModuleCard {
                         Layout.fillWidth: true
-                        heading: "Netwerk"
-                        description: "Wifi, kabelverbindingen, IP en beveiliging"
+                        heading: qsTr("Network")
+                        description: qsTr("Wi-Fi, wired connections, IP and security")
                         imageSource: "file:///usr/share/eczos/branding/screenshots/system-network.png"
                         moduleId: "kcm_networkmanagement"
                     }
                 }
-                Text { text: filteredModules.length + " van " + systemModules.length + " onderdelen"; color: root.textMuted; font.pixelSize: 13 }
+                Text { text: qsTr("%1 of %2 modules").arg(filteredModules.length).arg(systemModules.length); color: root.textMuted; font.pixelSize: 13 }
                 ScrollView {
                     Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentWidth: availableWidth
                     GridLayout {
@@ -368,7 +368,7 @@ ApplicationWindow {
                 RowLayout {
                     Layout.fillWidth: true
                     Text { Layout.fillWidth: true; text: backend.status; color: root.textMuted; font.pixelSize: 13 }
-                    FlatButton { text: "KDE-overzicht openen"; onClicked: backend.launch("devices") }
+                    FlatButton { text: qsTr("Open KDE overview"); onClicked: backend.launch("devices") }
                 }
             }
         }
@@ -382,19 +382,19 @@ ApplicationWindow {
                 width: parent.width; spacing: 20; anchors.margins: 34
                 RowLayout {
                     Layout.fillWidth: true
-                    PageHeading { Layout.fillWidth: true; heading: "Diagnose"; subtitle: "Een overzicht in gewone taal. Deze controle verandert niets aan je computer." }
-                    FlatButton { text: "Opnieuw controleren"; onClicked: backend.refresh("diagnostics") }
+                    PageHeading { Layout.fillWidth: true; heading: qsTr("Diagnostics"); subtitle: qsTr("A plain-language overview. This check does not change your computer.") }
+                    FlatButton { text: qsTr("Check again"); onClicked: backend.refresh("diagnostics") }
                 }
                 GridLayout {
                     Layout.fillWidth: true; columns: width > 700 ? 2 : 1; columnSpacing: 14; rowSpacing: 14
-                    StatusCard { Layout.fillWidth: true; heading: "Windows-apps"; okay: diagnostics.windows === true; detail: yesNo(okay) }
-                    StatusCard { Layout.fillWidth: true; heading: "Gaming"; okay: diagnostics.gaming === "ready"; detail: diagnostics.gaming === "ready" ? "Klaar voor Proton-games" : "Controleer de gamingpagina" }
-                    StatusCard { Layout.fillWidth: true; heading: "Apps en Flatpak"; okay: diagnostics.applications && diagnostics.applications.discover && diagnostics.applications.flatpak; detail: yesNo(okay) }
-                    StatusCard { Layout.fillWidth: true; heading: "Back-up"; okay: diagnostics.backup === true; detail: yesNo(okay) }
-                    StatusCard { Layout.fillWidth: true; heading: "Telefoonkoppeling"; okay: diagnostics.phone === true; detail: yesNo(okay) }
-                    StatusCard { Layout.fillWidth: true; heading: "Printers en scanners"; okay: diagnostics.devices && diagnostics.devices.printer && diagnostics.devices.scanner; detail: yesNo(okay) }
-                    StatusCard { Layout.fillWidth: true; heading: "Systeemdiensten"; okay: Number(diagnostics.failedUnits || 0) === 0; detail: okay ? "Geen fouten gevonden" : diagnostics.failedUnits + " dienst(en) vragen aandacht" }
-                    StatusCard { Layout.fillWidth: true; heading: "FreeOffice"; okay: diagnostics.office === "installed"; detail: okay ? "Geïnstalleerd" : "Niet geïnstalleerd" }
+                    StatusCard { Layout.fillWidth: true; heading: qsTr("Windows apps"); okay: diagnostics.windows === true; detail: yesNo(okay) }
+                    StatusCard { Layout.fillWidth: true; heading: qsTr("Gaming"); okay: diagnostics.gaming === "ready"; detail: diagnostics.gaming === "ready" ? qsTr("Ready for Proton games") : qsTr("Check the Gaming page") }
+                    StatusCard { Layout.fillWidth: true; heading: qsTr("Apps and Flatpak"); okay: diagnostics.applications && diagnostics.applications.discover && diagnostics.applications.flatpak; detail: yesNo(okay) }
+                    StatusCard { Layout.fillWidth: true; heading: qsTr("Backup"); okay: diagnostics.backup === true; detail: yesNo(okay) }
+                    StatusCard { Layout.fillWidth: true; heading: qsTr("Phone connection"); okay: diagnostics.phone === true; detail: yesNo(okay) }
+                    StatusCard { Layout.fillWidth: true; heading: qsTr("Printers and scanners"); okay: diagnostics.devices && diagnostics.devices.printer && diagnostics.devices.scanner; detail: yesNo(okay) }
+                    StatusCard { Layout.fillWidth: true; heading: qsTr("System services"); okay: Number(diagnostics.failedUnits || 0) === 0; detail: okay ? qsTr("No errors found") : qsTr("%1 service(s) need attention").arg(diagnostics.failedUnits) }
+                    StatusCard { Layout.fillWidth: true; heading: "FreeOffice"; okay: diagnostics.office === "installed"; detail: okay ? qsTr("Installed") : qsTr("Not installed") }
                 }
                 BusyIndicator { running: backend.busy; visible: running; Layout.alignment: Qt.AlignHCenter }
             }
@@ -409,8 +409,8 @@ ApplicationWindow {
                 width: parent.width; spacing: 20; anchors.margins: 34
                 RowLayout {
                     Layout.fillWidth: true
-                    PageHeading { Layout.fillWidth: true; heading: "ECZ Gaming"; subtitle: "In één oogopslag zien of deze computer klaar is voor Steam en Windows-games." }
-                    FlatButton { text: "Steam openen"; primary: true; onClicked: backend.launch("steam") }
+                    PageHeading { Layout.fillWidth: true; heading: "ECZ Gaming"; subtitle: qsTr("See at a glance whether this computer is ready for Steam and Windows games.") }
+                    FlatButton { text: qsTr("Open Steam"); primary: true; onClicked: backend.launch("steam") }
                 }
                 Rectangle {
                     Layout.fillWidth: true; implicitHeight: 150; radius: 16
@@ -418,20 +418,20 @@ ApplicationWindow {
                     border.color: gaming.verdict === "ready" ? root.good : root.warning
                     ColumnLayout {
                         anchors.fill: parent; anchors.margins: 22; spacing: 9
-                        Text { text: gaming.verdict === "ready" ? "Klaar om te spelen" : "Controle nodig"; color: root.textPrimary; font.pixelSize: 25; font.weight: Font.Bold }
-                        Text { text: gaming.summary || "De hardwarecontrole wordt uitgevoerd…"; color: root.textMuted; font.pixelSize: 15; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                        Text { text: gaming.verdict === "ready" ? qsTr("Ready to play") : qsTr("Check required"); color: root.textPrimary; font.pixelSize: 25; font.weight: Font.Bold }
+                        Text { text: gaming.summary || qsTr("Checking the hardware…"); color: root.textMuted; font.pixelSize: 15; wrapMode: Text.Wrap; Layout.fillWidth: true }
                     }
                 }
-                StatusCard { Layout.fillWidth: true; heading: "Grafische kaart"; okay: gaming.vulkan && gaming.vulkan.hardware; detail: gaming.gpu || "Wordt gecontroleerd…" }
-                StatusCard { Layout.fillWidth: true; heading: "32-bit Vulkan-driver"; okay: gaming.vulkan && gaming.vulkan.driver32Bit; detail: okay ? "Aanwezig voor oudere en Windows-games" : "Ontbreekt" }
-                StatusCard { Layout.fillWidth: true; heading: "UMU/Proton-ondersteuning"; okay: gaming.runtime && gaming.runtime.umu; detail: okay ? "Geïnstalleerd" : "Ontbreekt" }
-                StatusCard { Layout.fillWidth: true; heading: "GameMode"; okay: gaming.runtime && gaming.runtime.gameMode; detail: okay ? "Geïnstalleerd" : "Ontbreekt" }
+                StatusCard { Layout.fillWidth: true; heading: qsTr("Graphics card"); okay: gaming.vulkan && gaming.vulkan.hardware; detail: gaming.gpu || qsTr("Checking…") }
+                StatusCard { Layout.fillWidth: true; heading: qsTr("32-bit Vulkan driver"); okay: gaming.vulkan && gaming.vulkan.driver32Bit; detail: okay ? qsTr("Available for older and Windows games") : qsTr("Missing") }
+                StatusCard { Layout.fillWidth: true; heading: qsTr("UMU/Proton support"); okay: gaming.runtime && gaming.runtime.umu; detail: okay ? qsTr("Installed") : qsTr("Missing") }
+                StatusCard { Layout.fillWidth: true; heading: "GameMode"; okay: gaming.runtime && gaming.runtime.gameMode; detail: okay ? qsTr("Installed") : qsTr("Missing") }
                 ProgressBar { Layout.fillWidth: true; from: 0; to: 1; value: backend.progress; visible: backend.busy && backend.progress > 0 }
                 Text { Layout.fillWidth: true; visible: backend.status.length > 0; text: backend.status; color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap }
                 RowLayout {
                     Layout.fillWidth: true
-                    FlatButton { text: "Ontbrekende onderdelen installeren"; primary: true; visible: gaming.verdict === "setup-required"; enabled: !backend.busy; onClicked: backend.repairGaming() }
-                    FlatButton { text: "Opnieuw controleren"; onClicked: backend.refresh("gaming") }
+                    FlatButton { text: qsTr("Install missing components"); primary: true; visible: gaming.verdict === "setup-required"; enabled: !backend.busy; onClicked: backend.repairGaming() }
+                    FlatButton { text: qsTr("Check again"); onClicked: backend.refresh("gaming") }
                     Item { Layout.fillWidth: true }
                 }
             }
@@ -446,15 +446,15 @@ ApplicationWindow {
                 width: parent.width; spacing: 20; anchors.margins: 34
                 RowLayout {
                     Layout.fillWidth: true
-                    PageHeading { Layout.fillWidth: true; heading: "Windows-apps"; subtitle: "Windows-programma’s die ECZOS apart en veilig voor je beheert." }
-                    FlatButton { text: "Lijst bijwerken"; onClicked: backend.refresh("windows") }
+                    PageHeading { Layout.fillWidth: true; heading: qsTr("Windows apps"); subtitle: qsTr("Windows programs that ECZOS manages separately and safely for you.") }
+                    FlatButton { text: qsTr("Refresh list"); onClicked: backend.refresh("windows") }
                 }
                 Rectangle {
                     visible: windowsApps.length === 0 && !backend.busy
                     Layout.fillWidth: true; implicitHeight: 150; radius: 14; color: root.panelRaised; border.color: root.border
                     ColumnLayout { anchors.centerIn: parent; spacing: 8
-                        Text { Layout.alignment: Qt.AlignHCenter; text: "Nog geen Windows-apps"; color: root.textPrimary; font.pixelSize: 20; font.weight: Font.DemiBold }
-                        Text { text: "Open een .exe- of .msi-bestand om een app toe te voegen."; color: root.textMuted; font.pixelSize: 14 }
+                        Text { Layout.alignment: Qt.AlignHCenter; text: qsTr("No Windows apps yet"); color: root.textPrimary; font.pixelSize: 20; font.weight: Font.DemiBold }
+                        Text { text: qsTr("Open an .exe or .msi file to add an app."); color: root.textMuted; font.pixelSize: 14 }
                     }
                 }
                 Repeater {
@@ -467,12 +467,12 @@ ApplicationWindow {
                             Rectangle { width: 48; height: 48; radius: 12; color: "#183d54"; Text { anchors.centerIn: parent; text: "▦"; color: root.accent; font.pixelSize: 23 } }
                             ColumnLayout { Layout.fillWidth: true; spacing: 5
                                 Text { text: modelData.name || modelData.id; color: root.textPrimary; font.pixelSize: 17; font.weight: Font.DemiBold }
-                                Text { text: modelData.status === "installed" ? "Geïnstalleerd en klaar" : "Status: " + modelData.status; color: modelData.status === "installed" ? root.good : root.warning; font.pixelSize: 13 }
+                                Text { text: modelData.status === "installed" ? qsTr("Installed and ready") : qsTr("Status: %1").arg(modelData.status); color: modelData.status === "installed" ? root.good : root.warning; font.pixelSize: 13 }
                             }
-                            FlatButton { text: "Starten"; primary: true; enabled: modelData.status === "installed"; onClicked: backend.windowsAction(modelData.id, "run") }
-                            FlatButton { text: "Opnieuw zoeken"; onClicked: backend.windowsAction(modelData.id, "rescan") }
-                            FlatButton { text: "Herstellen"; onClicked: backend.windowsAction(modelData.id, "repair") }
-                            FlatButton { text: "Verwijderen"; onClicked: { removeDialog.appId = modelData.id; removeDialog.appName = modelData.name || modelData.id; removeDialog.open() } }
+                            FlatButton { text: qsTr("Start"); primary: true; enabled: modelData.status === "installed"; onClicked: backend.windowsAction(modelData.id, "run") }
+                            FlatButton { text: qsTr("Search again"); onClicked: backend.windowsAction(modelData.id, "rescan") }
+                            FlatButton { text: qsTr("Repair"); onClicked: backend.windowsAction(modelData.id, "repair") }
+                            FlatButton { text: qsTr("Remove"); onClicked: { removeDialog.appId = modelData.id; removeDialog.appName = modelData.name || modelData.id; removeDialog.open() } }
                         }
                     }
                 }
@@ -481,10 +481,10 @@ ApplicationWindow {
                 id: removeDialog
                 property string appId
                 property string appName
-                anchors.centerIn: parent; modal: true; title: "Windows-app verwijderen"
+                anchors.centerIn: parent; modal: true; title: qsTr("Remove Windows app")
                 standardButtons: Dialog.Cancel | Dialog.Ok
                 onAccepted: backend.windowsAction(appId, "remove")
-                Label { text: "‘" + removeDialog.appName + "’ en de aparte Windows-omgeving worden verwijderd."; wrapMode: Text.Wrap; width: 420 }
+                Label { text: qsTr("‘%1’ and its separate Windows environment will be removed.").arg(removeDialog.appName); wrapMode: Text.Wrap; width: 420 }
             }
         }
     }
@@ -494,29 +494,29 @@ ApplicationWindow {
         Item {
             ColumnLayout {
                 anchors.fill: parent; anchors.margins: 34; spacing: 22
-                PageHeading { heading: "Bestanden overzetten"; subtitle: "Neem documenten, foto’s, muziek en andere persoonlijke bestanden mee uit een Windows-profiel. Bestaande bestanden worden niet overschreven." }
+                PageHeading { heading: qsTr("Transfer files"); subtitle: qsTr("Bring documents, photos, music and other personal files over from a Windows profile. Existing files are not overwritten.") }
                 Rectangle {
                     Layout.fillWidth: true; implicitHeight: 150; radius: 14; color: root.panelRaised; border.color: root.border
                     RowLayout { anchors.fill: parent; anchors.margins: 20; spacing: 18
                         Rectangle { width: 54; height: 54; radius: 14; color: "#183d54"; Text { anchors.centerIn: parent; text: "⇢"; color: root.accent; font.pixelSize: 25 } }
                         ColumnLayout { Layout.fillWidth: true; spacing: 7
-                            Text { text: migrationSource ? fileName(migrationSource) : "Nog geen Windows-gebruikersmap gekozen"; color: root.textPrimary; font.pixelSize: 17; font.weight: Font.DemiBold }
-                            Text { text: migrationSource || "Kies bijvoorbeeld de map C:\\Users\\jouwnaam op een aangekoppelde Windows-schijf."; color: root.textMuted; font.pixelSize: 13; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            Text { text: migrationSource ? fileName(migrationSource) : qsTr("No Windows user folder selected yet"); color: root.textPrimary; font.pixelSize: 17; font.weight: Font.DemiBold }
+                            Text { text: migrationSource || qsTr("For example, select %1 on a mounted Windows drive.").arg("C:\\Users\\yourname"); color: root.textMuted; font.pixelSize: 13; wrapMode: Text.Wrap; Layout.fillWidth: true }
                         }
-                        FlatButton { text: "Map kiezen"; primary: true; onClicked: migrationFolder.open() }
+                        FlatButton { text: qsTr("Select folder"); primary: true; onClicked: migrationFolder.open() }
                     }
                 }
                 RowLayout {
                     spacing: 12
-                    FlatButton { text: "Eerst bekijken"; enabled: migrationSource && !backend.busy; onClicked: backend.migrate(migrationSource, false) }
-                    FlatButton { text: "Bestanden overzetten"; primary: true; enabled: migrationSource && !backend.busy; onClicked: migrateConfirm.open() }
+                    FlatButton { text: qsTr("Preview first"); enabled: migrationSource && !backend.busy; onClicked: backend.migrate(migrationSource, false) }
+                    FlatButton { text: qsTr("Transfer files"); primary: true; enabled: migrationSource && !backend.busy; onClicked: migrateConfirm.open() }
                 }
                 Text { visible: backend.status; text: backend.status; color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
                 BusyIndicator { running: backend.busy; visible: running }
                 Item { Layout.fillHeight: true }
             }
-            FolderDialog { id: migrationFolder; title: "Kies de Windows-gebruikersmap"; onAccepted: migrationSource = selectedFolder.toString() }
-            Dialog { id: migrateConfirm; anchors.centerIn: parent; modal: true; title: "Bestanden overzetten"; standardButtons: Dialog.Cancel | Dialog.Ok; onAccepted: backend.migrate(migrationSource, true); Label { width: 420; wrapMode: Text.Wrap; text: "ECZOS kopieert bekende persoonlijke mappen. Bestaande bestanden blijven behouden. Doorgaan?" } }
+            FolderDialog { id: migrationFolder; title: qsTr("Select the Windows user folder"); onAccepted: migrationSource = selectedFolder.toString() }
+            Dialog { id: migrateConfirm; anchors.centerIn: parent; modal: true; title: qsTr("Transfer files"); standardButtons: Dialog.Cancel | Dialog.Ok; onAccepted: backend.migrate(migrationSource, true); Label { width: 420; wrapMode: Text.Wrap; text: qsTr("ECZOS copies known personal folders. Existing files are preserved. Continue?") } }
         }
     }
 
@@ -525,30 +525,30 @@ ApplicationWindow {
         Item {
             ColumnLayout {
                 anchors.fill: parent; anchors.margins: 34; spacing: 20
-                PageHeading { heading: "Herstelmedium maken"; subtitle: "Schrijf een ECZOS-installatiekopie naar een USB-stick, SD-kaart of dvd. De voortgang blijft gewoon in dit venster zichtbaar." }
+                PageHeading { heading: qsTr("Create recovery media"); subtitle: qsTr("Write an ECZOS installation image to a USB drive, SD card or DVD. Progress remains visible in this window.") }
                 GridLayout {
                     Layout.fillWidth: true; columns: 2; columnSpacing: 14; rowSpacing: 14
-                    Label { text: "1  Installatiekopie"; color: root.textPrimary; font.pixelSize: 15; font.weight: Font.DemiBold }
+                    Label { text: qsTr("1  Installation image"); color: root.textPrimary; font.pixelSize: 15; font.weight: Font.DemiBold }
                     ColumnLayout {
                         Layout.fillWidth: true; spacing: 9
                         RowLayout { Layout.fillWidth: true
-                            Text { Layout.fillWidth: true; text: recoveryImage ? fileName(recoveryImage) : "Geen ISO of IMG gekozen"; color: root.textMuted; elide: Text.ElideMiddle }
-                            FlatButton { text: "Lokaal bestand kiezen"; onClicked: recoveryFile.open() }
+                            Text { Layout.fillWidth: true; text: recoveryImage ? fileName(recoveryImage) : qsTr("No ISO or IMG selected"); color: root.textMuted; elide: Text.ElideMiddle }
+                            FlatButton { text: qsTr("Select local file"); onClicked: recoveryFile.open() }
                         }
                         RowLayout { Layout.fillWidth: true
-                            DarkComboBox { id: releaseBox; Layout.fillWidth: true; emptyText: "Haal eerst de beschikbare ECZOS-versies op"; model: recoveryReleases; textRole: "label"; valueRole: "version" }
-                            FlatButton { text: recoveryReleases.length ? "Downloaden" : "Online versies ophalen"; onClicked: { if (recoveryReleases.length && releaseBox.currentIndex >= 0) { const item = recoveryReleases[releaseBox.currentIndex]; backend.downloadRecovery(item.version, item.url, item.sha256) } else backend.loadRecoveryCatalog() } }
+                            DarkComboBox { id: releaseBox; Layout.fillWidth: true; emptyText: qsTr("Load the available ECZOS versions first"); model: recoveryReleases; textRole: "label"; valueRole: "version" }
+                            FlatButton { text: recoveryReleases.length ? qsTr("Download") : qsTr("Load online versions"); onClicked: { if (recoveryReleases.length && releaseBox.currentIndex >= 0) { const item = recoveryReleases[releaseBox.currentIndex]; backend.downloadRecovery(item.version, item.url, item.sha256) } else backend.loadRecoveryCatalog() } }
                         }
                     }
-                    Label { text: "2  Medium"; color: root.textPrimary; font.pixelSize: 15; font.weight: Font.DemiBold }
+                    Label { text: qsTr("2  Media type"); color: root.textPrimary; font.pixelSize: 15; font.weight: Font.DemiBold }
                     RowLayout {
-                        ChoiceRadio { text: "USB-stick of SD-kaart"; checked: recoveryMode === "disk"; onClicked: { recoveryMode = "disk"; backend.refresh("recovery") } }
-                        ChoiceRadio { text: "Dvd of blu-ray"; checked: recoveryMode === "dvd"; onClicked: { recoveryMode = "dvd"; backend.refresh("recovery") } }
+                        ChoiceRadio { text: qsTr("USB drive or SD card"); checked: recoveryMode === "disk"; onClicked: { recoveryMode = "disk"; backend.refresh("recovery") } }
+                        ChoiceRadio { text: qsTr("DVD or Blu-ray"); checked: recoveryMode === "dvd"; onClicked: { recoveryMode = "dvd"; backend.refresh("recovery") } }
                     }
-                    Label { text: "3  Doelapparaat"; color: root.textPrimary; font.pixelSize: 15; font.weight: Font.DemiBold }
+                    Label { text: qsTr("3  Target device"); color: root.textPrimary; font.pixelSize: 15; font.weight: Font.DemiBold }
                     RowLayout { Layout.fillWidth: true
                         DarkComboBox { id: targetBox; Layout.fillWidth: true; model: recoveryDevices.filter(function(d) { return recoveryMode === "dvd" ? d.type === "rom" : d.type === "disk" }); textRole: "label"; valueRole: "name" }
-                        FlatButton { text: "Vernieuwen"; onClicked: backend.refresh("recovery") }
+                        FlatButton { text: qsTr("Refresh"); onClicked: backend.refresh("recovery") }
                     }
                 }
                 Rectangle {
@@ -556,22 +556,22 @@ ApplicationWindow {
                     color: "#342a16"; border.color: "#6d5420"
                     RowLayout { anchors.fill: parent; anchors.margins: 17; spacing: 14
                         Text { text: "!"; color: root.warning; font.pixelSize: 24; font.weight: Font.Bold }
-                        Text { Layout.fillWidth: true; text: "Alle gegevens op het gekozen medium worden gewist. De interne systeemschijf wordt altijd geblokkeerd."; color: "#ffe4a8"; font.pixelSize: 14; wrapMode: Text.Wrap }
+                        Text { Layout.fillWidth: true; text: qsTr("All data on the selected medium will be erased. The internal system drive is always blocked."); color: "#ffe4a8"; font.pixelSize: 14; wrapMode: Text.Wrap }
                     }
                 }
                 ProgressBar { Layout.fillWidth: true; from: 0; to: 1; value: backend.progress; visible: backend.busy || backend.progress > 0 }
                 RowLayout { Layout.fillWidth: true
-                    Text { Layout.fillWidth: true; text: backend.status || "Klaar om te beginnen"; color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap }
-                    FlatButton { text: "Medium maken"; primary: true; enabled: recoveryImage && targetBox.currentValue && !backend.busy; onClicked: recoveryConfirm.open() }
+                    Text { Layout.fillWidth: true; text: backend.status || qsTr("Ready to begin"); color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap }
+                    FlatButton { text: qsTr("Create media"); primary: true; enabled: recoveryImage && targetBox.currentValue && !backend.busy; onClicked: recoveryConfirm.open() }
                 }
                 Item { Layout.fillHeight: true }
             }
-            FileDialog { id: recoveryFile; title: "Kies een ECZOS ISO- of IMG-bestand"; nameFilters: ["Installatiekopieën (*.iso *.img)"]; onAccepted: recoveryImage = selectedFile.toString() }
+            FileDialog { id: recoveryFile; title: qsTr("Select an ECZOS ISO or IMG file"); nameFilters: [qsTr("Installation images (*.iso *.img)")]; onAccepted: recoveryImage = selectedFile.toString() }
             Dialog {
-                id: recoveryConfirm; anchors.centerIn: parent; modal: true; title: "Medium volledig wissen?"
+                id: recoveryConfirm; anchors.centerIn: parent; modal: true; title: qsTr("Erase the entire medium?")
                 standardButtons: Dialog.Cancel | Dialog.Ok
                 onAccepted: backend.writeRecovery(recoveryMode, recoveryImage, targetBox.currentValue)
-                Label { width: 440; wrapMode: Text.Wrap; text: "Alle gegevens op " + (targetBox.currentText || "het gekozen medium") + " worden gewist. Dit kan niet ongedaan worden gemaakt." }
+                Label { width: 440; wrapMode: Text.Wrap; text: qsTr("All data on %1 will be erased. This cannot be undone.").arg(targetBox.currentText || qsTr("the selected medium")) }
             }
         }
     }
@@ -581,17 +581,17 @@ ApplicationWindow {
         Item {
             ColumnLayout {
                 anchors.fill: parent; anchors.margins: 34; spacing: 22
-                PageHeading { heading: "Ondersteuning"; subtitle: "Maak een technisch rapport dat je aan EasyComp Zeeland kunt geven wanneer je hulp nodig hebt." }
+                PageHeading { heading: qsTr("Support"); subtitle: qsTr("Create a technical report that you can give to EasyComp Zeeland when you need help.") }
                 Rectangle {
                     Layout.fillWidth: true; implicitHeight: 210; radius: 16; color: root.panelRaised; border.color: root.border
                     ColumnLayout { anchors.fill: parent; anchors.margins: 22; spacing: 13
-                        Text { text: "Jij houdt de controle"; color: root.textPrimary; font.pixelSize: 22; font.weight: Font.Bold }
-                        Text { Layout.fillWidth: true; text: "Het rapport bevat systeeminformatie, hardware, opslag en mislukte diensten. Persoonlijke documenten, wachtwoorden en browsergeschiedenis worden niet opgenomen."; color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap }
-                        Text { Layout.fillWidth: true; text: "Het bestand wordt alleen lokaal opgeslagen en nooit automatisch verzonden."; color: root.good; font.pixelSize: 14; font.weight: Font.DemiBold; wrapMode: Text.Wrap }
+                        Text { text: qsTr("You stay in control"); color: root.textPrimary; font.pixelSize: 22; font.weight: Font.Bold }
+                        Text { Layout.fillWidth: true; text: qsTr("The report contains system information, hardware, storage and failed services. Personal documents, passwords and browser history are not included."); color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap }
+                        Text { Layout.fillWidth: true; text: qsTr("The file is stored locally and is never sent automatically."); color: root.good; font.pixelSize: 14; font.weight: Font.DemiBold; wrapMode: Text.Wrap }
                     }
                 }
                 RowLayout { Layout.fillWidth: true
-                    FlatButton { text: "Supportrapport maken"; primary: true; enabled: !backend.busy; onClicked: backend.createSupportReport() }
+                    FlatButton { text: qsTr("Create support report"); primary: true; enabled: !backend.busy; onClicked: backend.createSupportReport() }
                     BusyIndicator { running: backend.busy; visible: running }
                     Text { Layout.fillWidth: true; text: backend.status; color: root.textMuted; font.pixelSize: 14; wrapMode: Text.Wrap }
                 }

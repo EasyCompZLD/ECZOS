@@ -126,6 +126,14 @@ invalid_language_rows=$(awk -F '\t' '!/^#/ && (NF != 4 || ($4 != "ltr" && $4 != 
 [[ -z "$invalid_language_rows" ]] || fail "invalid ECZOS language matrix rows: $invalid_language_rows"
 duplicate_language_codes=$(awk -F '\t' '!/^#/ {seen[$1]++} END {for (code in seen) if (seen[code] > 1) print code}' "$LANGUAGE_MATRIX" | sort)
 [[ -z "$duplicate_language_codes" ]] || fail "duplicate ECZOS language codes: $duplicate_language_codes"
+if grep -Fq 'type="unfinished"' "$ROOT_DIR/packages/eczos-platform-tools/native/i18n/eczos-system-settings_nl.ts"; then
+    fail 'Dutch ECZOS Settings catalogue contains unfinished translations'
+fi
+for catalogue in "$ROOT_DIR"/packages/eczos-oobe/i18n/*.ts; do
+    if grep -Fq 'type="unfinished"' "$catalogue"; then
+        fail "complete OOBE catalogue contains unfinished translations: ${catalogue#"$ROOT_DIR/"}"
+    fi
+done
 
 while IFS= read -r hook; do
     sh -n "$hook" || fail "invalid image hook syntax: ${hook#"$ROOT_DIR/"}"
