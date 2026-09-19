@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export TEXTDOMAIN=${TEXTDOMAIN:-eczos-recovery-media}
+export TEXTDOMAINDIR=${TEXTDOMAINDIR:-/usr/share/locale}
+_() { gettext "$1"; }
 
-die() { printf 'FOUT: %s\n' "$*" >&2; exit 1; }
-[[ $(id -u) -eq 0 ]] || die 'de schrijver moet via systeemauthenticatie als root draaien'
-[[ $# -eq 3 || ($# -eq 4 && ($4 == --validate-only || $4 == --json-progress)) ]] || die 'ongeldige aanroep'
+die() { printf '%s: %s\n' "$(_ 'ERROR')" "$*" >&2; exit 1; }
+[[ $(id -u) -eq 0 ]] || die "$(_ 'the writer must run as root through system authentication')"
+[[ $# -eq 3 || ($# -eq 4 && ($4 == --validate-only || $4 == --json-progress)) ]] || die "$(_ 'invalid invocation')"
 mode=$1
 image=$(realpath -e -- "$2")
 target=$(readlink -f -- "$3")
@@ -11,8 +14,8 @@ validate_only=false
 json_progress=false
 [[ ${4:-} == --validate-only ]] && validate_only=true
 [[ ${4:-} == --json-progress ]] && json_progress=true
-[[ -f $image && -r $image ]] || die 'de installatiekopie is niet leesbaar'
-[[ $target == /dev/* && -b $target ]] || die 'het doel is geen blokapparaat'
+[[ -f $image && -r $image ]] || die "$(_ 'the installation image is not readable')"
+[[ $target == /dev/* && -b $target ]] || die "$(_ 'the target is not a block device')"
 
 top_disk() {
     local node parent
@@ -26,38 +29,38 @@ top_disk() {
 root_source=$(findmnt -nro SOURCE /)
 root_disk=$(top_disk "$root_source")
 target_disk=$(top_disk "$target")
-[[ $target_disk != "$root_disk" ]] || die 'de systeemschijf wordt nooit overschreven'
+[[ $target_disk != "$root_disk" ]] || die "$(_ 'the system drive is never overwritten')"
 
 source_mount=$(findmnt -nro SOURCE --target "$image" 2>/dev/null || true)
 if [[ -n $source_mount && $source_mount == /dev/* ]]; then
     [[ $(top_disk "$source_mount") != "$target_disk" ]] || \
-        die 'de installatiekopie staat op het gekozen doelmedium'
+        die "$(_ 'the installation image is stored on the selected target medium')"
 fi
 
 case $mode in
     disk)
-        [[ $(lsblk -dnro TYPE -- "$target") == disk ]] || die 'kies de volledige USB-schijf of SD-kaart'
+        [[ $(lsblk -dnro TYPE -- "$target") == disk ]] || die "$(_ 'select the complete USB drive or SD card')"
         removable=$(lsblk -dnro RM -- "$target")
         transport=$(lsblk -dnro TRAN -- "$target" 2>/dev/null || true)
         [[ $removable == 1 || $transport == usb || $transport == mmc || $target == /dev/mmcblk* ]] || \
-            die 'alleen een verwisselbare USB-schijf of SD-kaart is toegestaan'
+            die "$(_ 'only a removable USB drive or SD card is allowed')"
         image_size=$(stat -c %s -- "$image")
         target_size=$(blockdev --getsize64 "$target")
-        (( target_size >= image_size )) || die 'het doelmedium is kleiner dan de installatiekopie'
+        (( target_size >= image_size )) || die "$(_ 'the target medium is smaller than the installation image')"
         if $validate_only; then
-            printf 'Validatie geslaagd: %s kan naar %s worden geschreven.\n' "$image" "$target"
+            printf "$(_ 'Validation passed: %s can be written to %s.')\n" "$image" "$target"
             exit 0
         fi
         while IFS= read -r child; do
             if findmnt -rn -S "$child" >/dev/null 2>&1; then
-                umount -- "$child" || die "kan $child niet ontkoppelen"
+                umount -- "$child" || die "$(printf "$(_ 'cannot unmount %s')" "$child")"
             fi
         done < <(lsblk -lnpo NAME -- "$target")
-        printf 'Schrijven naar %s. Dit kan enige tijd duren...\n' "$target"
+        printf "$(_ 'Writing to %s. This may take some time...')\n" "$target"
         if $json_progress; then
-            printf 'ECZOS_EVENT {"type":"progress","fraction":0.01,"message":"Herstelmedium voorbereiden…"}\n'
+            printf 'ECZOS_EVENT {"type":"progress","fraction":0.01,"message":"%s"}\n' "$(_ 'Preparing recovery media…')"
             LC_ALL=C dd if="$image" of="$target" bs=4M iflag=fullblock conv=fsync status=progress \
-                2> >(tr '\r' '\n' | awk -v total="$image_size" '
+                2> >(tr '\r' '\n' | awk -v total="$image_size" -v writing="$(_ 'Writing recovery media…')" -v about="$(_ 'about')" -v remaining_text="$(_ 'min remaining')" '
                     BEGIN { started = systime() }
                     /^[0-9]+ bytes/ {
                         bytes = $1
@@ -66,8 +69,8 @@ case $mode in
                         elapsed = systime() - started
                         remaining = (bytes > 0 && elapsed > 0) ? int(((total - bytes) * elapsed / bytes) / 60 + 0.5) : 0
                         percent = int(fraction * 100)
-                        message = "Herstelmedium schrijven… " percent "%"
-                        if (remaining > 0) message = message " • ongeveer " remaining " min resterend"
+                        message = writing " " percent "%"
+                        if (remaining > 0) message = message " • " about " " remaining " " remaining_text
                         printf "ECZOS_EVENT {\"type\":\"progress\",\"fraction\":%.4f,\"message\":\"%s\"}\n", fraction, message
                         fflush()
                     }')
@@ -78,16 +81,16 @@ case $mode in
         blockdev --rereadpt "$target" 2>/dev/null || true
         ;;
     dvd)
-        [[ $(lsblk -dnro TYPE -- "$target") == rom ]] || die 'het doel is geen optisch station'
+        [[ $(lsblk -dnro TYPE -- "$target") == rom ]] || die "$(_ 'the target is not an optical drive')"
         if $validate_only; then
-            printf 'Validatie geslaagd: %s kan naar %s worden gebrand.\n' "$image" "$target"
+            printf "$(_ 'Validation passed: %s can be burned to %s.')\n" "$image" "$target"
             exit 0
         fi
-        printf 'Branden naar %s. Dit kan enige tijd duren...\n' "$target"
+        printf "$(_ 'Burning to %s. This may take some time...')\n" "$target"
         if $json_progress; then
-            printf 'ECZOS_EVENT {"type":"progress","fraction":0.05,"message":"Schijf branden… dit kan enige tijd duren"}\n'
+            printf 'ECZOS_EVENT {"type":"progress","fraction":0.05,"message":"%s"}\n' "$(_ 'Burning disc… this may take some time')"
             LC_ALL=C xorriso -as cdrecord -v dev="$target" blank=as_needed -eject "$image" \
-                2> >(tr '\r' '\n' | awk '
+                2> >(tr '\r' '\n' | awk -v burning="$(_ 'Burning disc…')" -v about="$(_ 'about')" -v remaining_text="$(_ 'min remaining')" '
                     BEGIN { started = systime() }
                     {
                         print > "/dev/stderr"
@@ -100,8 +103,8 @@ case $mode in
                                 elapsed = systime() - started
                                 remaining = (written > 0 && elapsed > 0) ? int(((total - written) * elapsed / written) / 60 + 0.5) : 0
                                 percent = int(fraction * 100)
-                                message = "Schijf branden… " percent "%"
-                                if (remaining > 0) message = message " • ongeveer " remaining " min resterend"
+                                message = burning " " percent "%"
+                                if (remaining > 0) message = message " • " about " " remaining " " remaining_text
                                 printf "ECZOS_EVENT {\"type\":\"progress\",\"fraction\":%.4f,\"message\":\"%s\"}\n", fraction, message
                                 fflush()
                                 break
@@ -112,7 +115,7 @@ case $mode in
             xorriso -as cdrecord -v dev="$target" blank=as_needed -eject "$image"
         fi
         ;;
-    *) die 'onbekend mediatype' ;;
+    *) die "$(_ 'unknown media type')" ;;
 esac
-printf '\nKlaar. Het ECZOS-herstelmedium is geschreven en kan veilig worden verwijderd.\n'
-$json_progress && printf 'ECZOS_EVENT {"type":"progress","fraction":1.0,"message":"Klaar. Het herstelmedium kan veilig worden verwijderd."}\n'
+printf '\n%s\n' "$(_ 'Done. The ECZOS recovery medium has been written and can be removed safely.')"
+$json_progress && printf 'ECZOS_EVENT {"type":"progress","fraction":1.0,"message":"%s"}\n' "$(_ 'Done. The recovery medium can be removed safely.')"

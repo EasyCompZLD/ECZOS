@@ -2,3 +2,12 @@
 
 %:
 	dh $@
+
+override_dh_auto_build:
+	mkdir -p debian/build/locale/nl/LC_MESSAGES debian/build/locale/de/LC_MESSAGES debian/build/locale/fr/LC_MESSAGES
+	msgfmt po/nl.po -o debian/build/locale/nl/LC_MESSAGES/eczos-gaming.mo
+	msgfmt po/de.po -o debian/build/locale/de/LC_MESSAGES/eczos-gaming.mo
+	msgfmt po/fr.po -o debian/build/locale/fr/LC_MESSAGES/eczos-gaming.mo
+
+override_dh_auto_clean:
+	rm -rf debian/build

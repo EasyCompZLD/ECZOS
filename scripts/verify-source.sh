@@ -57,6 +57,9 @@ for required in \
     packages/eczos-gaming-core/lib/runtime-umu \
     packages/eczos-gaming-core/lib/repair-runtime \
     packages/eczos-gaming-core/polkit/org.eczos.gaming.policy \
+    packages/eczos-gaming-core/po/nl.po \
+    packages/eczos-gaming-core/po/de.po \
+    packages/eczos-gaming-core/po/fr.po \
     packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json \
     packages/eczos-platform-tools/debian/control \
     packages/eczos-platform-tools/bin/eczos-control-center \
@@ -76,11 +79,15 @@ for required in \
     packages/eczos-recovery-media/bin/eczos-recovery-media \
     packages/eczos-recovery-media/lib/write-media \
     packages/eczos-recovery-media/polkit/org.eczos.recoverymedia.policy \
+    packages/eczos-recovery-media/po/nl.po \
     packages/eczos-desktop-apps/debian/control \
     packages/eczos-desktop/debian/control \
     packages/eczos-installer/debian/control \
     packages/eczos-installer/bin/eczos-installer \
     packages/eczos-installer/branding/eczos/branding.desc \
+    packages/eczos-installer/i18n/calamares-eczos_nl.ts \
+    packages/eczos-installer/i18n/calamares-eczos_de.ts \
+    packages/eczos-installer/i18n/calamares-eczos_fr.ts \
     packages/eczos-oobe/debian/control \
     packages/eczos-oobe/debian/rules \
     packages/eczos-oobe/bin/eczos-oobe \
@@ -134,6 +141,19 @@ for catalogue in "$ROOT_DIR"/packages/eczos-oobe/i18n/*.ts; do
         fail "complete OOBE catalogue contains unfinished translations: ${catalogue#"$ROOT_DIR/"}"
     fi
 done
+for catalogue in "$ROOT_DIR"/packages/eczos-installer/i18n/*.ts; do
+    if grep -Fq 'type="unfinished"' "$catalogue"; then
+        fail "complete installer catalogue contains unfinished translations: ${catalogue#"$ROOT_DIR/"}"
+    fi
+done
+if command -v msgfmt >/dev/null 2>&1; then
+    for catalogue in \
+        "$ROOT_DIR"/packages/eczos-gaming-core/po/*.po \
+        "$ROOT_DIR"/packages/eczos-recovery-media/po/nl.po; do
+        msgfmt --check --check-format "$catalogue" -o /dev/null || \
+            fail "invalid gettext catalogue: ${catalogue#"$ROOT_DIR/"}"
+    done
+fi
 
 while IFS= read -r hook; do
     sh -n "$hook" || fail "invalid image hook syntax: ${hook#"$ROOT_DIR/"}"

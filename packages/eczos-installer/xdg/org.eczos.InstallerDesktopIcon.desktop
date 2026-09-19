@@ -1,6 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=ECZOS installer-snelkoppeling
+Name=ECZOS installer shortcut
+Name[nl]=Snelkoppeling naar ECZOS-installatieprogramma
+Name[de]=Verknüpfung zum ECZOS-Installationsprogramm
+Name[fr]=Raccourci vers l’installateur ECZOS
 Exec=eczos-add-installer-icon
 NoDisplay=true
 OnlyShowIn=KDE;

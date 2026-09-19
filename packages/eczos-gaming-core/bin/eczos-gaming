@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export TEXTDOMAIN=${TEXTDOMAIN:-eczos-gaming}
+export TEXTDOMAINDIR=${TEXTDOMAINDIR:-/usr/share/locale}
+_() { gettext "$1"; }
 
 usage() {
-    cat <<'EOF'
-Gebruik: eczos-gaming COMMAND
+    cat <<EOF
+$(_ 'Usage: eczos-gaming COMMAND')
 
-  doctor [--json]  Controleer GPU, Vulkan, 32-bit drivers en runtimes
-  status           Hetzelfde als doctor
-  check-ready      Slaag alleen wanneer Proton-gaming volledig gereed is
-  manage           Toon de status grafisch
-  runtime-info     Toon de vastgelegde UMU-runtime-informatie
+  doctor [--json]  $(_ 'Check GPU, Vulkan, 32-bit drivers and runtimes')
+  status           $(_ 'Same as doctor')
+  check-ready      $(_ 'Succeed only when Proton gaming is fully ready')
+  manage           $(_ 'Show the status graphically')
+  runtime-info     $(_ 'Show the pinned UMU runtime information')
 EOF
 }
 
@@ -23,14 +26,14 @@ collect_status() {
             sub(/^[[:space:]]+/, ""); printf " (%s)", $0; in_gpu=0
         }
         END {print ""}' | head -c 2000)
-    [[ -n "$gpu" ]] || gpu='Onbekende grafische adapter'
+    [[ -n "$gpu" ]] || gpu=$(_ 'Unknown graphics adapter')
 
     vulkan_summary=''
     if command -v vulkaninfo >/dev/null 2>&1; then
         vulkan_summary=$(timeout 15s vulkaninfo --summary 2>&1 || true)
     fi
     vulkan_devices=$(awk -F= '/deviceName[[:space:]]*=/{gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); if (out) out=out "; "; out=out $2} END{print out}' <<<"$vulkan_summary")
-    [[ -n "$vulkan_devices" ]] || vulkan_devices='Geen Vulkan-apparaat gevonden'
+    [[ -n "$vulkan_devices" ]] || vulkan_devices=$(_ 'No Vulkan device found')
 
     hardware_vulkan=false
     if grep -Eq 'PHYSICAL_DEVICE_TYPE_(DISCRETE|INTEGRATED|VIRTUAL)_GPU' <<<"$vulkan_summary"; then
@@ -59,13 +62,13 @@ collect_status() {
 
     if [[ "$hardware_vulkan" != true ]]; then
         verdict=unsupported
-        summary='Niet geschikt voor Proton/DXVK: geen Vulkan-GPU gevonden.'
+        summary=$(_ 'Not suitable for Proton/DXVK: no Vulkan GPU was found.')
     elif [[ "$vulkan_32" != true || "$umu" != true || "$gamemode" != true ]]; then
         verdict=setup-required
-        summary='Geschikte Vulkan-GPU gevonden, maar de gaming-runtime is nog niet compleet.'
+        summary=$(_ 'A suitable Vulkan GPU was found, but the gaming runtime is not complete yet.')
     else
         verdict=ready
-        summary='Deze computer is technisch klaar voor ECZ Gaming.'
+        summary=$(_ 'This computer is technically ready for ECZ Gaming.')
     fi
 }
 
@@ -82,31 +85,32 @@ print_json() {
 }
 
 print_human() {
-    local mark_hw='nee' mark_32='nee' mark_umu='nee' mark_gm='nee'
-    [[ "$hardware_vulkan" == true ]] && mark_hw='ja'
-    [[ "$vulkan_32" == true ]] && mark_32='ja'
-    [[ "$umu" == true ]] && mark_umu='ja'
-    [[ "$gamemode" == true ]] && mark_gm='ja'
+    local mark_hw mark_32 mark_umu mark_gm
+    mark_hw=$(_ 'no'); mark_32=$(_ 'no'); mark_umu=$(_ 'no'); mark_gm=$(_ 'no')
+    [[ "$hardware_vulkan" == true ]] && mark_hw=$(_ 'yes')
+    [[ "$vulkan_32" == true ]] && mark_32=$(_ 'yes')
+    [[ "$umu" == true ]] && mark_umu=$(_ 'yes')
+    [[ "$gamemode" == true ]] && mark_gm=$(_ 'yes')
     cat <<EOF
-ECZ Gaming-controle
+$(_ 'ECZ Gaming check')
 
-Resultaat: $summary
+$(_ 'Result'): $summary
 GPU: $gpu
-Vulkan-apparaat: $vulkan_devices
-Hardware-Vulkan: $mark_hw
-32-bit Vulkan-driver: $mark_32
-UMU/Proton-adapter: $mark_umu
+$(_ 'Vulkan device'): $vulkan_devices
+$(_ 'Hardware Vulkan'): $mark_hw
+$(_ '32-bit Vulkan driver'): $mark_32
+$(_ 'UMU/Proton adapter'): $mark_umu
 GameMode: $mark_gm
-Werkgeheugen: ${memory_mib} MiB
+$(_ 'Memory'): ${memory_mib} MiB
 EOF
     if (( memory_mib < 8192 )); then
-        printf 'Waarschuwing: minder dan 8 GiB RAM; moderne games kunnen zwaar wisselgeheugen gebruiken.\n'
+        printf '%s\n' "$(_ 'Warning: less than 8 GiB RAM; modern games may use swap heavily.')"
     fi
     if [[ "$avx" != true ]]; then
-        printf 'Waarschuwing: deze CPU heeft geen AVX; veel moderne games starten daardoor niet.\n'
+        printf '%s\n' "$(_ 'Warning: this CPU has no AVX; many modern games will not start.')"
     fi
     if [[ "$software_vulkan" == true && "$hardware_vulkan" != true ]]; then
-        printf 'Let op: llvmpipe/lavapipe is software-rendering en telt niet als gaming-GPU.\n'
+        printf '%s\n' "$(_ 'Note: llvmpipe/lavapipe is software rendering and does not count as a gaming GPU.')"
     fi
 }
 

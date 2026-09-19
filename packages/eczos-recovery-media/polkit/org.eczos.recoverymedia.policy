@@ -5,8 +5,14 @@
   <vendor>EasyComp Zeeland</vendor>
   <vendor_url>https://easycompzeeland.nl/</vendor_url>
   <action id="org.eczos.recoverymedia.write">
-    <description>ECZOS-herstelmedium schrijven</description>
-    <message>Authenticatie is nodig om het gekozen medium volledig te wissen en te schrijven.</message>
+    <description>Write ECZOS recovery media</description>
+    <description xml:lang="nl">ECZOS-herstelmedium schrijven</description>
+    <description xml:lang="de">ECZOS-Wiederherstellungsmedium schreiben</description>
+    <description xml:lang="fr">Écrire un support de récupération ECZOS</description>
+    <message>Authentication is required to erase and write the selected medium.</message>
+    <message xml:lang="nl">Authenticatie is nodig om het gekozen medium volledig te wissen en te schrijven.</message>
+    <message xml:lang="de">Zum Löschen und Beschreiben des ausgewählten Mediums ist eine Authentifizierung erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour effacer et écrire le support sélectionné.</message>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>

@@ -1,9 +1,18 @@
 [Desktop Entry]
 Type=Application
-Name=Overstappen vanaf Windows
-Comment=Neem persoonlijke bestanden veilig over uit een Windows-profiel
+Name=Move from Windows
+Name[nl]=Overstappen vanaf Windows
+Name[de]=Von Windows wechseln
+Name[fr]=Migrer depuis Windows
+Comment=Safely transfer personal files from a Windows profile
+Comment[nl]=Neem persoonlijke bestanden veilig over uit een Windows-profiel
+Comment[de]=Persönliche Dateien sicher aus einem Windows-Profil übertragen
+Comment[fr]=Transférer en toute sécurité les fichiers personnels d’un profil Windows
 Exec=eczos-system-settings --module eczos:migration
 Icon=folder-sync
 Terminal=false
 Categories=Utility;
-Keywords=Windows;migratie;documenten;overzetten;
+Keywords=Windows;migration;documents;transfer;
+Keywords[nl]=Windows;migratie;documenten;overzetten;
+Keywords[de]=Windows;Migration;Dokumente;Übertragen;
+Keywords[fr]=Windows;migration;documents;transfert;

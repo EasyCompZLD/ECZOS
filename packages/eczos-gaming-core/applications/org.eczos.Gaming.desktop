@@ -1,7 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=ECZ Gaming
-Comment=Controleer of deze computer klaar is voor Windows-games
+Comment=Check whether this computer is ready for Windows games
+Comment[nl]=Controleer of deze computer klaar is voor Windows-games
+Comment[de]=Prüfen, ob dieser Computer für Windows-Spiele bereit ist
+Comment[fr]=Vérifier si cet ordinateur est prêt pour les jeux Windows
 Exec=eczos-system-settings --module eczos:gaming
 Icon=applications-games
 Terminal=false

@@ -3,6 +3,13 @@
 %:
 	dh $@
 
+override_dh_auto_build:
+	mkdir -p debian/build/locale/nl/LC_MESSAGES
+	msgfmt po/nl.po -o debian/build/locale/nl/LC_MESSAGES/eczos-recovery-media.mo
+
+override_dh_auto_clean:
+	rm -rf debian/build
+
 override_dh_fixperms:
 	dh_fixperms
 	chmod 0644 debian/eczos-recovery-media/etc/eczos/recovery-media.conf

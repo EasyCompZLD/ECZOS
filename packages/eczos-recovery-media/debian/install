@@ -3,3 +3,4 @@ bin/* usr/bin/
 config/* etc/eczos/
 lib/* usr/lib/eczos-recovery-media/
 polkit/* usr/share/polkit-1/actions/
+debian/build/locale/* usr/share/locale/

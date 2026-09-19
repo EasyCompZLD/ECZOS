@@ -1,3 +1,10 @@
+eczos-installer (0.1.0~dev5) UNRELEASED; urgency=medium
+
+  * Translate the installer slideshow through Calamares branding catalogues.
+  * Add English, Dutch, German and French installer launcher metadata.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 16:20:00 +0200
+
 eczos-installer (0.1.0~dev4) UNRELEASED; urgency=medium
 
   * Replace text-only feature slides with real ECZOS product screenshots.

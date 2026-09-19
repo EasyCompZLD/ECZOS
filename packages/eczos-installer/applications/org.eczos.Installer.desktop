@@ -1,13 +1,19 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=ECZOS installeren
+Name=Install ECZOS
 Name[nl]=ECZOS installeren
-GenericName=Besturingssysteem installeren
+Name[de]=ECZOS installieren
+Name[fr]=Installer ECZOS
+GenericName=Install operating system
 GenericName[nl]=Besturingssysteem installeren
+GenericName[de]=Betriebssystem installieren
+GenericName[fr]=Installer le système d’exploitation
 Exec=eczos-installer
-Comment=Installeer EasyComp Zeeland Operating System op deze computer
+Comment=Install EasyComp Zeeland Operating System on this computer
 Comment[nl]=Installeer EasyComp Zeeland Operating System op deze computer
+Comment[de]=EasyComp Zeeland Operating System auf diesem Computer installieren
+Comment[fr]=Installer EasyComp Zeeland Operating System sur cet ordinateur
 Keywords=eczos;system;install;installer;
 Icon=eczos-start
 Terminal=false

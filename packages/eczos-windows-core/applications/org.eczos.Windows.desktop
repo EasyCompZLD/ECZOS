@@ -1,7 +1,13 @@
 [Desktop Entry]
 Type=Application
-Name=Windows-app installeren
-Comment=Open veilig met ECZ Windows
+Name=Install Windows app
+Name[nl]=Windows-app installeren
+Name[de]=Windows-App installieren
+Name[fr]=Installer une application Windows
+Comment=Open safely with ECZ Windows
+Comment[nl]=Open veilig met ECZ Windows
+Comment[de]=Sicher mit ECZ Windows öffnen
+Comment[fr]=Ouvrir en toute sécurité avec ECZ Windows
 Exec=eczos-windows install %f
 Icon=eczos-start
 Terminal=false

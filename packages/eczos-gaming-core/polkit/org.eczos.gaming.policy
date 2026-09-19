@@ -5,8 +5,14 @@
   <vendor>EasyComp Zeeland</vendor>
   <vendor_url>https://easycompzeeland.nl/</vendor_url>
   <action id="org.eczos.gaming.repair">
-    <description>Ontbrekende ECZOS gaming-onderdelen installeren</description>
-    <message>Authenticatie is nodig om Vulkan-, GameMode- en Proton-ondersteuning te installeren.</message>
+    <description>Install missing ECZOS gaming components</description>
+    <description xml:lang="nl">Ontbrekende ECZOS gaming-onderdelen installeren</description>
+    <description xml:lang="de">Fehlende ECZOS-Spielkomponenten installieren</description>
+    <description xml:lang="fr">Installer les composants de jeu ECZOS manquants</description>
+    <message>Authentication is required to install Vulkan, GameMode and Proton support.</message>
+    <message xml:lang="nl">Authenticatie is nodig om Vulkan-, GameMode- en Proton-ondersteuning te installeren.</message>
+    <message xml:lang="de">Zur Installation der Vulkan-, GameMode- und Proton-Unterstützung ist eine Authentifizierung erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour installer la prise en charge de Vulkan, GameMode et Proton.</message>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>

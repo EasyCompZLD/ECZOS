@@ -1,7 +1,13 @@
 [Desktop Entry]
 Type=Application
-Name=ECZOS Herstelmedium maken
-Comment=Schrijf een ECZOS-installatiekopie naar USB, SD-kaart of dvd
+Name=Create ECZOS recovery media
+Name[nl]=ECZOS Herstelmedium maken
+Name[de]=ECZOS-Wiederherstellungsmedium erstellen
+Name[fr]=Créer un support de récupération ECZOS
+Comment=Write an ECZOS installation image to USB, SD card or DVD
+Comment[nl]=Schrijf een ECZOS-installatiekopie naar USB, SD-kaart of dvd
+Comment[de]=Ein ECZOS-Installationsabbild auf USB, SD-Karte oder DVD schreiben
+Comment[fr]=Écrire une image d’installation ECZOS sur une clé USB, une carte SD ou un DVD
 Exec=eczos-system-settings --module eczos:recovery
 Icon=drive-removable-media
 Terminal=false

@@ -1,3 +1,9 @@
+eczos-platform-tools (0.1.0~dev13) UNRELEASED; urgency=medium
+
+  * Localize the Settings, Diagnostics and Migration desktop entries.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 16:20:00 +0200
+
 eczos-platform-tools (0.1.0~dev12) UNRELEASED; urgency=medium
 
   * Convert every visible native and QML Settings label to an English source

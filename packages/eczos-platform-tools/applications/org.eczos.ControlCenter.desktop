@@ -1,9 +1,18 @@
 [Desktop Entry]
 Type=Application
-Name=ECZOS Instellingen
-Comment=Beheer apps, apparaten, back-ups, herstel en ondersteuning
+Name=ECZOS Settings
+Name[nl]=ECZOS Instellingen
+Name[de]=ECZOS-Einstellungen
+Name[fr]=Paramètres ECZOS
+Comment=Manage apps, devices, backups, recovery and support
+Comment[nl]=Beheer apps, apparaten, back-ups, herstel en ondersteuning
+Comment[de]=Apps, Geräte, Sicherungen, Wiederherstellung und Support verwalten
+Comment[fr]=Gérer les applications, les appareils, les sauvegardes, la récupération et l’assistance
 Exec=eczos-system-settings
 Icon=preferences-system
 Terminal=false
 Categories=Settings;
-Keywords=ECZOS;instellingen;apps;backup;herstel;ondersteuning;
+Keywords=ECZOS;settings;apps;backup;recovery;support;
+Keywords[nl]=ECZOS;instellingen;apps;backup;herstel;ondersteuning;
+Keywords[de]=ECZOS;Einstellungen;Apps;Sicherung;Wiederherstellung;Support;
+Keywords[fr]=ECZOS;paramètres;applications;sauvegarde;récupération;assistance;

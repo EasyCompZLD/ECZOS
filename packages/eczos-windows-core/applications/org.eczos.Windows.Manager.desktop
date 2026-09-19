@@ -1,7 +1,13 @@
 [Desktop Entry]
 Type=Application
 Name=ECZ Windows-apps
-Comment=Windows-applicaties bekijken, starten en herstellen
+Name[nl]=ECZ Windows-apps
+Name[de]=ECZ Windows-Apps
+Name[fr]=Applications ECZ Windows
+Comment=View, start and repair Windows applications
+Comment[nl]=Windows-applicaties bekijken, starten en herstellen
+Comment[de]=Windows-Anwendungen anzeigen, starten und reparieren
+Comment[fr]=Afficher, démarrer et réparer les applications Windows
 Exec=eczos-system-settings --module eczos:windows
 Icon=eczos-start
 Terminal=false

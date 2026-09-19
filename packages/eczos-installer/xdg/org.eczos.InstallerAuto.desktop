@@ -1,6 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=ECZOS automatische installerstart
+Name=Start the ECZOS installer automatically
+Name[nl]=ECZOS-installatieprogramma automatisch starten
+Name[de]=ECZOS-Installationsprogramm automatisch starten
+Name[fr]=Démarrer automatiquement l’installateur ECZOS
 Exec=eczos-installer --auto
 NoDisplay=true
 OnlyShowIn=KDE;

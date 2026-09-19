@@ -30,7 +30,7 @@ Presentation {
             Text {
                 anchors.fill: parent
                 anchors.margins: 28
-                text: qsTr(feature.heading + "\n\n" + feature.body)
+                text: feature.heading + "\n\n" + feature.body
                 color: "white"
                 font.pixelSize: 22
                 font.weight: Font.Medium
@@ -52,48 +52,48 @@ Presentation {
     Slide {
         Feature {
             anchors.fill: parent
-            heading: "Welkom bij ECZOS"
-            body: "Een vertrouwde desktop van EasyComp Zeeland. Alles wat je dagelijks nodig hebt staat straks voor je klaar."
+            heading: qsTr("Welcome to ECZOS")
+            body: qsTr("A familiar desktop from EasyComp Zeeland. Everything you need every day will be ready for you.")
             screenshot: "file:///usr/share/eczos/branding/screenshots/settings.png"
         }
     }
     Slide {
         Feature {
             anchors.fill: parent
-            heading: "Je vertrouwde programma's"
-            body: "Open veel Windows-programma's gewoon via ECZ Windows. Na installatie vind je ze terug in je startmenu."
+            heading: qsTr("Your familiar applications")
+            body: qsTr("Open many Windows applications with ECZ Windows. After installation, you will find them in the Start menu.")
             screenshot: "file:///usr/share/eczos/branding/screenshots/windows-apps.png"
         }
     }
     Slide {
         Feature {
             anchors.fill: parent
-            heading: "Klaar voor werk en school"
-            body: "FreeOffice, Firefox, e-mail, video en handige bestandsprogramma's maken ECZOS direct bruikbaar."
+            heading: qsTr("Ready for work and school")
+            body: qsTr("FreeOffice, Firefox, email, video and useful file utilities make ECZOS ready to use.")
             screenshot: "file:///usr/share/eczos/branding/screenshots/diagnostics.png"
         }
     }
     Slide {
         Feature {
             anchors.fill: parent
-            heading: "Ook voor games"
-            body: "Steam staat voor je klaar. Veel Windows-games werken via de ingebouwde compatibiliteitslaag."
+            heading: qsTr("Made for gaming too")
+            body: qsTr("Steam is ready for you. Many Windows games work through the built-in compatibility layer.")
             screenshot: "file:///usr/share/eczos/branding/screenshots/gaming.png"
         }
     }
     Slide {
         Feature {
             anchors.fill: parent
-            heading: "Neem je bestanden mee"
-            body: "De migratie-assistent helpt je documenten, foto's en muziek vanaf een Windows-schijf overzetten. Je ziet altijd eerst wat er gebeurt."
+            heading: qsTr("Bring your files with you")
+            body: qsTr("The migration assistant helps transfer documents, photos and music from a Windows drive. You always see what will happen first.")
             screenshot: "file:///usr/share/eczos/branding/screenshots/migration.png"
         }
     }
     Slide {
         Feature {
             anchors.fill: parent
-            heading: "Jij houdt de controle"
-            body: "Maak herstelmedia wanneer je wilt. ECZOS deelt geen supportrapport zonder jouw keuze."
+            heading: qsTr("You stay in control")
+            body: qsTr("Create recovery media whenever you want. ECZOS never shares a support report without your choice.")
             screenshot: "file:///usr/share/eczos/branding/screenshots/recovery.png"
         }
     }

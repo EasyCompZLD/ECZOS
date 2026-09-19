@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export TEXTDOMAIN=${TEXTDOMAIN:-eczos-recovery-media}
+export TEXTDOMAINDIR=${TEXTDOMAINDIR:-/usr/share/locale}
+_() { gettext "$1"; }
 
 if [[ ${1:-} == --self-test ]]; then
     for command_name in curl jq lsblk sha256sum xorriso pkexec eczos-ui; do
@@ -10,7 +13,7 @@ if [[ ${1:-} == --self-test ]]; then
     exit 0
 fi
 if [[ ${1:-} == -h || ${1:-} == --help ]]; then
-    printf 'Gebruik: eczos-recovery-media [--self-test]\n'
+    printf '%s\n' "$(_ 'Usage: eczos-recovery-media [--self-test]')"
     exit 0
 fi
 

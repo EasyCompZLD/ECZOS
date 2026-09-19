@@ -1,3 +1,10 @@
+eczos-recovery-media (0.1.0~dev4) UNRELEASED; urgency=medium
+
+  * Translate recovery-media output and progress with gettext.
+  * Localize launcher and authentication text with an English fallback.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 16:20:00 +0200
+
 eczos-recovery-media (0.1.0~dev3) UNRELEASED; urgency=medium
 
   * Open recovery-media creation inside native ECZOS Settings.

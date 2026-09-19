@@ -1,3 +1,10 @@
+eczos-gaming-core (0.1.0~dev6) UNRELEASED; urgency=medium
+
+  * Add complete Dutch, German and French gettext catalogues.
+  * Localize launcher and authentication text with an English fallback.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 16:20:00 +0200
+
 eczos-gaming-core (0.1.0~dev5) UNRELEASED; urgency=medium
 
   * Open gaming checks and repair inside native ECZOS Settings.

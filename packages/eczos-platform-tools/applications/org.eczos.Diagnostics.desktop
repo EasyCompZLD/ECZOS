@@ -1,9 +1,18 @@
 [Desktop Entry]
 Type=Application
-Name=ECZOS Diagnose
-Comment=Controleer de belangrijkste onderdelen van deze computer
+Name=ECZOS Diagnostics
+Name[nl]=ECZOS Diagnose
+Name[de]=ECZOS-Diagnose
+Name[fr]=Diagnostic ECZOS
+Comment=Check the most important parts of this computer
+Comment[nl]=Controleer de belangrijkste onderdelen van deze computer
+Comment[de]=Die wichtigsten Komponenten dieses Computers überprüfen
+Comment[fr]=Vérifier les composants les plus importants de cet ordinateur
 Exec=eczos-system-settings --module eczos:diagnostics
 Icon=tools-report-bug
 Terminal=false
 Categories=System;
 Keywords=diagnose;repair;support;hardware;
+Keywords[nl]=diagnose;reparatie;ondersteuning;hardware;
+Keywords[de]=Diagnose;Reparatur;Support;Hardware;
+Keywords[fr]=diagnostic;réparation;assistance;matériel;

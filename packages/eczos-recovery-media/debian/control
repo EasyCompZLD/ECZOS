@@ -2,7 +2,9 @@ Source: eczos-recovery-media
 Section: utils
 Priority: optional
 Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
-Build-Depends: debhelper-compat (= 13)
+Build-Depends:
+ debhelper-compat (= 13),
+ gettext
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
 Homepage: https://easycompzeeland.nl/
@@ -13,6 +15,7 @@ Depends:
  ${misc:Depends},
  curl,
  eczos-platform-tools (>= 0.1.0~dev5),
+ gettext-base,
  jq,
  pkexec,
  xorriso
