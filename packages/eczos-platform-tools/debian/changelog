@@ -1,3 +1,9 @@
+eczos-platform-tools (0.1.0~dev16) UNRELEASED; urgency=medium
+
+  * Add ECZOS automatic, light and dark appearance controls to Night Light.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 20:30:00 +0200
+
 eczos-platform-tools (0.1.0~dev15) UNRELEASED; urgency=medium
 
   * Reuse one ECZOS Settings window for every launcher and module request.

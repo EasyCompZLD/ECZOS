@@ -12,6 +12,10 @@ test -x /usr/bin/eczos-system-settings
 # QStringLiteral stores this value as little-endian UTF-16 in the native
 # executable, so inspect that encoding instead of treating the binary as text.
 strings -a -el /usr/bin/eczos-system-settings | grep -Fx 'eczos-system-settings.sock' >/dev/null
+for label in 'ECZOS appearance' 'Automatic' 'Applying %1 appearance'; do
+    strings -a /usr/bin/eczos-system-settings | grep -F "$label" >/dev/null
+done
+dpkg-query -W -f='${Status}\n' eczos-desktop-defaults | grep -Fx 'install ok installed'
 test -x /usr/bin/systemsettings
 test -x /usr/bin/kcmshell6
 test -x /usr/bin/systemsettings.eczos-distrib

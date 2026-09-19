@@ -1074,5 +1074,41 @@
         <source>The settings window could not be started.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>ECZOS appearance</source>
+        <translation>ECZOS-Erscheinungsbild</translation>
+    </message>
+    <message>
+        <source>Choose a light or dark appearance, or let ECZOS follow the time of day.</source>
+        <translation>Wählen Sie ein helles oder dunkles Erscheinungsbild oder lassen Sie ECZOS der Tageszeit folgen.</translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatisch</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Hell</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Dunkel</translation>
+    </message>
+    <message>
+        <source>Automatic uses the light appearance from 08:00 to 19:00 and the dark appearance at night.</source>
+        <translation>Automatisch verwendet von 08:00 bis 19:00 Uhr das helle und nachts das dunkle Erscheinungsbild.</translation>
+    </message>
+    <message>
+        <source>Applying %1 appearance…</source>
+        <translation>Erscheinungsbild %1 wird angewendet…</translation>
+    </message>
+    <message>
+        <source>%1 appearance enabled</source>
+        <translation>Erscheinungsbild %1 ist aktiviert</translation>
+    </message>
+    <message>
+        <source>Changing the appearance failed.</source>
+        <translation>Das Erscheinungsbild konnte nicht geändert werden.</translation>
+    </message>
 </context>
 </TS>

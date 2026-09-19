@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2026 EasyComp Zeeland
 
 #include <QApplication>
+#include <QAbstractButton>
+#include <QButtonGroup>
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QCommandLineParser>
@@ -1146,10 +1148,80 @@ private:
         auto *scroll = new QScrollArea(wrapper);
         scroll->setWidgetResizable(true);
         scroll->setFrameShape(QFrame::NoFrame);
-        layout->addWidget(scroll);
+        layout->addWidget(scroll, 1);
         m_module = KCModuleLoader::loadModule(data, scroll, {}, m_engine);
         scroll->setWidget(m_module->widget());
         m_module->load();
+        if (id == QStringLiteral("kcm_nightlight")) {
+            auto *appearance = new QGroupBox(tr("ECZOS appearance"), wrapper);
+            auto *appearanceLayout = new QVBoxLayout(appearance);
+            auto *explanation = new QLabel(
+                tr("Choose a light or dark appearance, or let ECZOS follow the time of day."), appearance);
+            explanation->setWordWrap(true);
+            appearanceLayout->addWidget(explanation);
+
+            auto *choices = new QHBoxLayout;
+            auto *choiceGroup = new QButtonGroup(appearance);
+            choiceGroup->setExclusive(true);
+            const QList<QPair<QString, QString>> modes = {
+                {QStringLiteral("auto"), tr("Automatic")},
+                {QStringLiteral("light"), tr("Light")},
+                {QStringLiteral("dark"), tr("Dark")},
+            };
+            QString selectedMode = QStringLiteral("auto");
+            QFile modeFile(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)
+                           + QStringLiteral("/eczos/theme-mode"));
+            if (modeFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                const QString storedMode = QString::fromUtf8(modeFile.readAll()).trimmed();
+                if (storedMode == QStringLiteral("auto") || storedMode == QStringLiteral("light")
+                    || storedMode == QStringLiteral("dark")) {
+                    selectedMode = storedMode;
+                }
+            }
+            for (int index = 0; index < modes.size(); ++index) {
+                auto *button = new QPushButton(modes.at(index).second, appearance);
+                button->setCheckable(true);
+                button->setIcon(QIcon::fromTheme(index == 0 ? QStringLiteral("weather-clear-night")
+                                                            : index == 1 ? QStringLiteral("weather-clear")
+                                                                         : QStringLiteral("weather-clear-night")));
+                choiceGroup->addButton(button, index);
+                choices->addWidget(button, 1);
+                if (modes.at(index).first == selectedMode) {
+                    button->setChecked(true);
+                    choiceGroup->setProperty("appliedId", index);
+                }
+            }
+            appearanceLayout->addLayout(choices);
+            auto *status = new QLabel(
+                tr("Automatic uses the light appearance from 08:00 to 19:00 and the dark appearance at night."), appearance);
+            status->setWordWrap(true);
+            status->setObjectName(QStringLiteral("pageDescription"));
+            appearanceLayout->addWidget(status);
+            layout->addWidget(appearance);
+
+            connect(choiceGroup, &QButtonGroup::idClicked, this,
+                    [this, choiceGroup, status, modes](int selectedId) {
+                        const int previousId = choiceGroup->property("appliedId").toInt();
+                        const QString mode = modes.at(selectedId).first;
+                        const QString label = modes.at(selectedId).second;
+                        setTaskFeedback(status);
+                        startTask(QStringLiteral("theme-switch"), QStringLiteral("/usr/bin/eczos-theme-switch"), {mode},
+                                  tr("Applying %1 appearance…").arg(label),
+                                  [this, choiceGroup, status, previousId, selectedId, label](int code, const QByteArray &, const QByteArray &errors) {
+                                      if (code == 0) {
+                                          choiceGroup->setProperty("appliedId", selectedId);
+                                          status->setText(tr("%1 appearance enabled").arg(label));
+                                      } else {
+                                          if (QAbstractButton *previous = choiceGroup->button(previousId)) {
+                                              previous->setChecked(true);
+                                          }
+                                          const QString detail = QString::fromUtf8(errors).trimmed();
+                                          status->setText(detail.isEmpty() ? tr("Changing the appearance failed.")
+                                                                          : detail.section('\n', -1));
+                                      }
+                                  });
+                    });
+        }
         m_moduleArea->setWidget(wrapper);
         m_heading->setText(data.name());
         m_description->setText(data.description());

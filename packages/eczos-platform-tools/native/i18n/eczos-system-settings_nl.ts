@@ -1074,5 +1074,41 @@
       <source>The settings window could not be started.</source>
       <translation>Het instellingenvenster kon niet worden gestart.</translation>
     </message>
+    <message>
+      <source>ECZOS appearance</source>
+      <translation>ECZOS-weergave</translation>
+    </message>
+    <message>
+      <source>Choose a light or dark appearance, or let ECZOS follow the time of day.</source>
+      <translation>Kies een lichte of donkere weergave, of laat ECZOS het tijdstip van de dag volgen.</translation>
+    </message>
+    <message>
+      <source>Automatic</source>
+      <translation>Automatisch</translation>
+    </message>
+    <message>
+      <source>Light</source>
+      <translation>Licht</translation>
+    </message>
+    <message>
+      <source>Dark</source>
+      <translation>Donker</translation>
+    </message>
+    <message>
+      <source>Automatic uses the light appearance from 08:00 to 19:00 and the dark appearance at night.</source>
+      <translation>Automatisch gebruikt de lichte weergave van 08.00 tot 19.00 uur en 's nachts de donkere weergave.</translation>
+    </message>
+    <message>
+      <source>Applying %1 appearance…</source>
+      <translation>Weergave %1 toepassen…</translation>
+    </message>
+    <message>
+      <source>%1 appearance enabled</source>
+      <translation>Weergave %1 is ingeschakeld</translation>
+    </message>
+    <message>
+      <source>Changing the appearance failed.</source>
+      <translation>Het wijzigen van de weergave is mislukt.</translation>
+    </message>
   </context>
 </TS>
