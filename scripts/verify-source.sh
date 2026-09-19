@@ -70,6 +70,7 @@ for required in \
     packages/eczos-platform-tools/debian/postrm \
     packages/eczos-platform-tools/native/CMakeLists.txt \
     packages/eczos-platform-tools/native/main.cpp \
+    packages/eczos-platform-tools/po/nl.po \
     packages/eczos-platform-tools/qml/Main.qml \
     packages/eczos-platform-tools/bin/eczos-doctor \
     packages/eczos-platform-tools/bin/eczos-migrate \
@@ -149,6 +150,7 @@ done
 if command -v msgfmt >/dev/null 2>&1; then
     for catalogue in \
         "$ROOT_DIR"/packages/eczos-gaming-core/po/*.po \
+        "$ROOT_DIR"/packages/eczos-platform-tools/po/nl.po \
         "$ROOT_DIR"/packages/eczos-recovery-media/po/nl.po; do
         msgfmt --check --check-format "$catalogue" -o /dev/null || \
             fail "invalid gettext catalogue: ${catalogue#"$ROOT_DIR/"}"

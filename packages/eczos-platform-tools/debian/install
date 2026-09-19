@@ -2,3 +2,4 @@ applications/*.desktop usr/share/applications/
 bin/* usr/bin/
 qml/* usr/share/eczos/ui/
 product/default-apps.json usr/share/eczos/product/
+debian/build/locale/* usr/share/locale/

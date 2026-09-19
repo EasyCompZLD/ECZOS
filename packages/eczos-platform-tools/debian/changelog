@@ -1,3 +1,9 @@
+eczos-platform-tools (0.1.0~dev14) UNRELEASED; urgency=medium
+
+  * Translate diagnostic, migration and support command-line tools with gettext.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 19 Sep 2026 16:45:00 +0200
+
 eczos-platform-tools (0.1.0~dev13) UNRELEASED; urgency=medium
 
   * Localize the Settings, Diagnostics and Migration desktop entries.

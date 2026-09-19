@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export TEXTDOMAIN=${TEXTDOMAIN:-eczos-platform-tools}
+export TEXTDOMAINDIR=${TEXTDOMAINDIR:-/usr/share/locale}
+_() { gettext "$1"; }
 
 if [[ $# -eq 0 && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
     exec /usr/bin/eczos-ui migration
 fi
 
 if [[ $(id -u) -eq 0 ]]; then
-    printf 'Voer de migratie uit als de ingelogde gebruiker, niet als root.\n' >&2
+    printf '%s\n' "$(_ 'Run migration as the signed-in user, not as root.')" >&2
     exit 2
 fi
 
@@ -19,25 +22,25 @@ while (( $# )); do
         --apply) mode=apply ;;
         --source) shift; source_profile=${1:-} ;;
         --no-gui) gui=false ;;
-        -h|--help) printf 'Gebruik: eczos-migrate [--dry-run|--apply] [--source WINDOWS-PROFIEL] [--no-gui]\n'; exit 0 ;;
-        *) printf 'Onbekende optie: %s\n' "$1" >&2; exit 2 ;;
+        -h|--help) printf '%s\n' "$(_ 'Usage: eczos-migrate [--dry-run|--apply] [--source WINDOWS-PROFILE] [--no-gui]')"; exit 0 ;;
+        *) printf "$(_ 'Unknown option: %s')\n" "$1" >&2; exit 2 ;;
     esac
     shift
 done
 
 if [[ -z "$source_profile" && $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
-    source_profile=$(kdialog --getexistingdirectory "$HOME" --title 'Kies de Windows-gebruikersmap' || true)
+    source_profile=$(kdialog --getexistingdirectory "$HOME" --title "$(_ 'Select the Windows user folder')" || true)
 fi
-[[ -n "$source_profile" ]] || { printf 'Geen Windows-profiel gekozen.\n' >&2; exit 2; }
+[[ -n "$source_profile" ]] || { printf '%s\n' "$(_ 'No Windows profile selected.')" >&2; exit 2; }
 source_profile=$(realpath -e -- "$source_profile")
 [[ -d "$source_profile" && "$source_profile" != / && "$source_profile" != "$HOME" ]] || {
-    printf 'Ongeldige bronmap.\n' >&2; exit 2;
+    printf '%s\n' "$(_ 'Invalid source folder.')" >&2; exit 2;
 }
 
 folders=(Desktop Documents Downloads Music Pictures Videos Favorites)
 found=false
 for folder in "${folders[@]}"; do [[ -d "$source_profile/$folder" ]] && found=true; done
-[[ $found == true ]] || { printf 'In deze map zijn geen bekende Windows-gebruikersmappen gevonden.\n' >&2; exit 1; }
+[[ $found == true ]] || { printf '%s\n' "$(_ 'No known Windows user folders were found in this folder.')" >&2; exit 1; }
 
 state_dir=${XDG_STATE_HOME:-"$HOME/.local/state"}/eczos/migration
 mkdir -p "$state_dir"
@@ -46,7 +49,7 @@ rsync_options=(-a --safe-links --ignore-existing --exclude=desktop.ini --exclude
 [[ $mode == dry-run ]] && rsync_options+=(--dry-run --itemize-changes)
 
 if [[ $mode == apply && $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
-    kdialog --yesno "Bestaande bestanden worden niet overschreven. Bestanden overzetten uit:\n$source_profile?" || exit 0
+    kdialog --yesno "$(printf "$(_ 'Existing files will not be overwritten. Transfer files from:\n%s?')" "$source_profile")" || exit 0
 fi
 
 for folder in "${folders[@]}"; do
@@ -66,9 +69,9 @@ for folder in "${folders[@]}"; do
 done
 
 if [[ $mode == dry-run ]]; then
-    message="Voorbeeld voltooid; er is nog niets gekopieerd. Log: $log"
+    message=$(printf "$(_ 'Preview complete; nothing has been copied yet. Log: %s')" "$log")
 else
-    message="Overzetten voltooid. Bestaande bestanden zijn behouden. Log: $log"
+    message=$(printf "$(_ 'Transfer complete. Existing files were preserved. Log: %s')" "$log")
 fi
 printf '%s\n' "$message"
-if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then kdialog --msgbox "$message" --title 'Overstappen vanaf Windows'; fi
+if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then kdialog --msgbox "$message" --title "$(_ 'Move from Windows')"; fi

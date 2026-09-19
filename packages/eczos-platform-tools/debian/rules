@@ -8,9 +8,12 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	dh_auto_build --buildsystem=cmake --sourcedirectory=native
+	mkdir -p debian/build/locale/nl/LC_MESSAGES
+	msgfmt po/nl.po -o debian/build/locale/nl/LC_MESSAGES/eczos-platform-tools.mo
 
 override_dh_auto_install:
 	dh_auto_install --buildsystem=cmake --sourcedirectory=native
 
 override_dh_auto_clean:
 	dh_auto_clean --buildsystem=cmake --sourcedirectory=native
+	rm -rf debian/build/locale

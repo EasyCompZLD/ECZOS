@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export TEXTDOMAIN=${TEXTDOMAIN:-eczos-platform-tools}
+export TEXTDOMAINDIR=${TEXTDOMAINDIR:-/usr/share/locale}
+_() { gettext "$1"; }
 
 if [[ $# -eq 0 && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
     exec /usr/bin/eczos-ui support
@@ -9,12 +12,12 @@ gui=true
 case ${1:-} in
     --no-gui) gui=false ;;
     '') ;;
-    -h|--help) printf 'Gebruik: eczos-support-report [--no-gui]\n'; exit 0 ;;
-    *) printf 'Onbekende optie: %s\n' "$1" >&2; exit 2 ;;
+    -h|--help) printf '%s\n' "$(_ 'Usage: eczos-support-report [--no-gui]')"; exit 0 ;;
+    *) printf "$(_ 'Unknown option: %s')\n" "$1" >&2; exit 2 ;;
 esac
 
 if [[ $(id -u) -eq 0 ]]; then
-    printf 'Maak een supportrapport als de ingelogde gebruiker, niet als root.\n' >&2
+    printf '%s\n' "$(_ 'Create a support report as the signed-in user, not as root.')" >&2
     exit 2
 fi
 
@@ -24,24 +27,24 @@ mkdir -p "$documents"
 output="$documents/ECZOS-supportrapport-$(date +%Y%m%d-%H%M%S).txt"
 umask 077
 {
-    printf 'ECZOS supportrapport\nGemaakt: %s\n\n' "$(date --iso-8601=seconds)"
-    printf '%s\n' '--- Systeem ---'
+    printf "$(_ 'ECZOS support report\nCreated: %s\n\n')" "$(date --iso-8601=seconds)"
+    printf '%s\n' "$(_ '--- System ---')"
     grep -E '^(PRETTY_NAME|VARIANT|VERSION)=' /etc/os-release 2>/dev/null || true
     uname -srmo
     lscpu | grep -E '^(Architecture|Model name|CPU\(s\)):' || true
-    printf '\n%s\n' '--- Geheugen en opslag ---'
+    printf '\n%s\n' "$(_ '--- Memory and storage ---')"
     free -h
     lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS
-    printf '\n%s\n' '--- Grafische hardware ---'
+    printf '\n%s\n' "$(_ '--- Graphics hardware ---')"
     lspci -nnk | awk '/VGA compatible controller|3D controller|Display controller/{print; keep=2; next} keep>0 {print; keep--}'
-    printf '\n%s\n' '--- ECZOS onderdelen ---'
+    printf '\n%s\n' "$(_ '--- ECZOS components ---')"
     eczos-doctor
-    printf '\n%s\n' '--- Mislukte diensten ---'
+    printf '\n%s\n' "$(_ '--- Failed services ---')"
     systemctl --failed --no-pager 2>&1 || true
-    printf '\nDit rapport wordt niet automatisch verzonden. Controleer het voor delen.\n'
+    printf '\n%s\n' "$(_ 'This report is not sent automatically. Check it before sharing.')"
 } > "$output"
 
-printf 'Supportrapport opgeslagen: %s\n' "$output"
+printf "$(_ 'Support report saved: %s')\n" "$output"
 if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
-    kdialog --title 'ECZOS Ondersteuning' --msgbox "Het rapport is opgeslagen als:\n$output\n\nHet is niet automatisch verzonden."
+    kdialog --title "$(_ 'ECZOS Support')" --msgbox "$(printf "$(_ 'The report was saved as:\n%s\n\nIt was not sent automatically.')" "$output")"
 fi

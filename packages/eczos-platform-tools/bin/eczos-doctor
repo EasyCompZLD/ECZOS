@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export TEXTDOMAIN=${TEXTDOMAIN:-eczos-platform-tools}
+export TEXTDOMAINDIR=${TEXTDOMAINDIR:-/usr/share/locale}
+_() { gettext "$1"; }
 
 json=false
 gui=false
@@ -9,11 +12,11 @@ case ${1:-} in
         exec /usr/bin/eczos-ui diagnostics
         ;;
     '') ;;
-    *) printf 'Gebruik: eczos-doctor [--json|--gui]\n' >&2; exit 2 ;;
+    *) printf '%s\n' "$(_ 'Usage: eczos-doctor [--json|--gui]')" >&2; exit 2 ;;
 esac
 
 package_ok() { dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -Fxq 'install ok installed'; }
-yesno() { [[ $1 == true ]] && printf ja || printf nee; }
+yesno() { [[ $1 == true ]] && _ 'yes' || _ 'no'; }
 
 windows=false
 if command -v eczos-windows >/dev/null 2>&1 && \
@@ -33,10 +36,10 @@ firmware=false; package_ok fwupd && firmware=true
 printer=false; package_ok cups && printer=true
 scanner=false; package_ok skanpage && scanner=true
 office=missing
-office_label='niet geïnstalleerd'
+office_label=$(_ 'not installed')
 if package_ok softmaker-freeoffice-2024; then
     office=installed
-    office_label=geïnstalleerd
+    office_label=$(_ 'installed')
 fi
 failed_units=$(systemctl --failed --no-legend 2>/dev/null | wc -l | tr -d ' ')
 
@@ -51,19 +54,19 @@ if [[ $json == true ]]; then
 fi
 
 report=$(cat <<EOF
-ECZOS Diagnose
+ECZOS $(_ 'Diagnostics')
 
-Windows-apps: $(yesno "$windows")
-Gaming: $gaming_verdict
-ECZ Apps: $(yesno "$apps")
-Flatpak-koppeling: $(yesno "$flatpak")
-Back-up: $(yesno "$backup")
-Telefoonkoppeling: $(yesno "$phone")
-Firmware-updates: $(yesno "$firmware")
-Printers: $(yesno "$printer")
-Scanners: $(yesno "$scanner")
-Office: $office_label
-Mislukte systeemdiensten: $failed_units
+$(_ 'Windows apps'): $(yesno "$windows")
+$(_ 'Gaming'): $gaming_verdict
+$(_ 'ECZ Apps'): $(yesno "$apps")
+$(_ 'Flatpak integration'): $(yesno "$flatpak")
+$(_ 'Backup'): $(yesno "$backup")
+$(_ 'Phone integration'): $(yesno "$phone")
+$(_ 'Firmware updates'): $(yesno "$firmware")
+$(_ 'Printers'): $(yesno "$printer")
+$(_ 'Scanners'): $(yesno "$scanner")
+$(_ 'Office'): $office_label
+$(_ 'Failed system services'): $failed_units
 EOF
 )
 
