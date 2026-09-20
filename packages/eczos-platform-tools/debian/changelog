@@ -1,3 +1,10 @@
+eczos-platform-tools (0.1.1) trixie; urgency=medium
+
+  * Load the verified ECZOS release-image catalogue automatically in Recovery
+    Media Creator.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 17:00:00 +0200
+
 eczos-platform-tools (0.1.0) trixie; urgency=medium
 
   * Release ECZOS Settings, diagnostics and migration tools for ECZOS 0.1.

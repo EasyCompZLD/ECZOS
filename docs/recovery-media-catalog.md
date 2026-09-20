@@ -1,8 +1,9 @@
 # ECZOS recovery media catalog
 
 The recovery media creator works with local `.iso` and `.img` files. Online
-version selection becomes available after `CatalogURL` in
-`/etc/eczos/recovery-media.conf` points to a public HTTPS JSON document.
+version selection is provided by the public HTTPS catalogue at
+`https://repo.easycomp.cloud/eczos/releases.json`, configured through
+`CatalogURL` in `/etc/eczos/recovery-media.conf`.
 
 The catalog format is:
 

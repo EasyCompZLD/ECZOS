@@ -14,4 +14,5 @@ if grep -Fq 'konsole --hold' /usr/bin/eczos-recovery-media; then
     exit 1
 fi
 grep -Fq -- '--json-progress' /usr/lib/eczos-recovery-media/write-media
+grep -Fxq 'CatalogURL=https://repo.easycomp.cloud/eczos/releases.json' /etc/eczos/recovery-media.conf
 printf 'eczos-recovery-media installed-package smoke test passed\n'

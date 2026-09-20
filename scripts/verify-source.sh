@@ -128,11 +128,13 @@ for required in \
     scripts/init-eczos-repository.sh \
     scripts/import-eczos-repository-packages.sh \
     scripts/publish-eczos-repository.sh \
+    scripts/generate-eczos-repository-web.py \
     scripts/verify-release-0.1.0.sh \
     scripts/build-release-packages-vm.sh \
     scripts/publish-release-0.1.0-vm.sh \
     scripts/build-release-image-vm.sh \
     scripts/finalize-release-0.1.0-vm.sh \
+    scripts/publish-media-update-0.1.1-vm.sh \
     scripts/unlock-eczos-repository-key.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \

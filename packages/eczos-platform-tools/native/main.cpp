@@ -1299,6 +1299,7 @@ private:
         });
         setCustomContent(page, tr("Create recovery media"), tr("Write an ECZOS installation image to USB, SD card or optical media with visible progress."));
         refreshDevices();
+        QTimer::singleShot(0, catalogButton, &QPushButton::click);
     }
 
     void showCustomPage(const QString &id)

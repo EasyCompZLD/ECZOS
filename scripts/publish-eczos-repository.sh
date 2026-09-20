@@ -12,7 +12,8 @@ fi
 for required in \
     "$REPOSITORY_DIR/dists/trixie/InRelease" \
     "$REPOSITORY_DIR/dists/trixie-testing/InRelease" \
-    "$REPOSITORY_DIR/keys/eczos-archive-keyring.gpg"; do
+    "$REPOSITORY_DIR/keys/eczos-archive-keyring.gpg" \
+    "$REPOSITORY_DIR/releases.json"; do
     [[ -s "$required" ]] || {
         printf 'Repository is incomplete: %s\n' "$required" >&2
         exit 1
@@ -43,6 +44,8 @@ publish_target() {
     # a package referenced by the previous InRelease file.
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/pool/" "$target/pool/"
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/keys/" "$target/keys/"
+    rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/images/" "$target/images/"
+    rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/releases.json" "$target/releases.json"
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/index.html" "$target/index.html"
     rsync -a --delete-delay --chmod=D755,F644 \
         "$REPOSITORY_DIR/dists/" "$target/dists/"

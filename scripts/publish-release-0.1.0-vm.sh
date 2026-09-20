@@ -27,6 +27,8 @@ export ECZOS_SSH_OPTIONS=${ECZOS_SSH_OPTIONS:--p 222 -l codex@repo.easycomp.clou
 
 "$ROOT_DIR/scripts/import-eczos-repository-packages.sh" \
     "$REPOSITORY_DIR" trixie "${release_packages[@]}"
+"$ROOT_DIR/scripts/generate-eczos-repository-web.py" \
+    "$REPOSITORY_DIR" "$RELEASE_DIR" --version 0.1.0 --published 2026-09-20
 "$ROOT_DIR/scripts/publish-eczos-repository.sh" \
     "$REPOSITORY_DIR" "$PRIMARY_TARGET" "${ECZOS_REPOSITORY_MIRROR_TARGET:-}"
 

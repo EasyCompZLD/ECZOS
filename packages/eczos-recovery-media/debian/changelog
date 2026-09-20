@@ -1,3 +1,9 @@
+eczos-recovery-media (0.1.1) trixie; urgency=medium
+
+  * Enable the public, checksummed ECZOS release-image catalogue.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 17:00:00 +0200
+
 eczos-recovery-media (0.1.0) trixie; urgency=medium
 
   * Release the graphical recovery-media creator for ECZOS 0.1.

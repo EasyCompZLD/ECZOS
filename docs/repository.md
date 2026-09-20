@@ -6,6 +6,12 @@ identical standby mirror may be published at
 until mirror failover has been tested; this avoids inconsistent metadata while
 the mirror is synchronizing.
 
+The public index is generated from the signed stable `Packages.gz` file during
+publication. It lists each current ECZOS package, version, architecture and
+short description instead of maintaining a second manual software list. The
+same generation step publishes `releases.json` and the checksummed release ISO
+used by Recovery Media Creator.
+
 The archive is managed with `reprepro` and has two Debian 13 suites:
 
 - `trixie` contains qualified stable ECZOS updates;
@@ -91,6 +97,14 @@ for rsync automatically; the password is never committed or printed.
 
 Add the mirror target as the final argument only after its SSH account and
 document root have been verified.
+
+## GitHub release
+
+The ECZOS 0.1.0 ISO is larger than GitHub's per-asset limit and therefore
+remains hosted at `repo.easycomp.cloud`. Create the GitHub release manually with
+tag `v0.1.0`, use `docs/releases/0.1.0.md` as its release notes, attach the
+small `.sha256` file, and retain the official HTTPS ISO link in those notes.
+The Git repository itself must not contain ISO or Debian package binaries.
 
 The client source and `eczos-archive-keyring` package are enabled only after a
 clean machine can retrieve and authenticate both suites over HTTPS. Existing
