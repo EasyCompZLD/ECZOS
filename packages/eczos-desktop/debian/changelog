@@ -1,3 +1,9 @@
+eczos-desktop (0.1.0) trixie; urgency=medium
+
+  * Release the complete ECZOS 0.1 desktop product layer.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 16:00:00 +0200
+
 eczos-desktop (0.1.0~dev37) UNRELEASED; urgency=medium
 
   * Require the release-candidate OOBE visuals and fast-system splash fix.

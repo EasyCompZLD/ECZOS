@@ -1,3 +1,9 @@
+eczos-sddm-theme (0.1.0) trixie; urgency=medium
+
+  * Release the ECZOS 0.1 login presentation.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 16:00:00 +0200
+
 eczos-sddm-theme (0.1.0~dev1) UNRELEASED; urgency=medium
 
   * Package the existing EasyComp SDDM presentation as an ECZOS-owned theme.

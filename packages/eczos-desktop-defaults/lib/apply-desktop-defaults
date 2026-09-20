@@ -5,6 +5,29 @@ STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
 STATE_DIR="$STATE_HOME/eczos"
 MARKER="$STATE_DIR/desktop-defaults-v5"
 
+remove_legacy_debian_installer_shortcut() {
+    local desktop_dir candidate
+    local -a desktop_dirs=("$HOME/Desktop" "$HOME/Bureaublad")
+
+    if command -v xdg-user-dir >/dev/null 2>&1; then
+        desktop_dir=$(xdg-user-dir DESKTOP 2>/dev/null || true)
+        [[ -n "$desktop_dir" ]] && desktop_dirs+=("$desktop_dir")
+    fi
+
+    for desktop_dir in "${desktop_dirs[@]}"; do
+        candidate="$desktop_dir/calamares-install-debian.desktop"
+        [[ -f "$candidate" && ! -L "$candidate" ]] || continue
+        if grep -Fxq 'Exec=calamares-install-debian' "$candidate" || \
+           grep -Fxq 'Name=Install Debian' "$candidate"; then
+            rm -f -- "$candidate"
+        fi
+    done
+}
+
+# This is deliberately before the one-time defaults marker. Old live images
+# may already have applied the defaults while leaving Debian's copied launcher.
+remove_legacy_debian_installer_shortcut
+
 if [[ ${1:-} != --force && -e "$MARKER" ]]; then
     exit 0
 fi

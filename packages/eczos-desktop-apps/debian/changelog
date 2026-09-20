@@ -1,3 +1,9 @@
+eczos-desktop-apps (0.1.0) trixie; urgency=medium
+
+  * Release the supported ECZOS 0.1 desktop application set.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 16:00:00 +0200
+
 eczos-desktop-apps (0.1.0~dev4) UNRELEASED; urgency=medium
 
   * Require the current integrated settings, gaming and recovery tools.

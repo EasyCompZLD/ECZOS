@@ -7,6 +7,8 @@ test -x /usr/bin/eczos-installer
 test -x /usr/bin/eczos-add-installer-icon
 sh -n /usr/bin/eczos-installer
 sh -n /usr/bin/eczos-add-installer-icon
+test -x /var/lib/dpkg/info/eczos-installer.prerm
+sh -n /var/lib/dpkg/info/eczos-installer.prerm
 test -s /usr/share/applications/org.eczos.Installer.desktop
 test -s /usr/share/calamares/branding/eczos/branding.desc
 test -e /usr/share/calamares/branding/eczos/eczos-logo.png
@@ -29,6 +31,8 @@ if grep -REi 'Debian GNU/Linux|Install Debian' \
     printf 'Visible Debian installer branding found in ECZOS-owned files.\n' >&2
     exit 1
 fi
+grep -Fq 'calamares-install-debian.desktop' /usr/bin/eczos-add-installer-icon
+grep -Fq 'calamares-install-debian.desktop' /var/lib/dpkg/info/eczos-installer.prerm
 dpkg --audit
 apt-get check
 printf 'eczos-installer installed-package smoke test passed\n'

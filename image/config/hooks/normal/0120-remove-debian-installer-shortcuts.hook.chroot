@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+remove_launcher() {
+    candidate=$1
+    [ -f "$candidate" ] && [ ! -L "$candidate" ] || return 0
+    if grep -Fxq 'Exec=calamares-install-debian' "$candidate" || \
+       grep -Fxq 'Name=Install Debian' "$candidate"; then
+        rm -f -- "$candidate"
+    fi
+}
+
+# calamares-settings-debian can ship a skeleton Desktop launcher. It is not
+# part of the ECZOS live experience; ECZOS supplies its own installer icon.
+remove_launcher /etc/skel/Desktop/calamares-install-debian.desktop
+remove_launcher /etc/skel/Bureaublad/calamares-install-debian.desktop
+
+exit 0

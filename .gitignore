@@ -1,6 +1,8 @@
 # macOS metadata
 .DS_Store
 **/.DS_Store
+**/__pycache__/
+*.pyc
 
 # Historical/generated images and third-party binary packages
 /Build/

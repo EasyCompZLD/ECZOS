@@ -12,6 +12,7 @@ for required in \
     config/hooks/normal/0090-eczos-product-policy.hook.chroot \
     config/hooks/normal/0100-eczos-image-policy.hook.chroot \
     config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
+    config/hooks/normal/0120-remove-debian-installer-shortcuts.hook.chroot \
     config/bootloaders/grub-pc/grub.cfg \
     config/bootloaders/grub-pc/splash.png \
     config/bootloaders/grub-pc/live-theme/theme.txt \
@@ -47,6 +48,10 @@ grep -F -- 'username=eczos user-fullname=ECZOS hostname=eczos-live' \
     "$IMAGE_DIR/auto/config"
 grep -Fx 'Autolock=false' \
     "$IMAGE_DIR/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session"
+grep -Fq 'calamares-install-debian.desktop' \
+    "$IMAGE_DIR/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session"
+grep -Fq 'calamares-install-debian.desktop' \
+    "$IMAGE_DIR/config/hooks/normal/0120-remove-debian-installer-shortcuts.hook.chroot"
 grep -F 'menuentry "ECZOS proberen"' \
     "$IMAGE_DIR/config/bootloaders/grub-pc/grub.cfg"
 grep -F 'menuentry "ECZOS installeren"' \

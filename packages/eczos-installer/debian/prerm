@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+remove_launcher() {
+    candidate=$1
+    [ -f "$candidate" ] && [ ! -L "$candidate" ] || return 0
+    if grep -Fxq 'Exec=calamares-install-debian' "$candidate" || \
+       grep -Fxq 'Name=Install Debian' "$candidate"; then
+        rm -f -- "$candidate"
+    fi
+}
+
+# Calamares removes this live-only package from the installed target. Remove
+# only the known Debian launcher, with a content guard so user files with a
+# coincidental name are not deleted.
+getent passwd | while IFS=: read -r _ _ uid _ _ home _; do
+    case "$uid" in
+        ''|*[!0-9]*) continue ;;
+    esac
+    if [ "$uid" -eq 0 ] || { [ "$uid" -ge 1000 ] && [ "$uid" -lt 60000 ]; }; then
+        remove_launcher "$home/Desktop/calamares-install-debian.desktop"
+        remove_launcher "$home/Bureaublad/calamares-install-debian.desktop"
+    fi
+done
+
+exit 0

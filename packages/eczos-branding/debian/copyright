@@ -2,11 +2,16 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: ECZOS Branding
 Source: internal EasyComp Zeeland project assets
 Comment:
- Asset provenance and redistribution rights must be confirmed before any public
- distribution. This development package is for internal evaluation only.
+ Asset provenance and the project-owner confirmation are recorded in
+ docs/asset-rights-0.1.0.txt in the ECZOS source tree. Third-party interfaces,
+ names and marks visible in product screenshots remain the property of their
+ respective owners.
 
 Files: *
 Copyright: 2026 EasyComp Zeeland
-License: All-rights-reserved
- These files may not be redistributed outside EasyComp Zeeland until a formal
- project and asset license has been approved.
+License: ECZOS-Proprietary-Redistributable
+ All rights are reserved by EasyComp Zeeland. Permission is granted to copy and
+ redistribute these files, unmodified, as part of official ECZOS packages,
+ installation images and recovery media published by EasyComp Zeeland. No
+ permission is granted to use the ECZOS marks separately or to imply
+ endorsement.

@@ -1,3 +1,9 @@
+eczos-oobe (0.1.0) trixie; urgency=medium
+
+  * Release the ECZOS 0.1 first-run experience.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 16:00:00 +0200
+
 eczos-oobe (0.1.0~dev8) UNRELEASED; urgency=medium
 
   * Open networking in ECZOS Settings and show the matching current capture.

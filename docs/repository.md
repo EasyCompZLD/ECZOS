@@ -41,6 +41,30 @@ Promote a separately retained, tested package set to `trixie`; do not rebuild a
 different binary with the same version. Every published package version must be
 unique and immutable.
 
+## ECZOS 0.1.0 release publication
+
+The release scripts use one checksummed package bundle for both the stable
+repository and the ISO. This prevents package binaries from changing between
+publication and image creation.
+
+On `ECZ-GamePC`, build the complete bundle as root:
+
+```sh
+cd /srv/eczos
+./scripts/build-release-packages-vm.sh
+```
+
+After that succeeds, publish its 14 ECZOS packages to stable as the `ecz`
+development user. The existing password and signing-key files below
+`/srv/eczos-repository-secrets` are detected automatically:
+
+```sh
+cd /srv/eczos
+./scripts/publish-release-0.1.0-vm.sh
+```
+
+Both commands stop until the formal ECZOS 0.1.0 asset-rights gate is approved.
+
 ## Publication
 
 The Virtualmin document root for the primary endpoint is

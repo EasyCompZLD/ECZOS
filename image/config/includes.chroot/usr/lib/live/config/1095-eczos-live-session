@@ -17,6 +17,16 @@ HOME_DIR=$(getent passwd "$LIVE_USERNAME" | cut -d: -f6)
 [ -n "$HOME_DIR" ] || exit 0
 LIVE_GROUP=$(id -gn "$LIVE_USERNAME")
 
+for desktop_dir in "$HOME_DIR/Desktop" "$HOME_DIR/Bureaublad"; do
+    legacy_launcher="$desktop_dir/calamares-install-debian.desktop"
+    if [ -f "$legacy_launcher" ] && [ ! -L "$legacy_launcher" ]; then
+        if grep -Fxq 'Exec=calamares-install-debian' "$legacy_launcher" || \
+           grep -Fxq 'Name=Install Debian' "$legacy_launcher"; then
+            rm -f -- "$legacy_launcher"
+        fi
+    fi
+done
+
 install -d -m 0700 -o "$LIVE_USERNAME" -g "$LIVE_GROUP" "$HOME_DIR/.config"
 cat > "$HOME_DIR/.config/kscreenlockerrc" <<'EOF'
 [Daemon]

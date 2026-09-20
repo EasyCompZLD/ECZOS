@@ -1,3 +1,10 @@
+eczos-desktop-defaults (0.1.0) trixie; urgency=medium
+
+  * Release the ECZOS 0.1 Plasma defaults and startup experience.
+  * Remove stale Debian installer launchers even for existing user profiles.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 16:00:00 +0200
+
 eczos-desktop-defaults (0.1.0~dev11) UNRELEASED; urgency=medium
 
   * Start the meaningful ECZOS sunrise sequence immediately on fast systems.

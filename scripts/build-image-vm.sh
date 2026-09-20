@@ -19,7 +19,7 @@ BUILD_DIR="$IMAGE_DIR/.build"
 ARTIFACT_DIR="$BUILD_DIR/artifacts"
 LOG_DIR="$BUILD_DIR/logs"
 BUILD_ID=$(date -u +%Y%m%d-%H%M%S)
-ISO_NAME="ECZOS-development-amd64-${BUILD_ID}.iso"
+ISO_NAME="ECZOS-0.1.0-amd64-${BUILD_ID}.iso"
 
 if [[ -e "$IMAGE_DIR/BUILD_BLOCKED.md" ]]; then
     printf 'ECZOS image build is intentionally blocked by:\n%s\n' \

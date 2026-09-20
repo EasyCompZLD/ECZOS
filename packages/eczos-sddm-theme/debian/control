@@ -11,7 +11,7 @@ Package: eczos-sddm-theme
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding (>= 0.1.0~dev1),
+ eczos-branding (>= 0.1.0),
  sddm,
  sddm-theme-breeze (>= 4:6.3.6)
 Description: ECZOS login theme for SDDM

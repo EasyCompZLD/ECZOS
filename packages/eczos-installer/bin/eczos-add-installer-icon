@@ -4,5 +4,14 @@ set -eu
 [ -e /run/live/medium ] || exit 0
 DESKTOP=$(xdg-user-dir DESKTOP)
 mkdir -p "$DESKTOP"
+
+LEGACY_LAUNCHER="$DESKTOP/calamares-install-debian.desktop"
+if [ -f "$LEGACY_LAUNCHER" ] && [ ! -L "$LEGACY_LAUNCHER" ]; then
+    if grep -Fxq 'Exec=calamares-install-debian' "$LEGACY_LAUNCHER" || \
+       grep -Fxq 'Name=Install Debian' "$LEGACY_LAUNCHER"; then
+        rm -f -- "$LEGACY_LAUNCHER"
+    fi
+fi
+
 install -m 0755 /usr/share/applications/org.eczos.Installer.desktop \
     "$DESKTOP/ECZOS-installeren.desktop"

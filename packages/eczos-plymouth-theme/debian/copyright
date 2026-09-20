@@ -2,12 +2,14 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: ECZOS Plymouth Theme
 Source: existing EasyComp Zeeland ECZOS prototype theme
 Comment:
- The project owner explicitly approved reuse of the existing ECZOS animation.
+ The project owner confirmed authorship and distribution rights for the ECZOS
+ animation and its support images on 2026-09-20.
  Only files required at runtime are included; editor, preview and source-frame
  files from the historical working directory are excluded.
 
 Files: *
 Copyright: 2026 EasyComp Zeeland
-License: All-rights-reserved
- These ECZOS-specific files may not be redistributed outside EasyComp Zeeland
- until a formal project license has been approved.
+License: ECZOS-Proprietary-Redistributable
+ All rights are reserved by EasyComp Zeeland. Permission is granted to copy and
+ redistribute these files, unmodified, as part of official ECZOS packages,
+ installation images and recovery media published by EasyComp Zeeland.

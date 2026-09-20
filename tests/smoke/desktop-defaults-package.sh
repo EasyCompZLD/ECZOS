@@ -23,6 +23,7 @@ grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
 grep -F 'START_ICON=file:///usr/share/eczos/branding/logo/logo-dark.png' /usr/bin/eczos-theme-switch
 grep -F 'START_ICON=file:///usr/share/eczos/branding/logo/logo.png' /usr/bin/eczos-theme-switch
 grep -F 'desktop-defaults-v5' /usr/lib/eczos/apply-desktop-defaults
+grep -F 'calamares-install-debian.desktop' /usr/lib/eczos/apply-desktop-defaults
 grep -F 'timeout 12s plasma-apply-wallpaperimage' /usr/bin/eczos-theme-switch
 grep -F 'kscreenlockerrc' /usr/bin/eczos-theme-switch
 grep -F 'org.eczos.desktop' /usr/bin/eczos-theme-switch

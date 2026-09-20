@@ -11,7 +11,7 @@ Package: eczos-desktop-defaults
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding (>= 0.1.0~dev8),
+ eczos-branding (>= 0.1.0),
  dbus-bin,
  libkf6config-bin,
  plasma-workspace,

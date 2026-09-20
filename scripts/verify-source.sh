@@ -14,6 +14,8 @@ for required in \
     config/debian-extra-components.list \
     config/supported-languages.tsv \
     docs/architecture.md \
+    docs/asset-rights-0.1.0.txt \
+    docs/asset-provenance.md \
     docs/repository.md \
     docs/security.md \
     repository/conf/distributions.template \
@@ -91,6 +93,7 @@ for required in \
     packages/eczos-desktop/debian/control \
     packages/eczos-installer/debian/control \
     packages/eczos-installer/bin/eczos-installer \
+    packages/eczos-installer/debian/prerm \
     packages/eczos-installer/branding/eczos/branding.desc \
     packages/eczos-installer/i18n/calamares-eczos_nl.ts \
     packages/eczos-installer/i18n/calamares-eczos_de.ts \
@@ -114,10 +117,15 @@ for required in \
     image/config/includes.chroot/usr/lib/live/config/1095-eczos-live-session \
     image/config/includes.chroot/etc/calamares/settings.conf \
     image/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
+    image/config/hooks/normal/0120-remove-debian-installer-shortcuts.hook.chroot \
     scripts/configure-freeoffice-repository-vm.sh \
     scripts/init-eczos-repository.sh \
     scripts/import-eczos-repository-packages.sh \
     scripts/publish-eczos-repository.sh \
+    scripts/verify-release-0.1.0.sh \
+    scripts/build-release-packages-vm.sh \
+    scripts/publish-release-0.1.0-vm.sh \
+    scripts/build-release-image-vm.sh \
     scripts/unlock-eczos-repository-key.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \
@@ -198,6 +206,12 @@ grep -Fxq 'WatermarkVerticalAlignment=1.5' \
 grep -Fxq 'welcomeStyleCalamares: false' \
     "$ROOT_DIR/packages/eczos-installer/branding/eczos/branding.desc" || \
     fail 'Calamares name is still enabled in the welcome heading'
+grep -Fq 'calamares-install-debian.desktop' \
+    "$ROOT_DIR/packages/eczos-installer/debian/prerm" || \
+    fail 'installer removal does not clean the legacy Debian desktop launcher'
+grep -Fq 'calamares-install-debian.desktop' \
+    "$ROOT_DIR/packages/eczos-installer/bin/eczos-add-installer-icon" || \
+    fail 'live installer setup does not clean the legacy Debian desktop launcher'
 grep -Fq 'visibility: Window.FullScreen' \
     "$ROOT_DIR/packages/eczos-oobe/qml/Main.qml" || \
     fail 'ECZOS OOBE is not configured for full-screen display'

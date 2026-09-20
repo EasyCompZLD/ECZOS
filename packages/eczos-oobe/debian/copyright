@@ -4,6 +4,7 @@ Source: https://easycompzeeland.nl/
 
 Files: *
 Copyright: 2026 EasyComp Zeeland
-License: Proprietary
- All rights reserved by EasyComp Zeeland. Distribution is permitted only as
- part of authorized ECZOS development and release media.
+License: ECZOS-Proprietary-Redistributable
+ All rights are reserved by EasyComp Zeeland. Permission is granted to copy and
+ redistribute these files, unmodified, as part of official ECZOS packages,
+ installation images and recovery media published by EasyComp Zeeland.

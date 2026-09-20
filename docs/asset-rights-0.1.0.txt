@@ -1,0 +1,53 @@
+ECZOS 0.1.0 asset-rights declaration
+====================================
+
+Status: approved-for-eczos-0.1.0
+Record date: 2026-09-20
+Rights holder: EasyComp Zeeland
+Owner confirmation: explicitly confirmed by the project owner on 2026-09-20
+
+Approved declaration
+--------------------
+
+EasyComp Zeeland confirms that it created, commissioned with transferable
+rights, or otherwise holds sufficient worldwide distribution rights for the
+following ECZOS-specific media:
+
+- packages/eczos-branding/assets/logo/*
+- packages/eczos-branding/assets/login/*
+- packages/eczos-branding/assets/wallpapers/*
+- packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/eczos-startup.mp4
+- packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/eczos-startup-poster.png
+- packages/eczos-oobe/assets/ambient-loop.mp4
+- packages/eczos-oobe/assets/new-dawn.m4a
+- packages/eczos-plymouth-theme/theme/images/animation-*.png
+- packages/eczos-plymouth-theme/theme/images/throbber-*.png
+- the remaining ECZOS Plymouth support images in that directory
+
+The rights holder permits those files to be copied and redistributed,
+unmodified, as part of official ECZOS packages, installation images and
+recovery media published by EasyComp Zeeland. All other rights are reserved.
+
+Product screenshots
+-------------------
+
+The screenshots below were captured from ECZOS test installations by the
+project owner. They are cleared for descriptive use in official ECZOS packages,
+installation images, documentation and marketing. Third-party application
+interfaces, names and marks visible in screenshots remain the property of their
+respective owners; ECZOS claims no ownership of those elements.
+
+- packages/eczos-branding/assets/screenshots/*
+
+Third-party runtime material
+----------------------------
+
+- The ECZOS SDDM package contains only ECZOS configuration and symlinks. KDE
+  Breeze implementation files remain owned and licensed by their package.
+- Debian, KDE, Wine, Steam, browser and other dependency files are not relicensed
+  by this declaration and retain their upstream licenses.
+- SoftMaker FreeOffice is distributed only under the separately recorded vendor
+  permission and pinned package-artifact policy.
+
+This declaration is the formal asset-rights record for ECZOS 0.1.0. Later
+releases must add newly introduced media to their own reviewed declaration.
