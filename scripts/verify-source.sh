@@ -130,6 +130,7 @@ for required in \
     scripts/publish-eczos-repository.sh \
     scripts/generate-eczos-repository-web.py \
     scripts/prepare-github-upload.sh \
+    scripts/prepare-github-source.sh \
     scripts/verify-release-0.1.0.sh \
     scripts/build-release-packages-vm.sh \
     scripts/publish-release-0.1.0-vm.sh \

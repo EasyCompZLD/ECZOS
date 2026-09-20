@@ -93,3 +93,13 @@ This checkout also uses tracked Git hooks to refresh the directory after every
 commit, branch checkout and merge. Only the release notes, checksum and upload
 instructions are copied. ISO images, credentials, signing keys and build caches
 are deliberately excluded.
+
+The complete source repository intended for GitHub Desktop is maintained
+separately in `Build/GitHub/ECZOS-SOURCE/`. It is a clean Git clone containing
+only committed project files and history. Untracked share content such as the
+separate `website/` project, ISO images, credentials and build output cannot be
+copied into it. Refresh it manually with:
+
+```sh
+make github-source
+```
