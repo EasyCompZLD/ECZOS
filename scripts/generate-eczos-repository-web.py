@@ -201,7 +201,7 @@ def render_index(packages, releases):
     body {{ font-family: Arial, sans-serif; background: #f7f7f7; color: #202124; margin: 0; padding: 20px; line-height: 1.5; }}
     .container {{ max-width: 1000px; margin: auto; background: #fff; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,.1); }}
     header {{ position: relative; text-align: center; margin-bottom: 30px; }}
-    header img {{ display: block; width: 120px; height: 120px; object-fit: contain; margin: 0 auto 10px; }}
+    header img {{ display: block; width: auto; max-width: 150px; height: auto; max-height: 120px; object-fit: contain; margin: 0 auto 10px; }}
     h1 {{ color: #003366; margin: 0 0 5px; }}
     h2 {{ color: #003366; margin: 32px 0 12px; }}
     p {{ color: #555; }}
@@ -223,7 +223,7 @@ def render_index(packages, releases):
     footer {{ text-align: center; margin-top: 40px; font-size: .9em; color: #777; }}
     @media (max-width: 680px) {{
       body {{ padding: 0; }} .container {{ padding: 22px 14px; min-height: 100vh; }}
-      .language {{ position: static; margin-bottom: 16px; }} header img {{ width: 96px; height: 96px; }}
+      .language {{ position: static; margin-bottom: 16px; }} header img {{ max-width: 135px; max-height: 96px; }}
       h1 {{ font-size: 1.65rem; }} th, td {{ padding: 9px; }}
     }}
   </style>
@@ -238,7 +238,9 @@ def render_index(packages, releases):
         <option value="de">Deutsch</option><option value="fr">Français</option>
       </select>
     </div>
-    <img src="assets/eczos-logo-dark.png" alt="EasyComp Zeeland">
+    <img src="https://easycompzeeland.nl/wp-content/uploads/2021/05/EasyComp-Zeeland-ECZ-logo-2020-Vectorv2_0000s_0010s_0000s_0000__Groep_@01x.png"
+         onerror="this.onerror=null;this.src='assets/eczos-logo-dark.png'"
+         alt="EasyComp Zeeland Logo">
     <h1 data-i18n="title">ECZOS-softwarerepository</h1>
     <p data-i18n="intro">Ondertekende software-updates en installatiekopieën voor EasyComp Zeeland Operating System.</p>
   </header>
