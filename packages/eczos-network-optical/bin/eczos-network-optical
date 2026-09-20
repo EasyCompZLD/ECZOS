@@ -7,6 +7,7 @@ import ipaddress
 import json
 import os
 import re
+import socket
 import subprocess
 from pathlib import Path
 
@@ -35,9 +36,13 @@ def udev_properties(device):
 def load_state():
     try:
         data = json.loads(STATE.read_text(encoding="utf-8"))
-        return data if data.get("schema") == 1 else {"schema": 1, "shares": {}}
+        if data.get("schema") == 1:
+            data.setdefault("shares", {})
+            data.setdefault("clients", {})
+            return data
+        return {"schema": 1, "shares": {}, "clients": {}}
     except (OSError, ValueError):
-        return {"schema": 1, "shares": {}}
+        return {"schema": 1, "shares": {}, "clients": {}}
 
 
 def capability_summary(props):
@@ -95,6 +100,7 @@ def local_drives():
             "address": share.get("address", ""),
             "port": share.get("port", 3260),
             "claim": share.get("claim", ""),
+            "server": f"{socket.gethostname()}.local",
         })
     return drives
 
@@ -120,6 +126,10 @@ def sessions():
 def network_drives():
     result = run(["/usr/bin/avahi-browse", "--resolve", "--parsable", "--terminate", SERVICE_TYPE], timeout=12)
     active = sessions()
+    automatic = {
+        iqn for iqn, node in load_state().get("clients", {}).items()
+        if isinstance(node, dict) and node.get("automatic") is True
+    }
     records = {}
     if not result or result.returncode not in (0, 1):
         return []
@@ -156,6 +166,7 @@ def network_drives():
             "capabilities": txt.get("capabilities", "Optical drive"),
             "writable": txt.get("write") == "true",
             "connected": iqn in active,
+            "automatic": iqn in automatic,
             "device": (active.get(iqn) or [""])[0],
             "status": "connected" if iqn in active else "available",
         }

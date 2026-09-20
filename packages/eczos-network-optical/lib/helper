@@ -23,6 +23,7 @@ STATE_DIR = Path("/var/lib/eczos/network-optical")
 STATE = STATE_DIR / "state.json"
 LOCK = STATE_DIR / "state.lock"
 AVAHI_DIR = Path("/etc/avahi/services")
+UDEV_RULES_DIR = Path("/etc/udev/rules.d")
 CONFIG = Path("/etc/eczos/network-optical.conf")
 IQN_PATTERN = re.compile(r"iqn\.[A-Za-z0-9.:-]{8,223}")
 HOST_PATTERN = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9.:-]{0,251}[A-Za-z0-9])?")
@@ -81,7 +82,8 @@ def locked_state():
         if data.get("schema") != 1 or not isinstance(data.get("shares"), dict):
             raise ValueError
     except (OSError, ValueError):
-        data = {"schema": 1, "shares": {}}
+        data = {"schema": 1, "shares": {}, "clients": {}}
+    data.setdefault("clients", {})
     return descriptor, data
 
 
@@ -178,6 +180,29 @@ def avahi_path(device_id):
     return AVAHI_DIR / f"eczos-optical-{device_id}.service"
 
 
+def udev_rule_path(device_id):
+    return UDEV_RULES_DIR / f"99-eczos-network-optical-{device_id}.rules"
+
+
+def set_local_use_blocked(device_id, device, blocked, match_key="", match_value=""):
+    path = udev_rule_path(device_id)
+    if blocked:
+        UDEV_RULES_DIR.mkdir(parents=True, exist_ok=True)
+        if match_key not in ("ID_SERIAL", "ID_PATH") or not match_value:
+            match_key, match_value = "DEVNAME", device
+        if any(character in match_value for character in ('\n', '\r', '\x00')):
+            fail("The optical drive identity is invalid.")
+        escaped = match_value.replace("\\", "\\\\").replace('"', '\\"')
+        path.write_text(
+            f'# Managed by ECZOS Network Optical Drives\nENV{{{match_key}}}=="{escaped}", ENV{{UDISKS_IGNORE}}="1"\n',
+            encoding="utf-8")
+        os.chmod(path, 0o644)
+    elif path.exists():
+        path.unlink()
+    run(["/usr/bin/udevadm", "control", "--reload"], check=False)
+    run(["/usr/bin/udevadm", "trigger", "--action=change", "--name-match", Path(device).name], check=False)
+
+
 def write_avahi(share):
     AVAHI_DIR.mkdir(parents=True, exist_ok=True)
     txt = {
@@ -214,6 +239,12 @@ def share(args):
     if len(args.name) > 80 or any(ord(char) < 32 for char in args.name):
         fail("The share name is invalid.")
     address = lan_address(args.address)
+    mounts = run(["/usr/bin/findmnt", "-rn", "-S", device], check=False)
+    if mounts and mounts.stdout.strip():
+        run(["/usr/bin/udisksctl", "unmount", "--block-device", device])
+    busy = run(["/usr/bin/fuser", "--", device], check=False)
+    if busy and busy.returncode == 0:
+        fail("The drive is currently in use. Stop reading or writing before sharing it.", 4)
     lock, state = locked_state()
     if device_id in state["shares"]:
         release_state(lock)
@@ -244,9 +275,12 @@ def share(args):
         "bluray": any(props.get(key) == "1" for key in ("ID_CDROM_BD", "ID_CDROM_BD_R", "ID_CDROM_BD_RE")),
         "iqn": iqn, "backstore": backstore, "address": address, "port": 3260,
         "claim": "", "claimMissingSince": 0,
+        "udevMatchKey": "ID_SERIAL" if props.get("ID_SERIAL") else ("ID_PATH" if props.get("ID_PATH") else "DEVNAME"),
+        "udevMatchValue": props.get("ID_SERIAL") or props.get("ID_PATH") or device,
     }
     state["shares"][device_id] = record
     save_state(lock, state)
+    set_local_use_blocked(device_id, device, True, record["udevMatchKey"], record["udevMatchValue"])
     write_avahi(record)
     run(["/usr/bin/systemctl", "enable", "--now", "eczos-network-optical-guard.service"])
     LOG.info("shared %s as %s on %s", device, iqn, address)
@@ -280,6 +314,7 @@ def unshare(args):
     path = avahi_path(args.id)
     if path.exists():
         path.unlink()
+    set_local_use_blocked(args.id, record["device"], False)
     del state["shares"][args.id]
     save_state(lock, state)
     LOG.info("stopped share %s", record["iqn"])
@@ -287,14 +322,14 @@ def unshare(args):
 
 
 def endpoint(host, port):
-    if port != 3260 or not HOST_PATTERN.fullmatch(host) or host.startswith("-"):
+    if port != 3260:
         fail("The discovered server address is invalid.")
     try:
         address = ipaddress.ip_address(host)
         if not address.is_private:
             fail("Only private LAN servers are allowed.")
     except ValueError:
-        if not host.endswith(".local"):
+        if not HOST_PATTERN.fullmatch(host) or host.startswith("-") or not host.endswith(".local"):
             fail("Only local-network hostnames are allowed.")
     return f"[{host}]:{port}" if ":" in host else f"{host}:{port}"
 
@@ -320,6 +355,11 @@ def connect(args):
             fail("The drive is in use by another computer or authentication was refused.", 5)
         fail("Connecting to the network optical drive failed.")
     run(["/usr/bin/udevadm", "settle", "--timeout=15"], timeout=20, check=False)
+    lock, state = locked_state()
+    state["clients"][args.iqn] = {
+        "host": args.host, "port": args.port, "automatic": bool(args.auto)
+    }
+    save_state(lock, state)
     LOG.info("connected target %s at %s", args.iqn, portal)
     print(json.dumps({"ok": True, "iqn": args.iqn}))
 
@@ -364,6 +404,11 @@ def set_auto(args):
     portal = endpoint(args.host, args.port)
     run(["/usr/sbin/iscsiadm", "-m", "node", "-T", args.iqn, "-p", portal,
          "--op", "update", "-n", "node.startup", "-v", "automatic" if args.enabled else "manual"])
+    lock, state = locked_state()
+    state["clients"][args.iqn] = {
+        "host": args.host, "port": args.port, "automatic": bool(args.enabled)
+    }
+    save_state(lock, state)
     print(json.dumps({"ok": True}))
 
 
@@ -373,6 +418,9 @@ def forget(args):
     if target_devices(args.iqn):
         fail("Disconnect the drive before forgetting it.")
     run(["/usr/sbin/iscsiadm", "-m", "node", "-T", args.iqn, "-p", portal, "--op", "delete"])
+    lock, state = locked_state()
+    state["clients"].pop(args.iqn, None)
+    save_state(lock, state)
     print(json.dumps({"ok": True}))
 
 

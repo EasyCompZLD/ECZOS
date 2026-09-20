@@ -761,14 +761,15 @@ private:
             }
         };
         auto refreshData = std::make_shared<std::function<void()>>();
-        *refreshData = [this, page, localLayout, networkLayout, status, clearCards, refreshData] {
+        const std::weak_ptr<std::function<void()>> weakRefresh = refreshData;
+        *refreshData = [this, page, localLayout, networkLayout, status, clearCards, weakRefresh] {
             if (!page->isVisible() || (m_task && m_task->state() != QProcess::NotRunning)) {
                 return;
             }
             setTaskFeedback(status);
             startTask(QStringLiteral("network-optical-status"), QStringLiteral("/usr/bin/eczos-network-optical"),
                       {QStringLiteral("status"), QStringLiteral("--json")}, tr("Looking for optical drives…"),
-                      [this, page, localLayout, networkLayout, status, clearCards, refreshData]
+                      [this, page, localLayout, networkLayout, status, clearCards, weakRefresh]
                       (int code, const QByteArray &output, const QByteArray &errors) {
                 if (!page->isVisible()) {
                     return;
@@ -789,12 +790,15 @@ private:
                     auto *cardLayout = new QVBoxLayout(card);
                     auto *summary = new QLabel(
                         drive.value(QStringLiteral("capabilities")).toString() + QStringLiteral("\n")
-                        + drive.value(QStringLiteral("device")).toString(), card);
+                        + drive.value(QStringLiteral("device")).toString() + QStringLiteral("\n")
+                        + (drive.value(QStringLiteral("media")).toBool() ? tr("Media inserted") : tr("No media")), card);
                     summary->setWordWrap(true);
                     cardLayout->addWidget(summary);
                     const bool shared = drive.value(QStringLiteral("shared")).toBool();
                     auto *state = new QLabel(shared
-                        ? tr("● Shared on the local network as %1").arg(drive.value(QStringLiteral("shareName")).toString())
+                        ? tr("● Shared on the local network as %1\nServer: %2")
+                              .arg(drive.value(QStringLiteral("shareName")).toString(),
+                                   drive.value(QStringLiteral("server")).toString())
                         : tr("Not shared"), card);
                     state->setStyleSheet(shared ? QStringLiteral("color: #15956f; font-weight: 600;") : QString());
                     cardLayout->addWidget(state);
@@ -812,7 +816,7 @@ private:
                     cardLayout->addWidget(advanced, 0, Qt::AlignLeft);
                     cardLayout->addWidget(details);
                     auto *button = new QPushButton(shared ? tr("Stop sharing") : tr("Share drive"), card);
-                    connect(button, &QPushButton::clicked, this, [this, drive, shared, status, refreshData] {
+                    connect(button, &QPushButton::clicked, this, [this, drive, shared, status, weakRefresh] {
                         QStringList arguments{QStringLiteral("/usr/lib/eczos-network-optical/helper")};
                         if (shared) {
                             if (QMessageBox::question(this, tr("Stop sharing this drive?"),
@@ -836,9 +840,9 @@ private:
                         setTaskFeedback(status);
                         startTask(QStringLiteral("network-optical-manage"), QStringLiteral("/usr/bin/pkexec"), arguments,
                                   shared ? tr("Stopping the share…") : tr("Sharing the drive…"),
-                                  [status, refreshData](int result, const QByteArray &, const QByteArray &taskErrors) {
+                                  [status, weakRefresh](int result, const QByteArray &, const QByteArray &taskErrors) {
                             if (result == 0) {
-                                (*refreshData)();
+                                if (const auto action = weakRefresh.lock()) (*action)();
                             } else {
                                 const QString detail = QString::fromUtf8(taskErrors).trimmed();
                                 status->setText(detail.isEmpty() ? QObject::tr("The operation failed.") : detail.section('\n', -1));
@@ -872,7 +876,7 @@ private:
                     summary->setStyleSheet(connected ? QStringLiteral("color: #15956f;") : QString());
                     cardLayout->addWidget(summary);
                     auto *autoConnect = new QCheckBox(tr("Connect automatically at startup"), card);
-                    autoConnect->setChecked(false);
+                    autoConnect->setChecked(drive.value(QStringLiteral("automatic")).toBool());
                     autoConnect->setToolTip(tr("Off by default because a physical drive can be used by only one computer at a time."));
                     cardLayout->addWidget(autoConnect);
                     auto *buttons = new QHBoxLayout;
@@ -880,22 +884,45 @@ private:
                     buttons->addWidget(primary);
                     if (connected) {
                         auto *eject = new QPushButton(tr("Eject"), card);
-                        connect(eject, &QPushButton::clicked, this, [this, drive, status, refreshData] {
+                        connect(eject, &QPushButton::clicked, this, [this, drive, status, weakRefresh] {
                             setTaskFeedback(status);
                             startTask(QStringLiteral("network-optical-eject"), QStringLiteral("/usr/bin/pkexec"),
                                       {QStringLiteral("/usr/lib/eczos-network-optical/helper"), QStringLiteral("eject"),
                                        QStringLiteral("--device"), drive.value(QStringLiteral("device")).toString()},
-                                      tr("Ejecting media…"), [status, refreshData](int result, const QByteArray &, const QByteArray &taskErrors) {
+                                      tr("Ejecting media…"), [status, weakRefresh](int result, const QByteArray &, const QByteArray &taskErrors) {
                                 status->setText(result == 0 ? QObject::tr("Media ejected")
                                     : QString::fromUtf8(taskErrors).trimmed().section('\n', -1));
-                                if (result == 0) (*refreshData)();
+                                if (result == 0) {
+                                    if (const auto action = weakRefresh.lock()) (*action)();
+                                }
                             });
                         });
                         buttons->addWidget(eject);
                     }
                     buttons->addStretch(1);
                     cardLayout->addLayout(buttons);
-                    connect(primary, &QPushButton::clicked, this, [this, drive, connected, autoConnect, status, refreshData] {
+                    if (connected) {
+                        connect(autoConnect, &QCheckBox::toggled, this, [this, drive, status, weakRefresh](bool enabled) {
+                            QStringList arguments{QStringLiteral("/usr/lib/eczos-network-optical/helper"),
+                                                  QStringLiteral("set-auto"),
+                                                  QStringLiteral("--host"), drive.value(QStringLiteral("address")).toString(),
+                                                  QStringLiteral("--port"), QString::number(drive.value(QStringLiteral("port")).toInt(3260)),
+                                                  QStringLiteral("--iqn"), drive.value(QStringLiteral("iqn")).toString()};
+                            if (enabled) arguments << QStringLiteral("--enabled");
+                            setTaskFeedback(status);
+                            startTask(QStringLiteral("network-optical-auto"), QStringLiteral("/usr/bin/pkexec"), arguments,
+                                      tr("Saving automatic connection…"),
+                                      [status, weakRefresh](int result, const QByteArray &, const QByteArray &taskErrors) {
+                                if (result == 0) {
+                                    if (const auto action = weakRefresh.lock()) (*action)();
+                                } else {
+                                    const QString detail = QString::fromUtf8(taskErrors).trimmed();
+                                    status->setText(detail.isEmpty() ? QObject::tr("The operation failed.") : detail.section('\n', -1));
+                                }
+                            });
+                        });
+                    }
+                    connect(primary, &QPushButton::clicked, this, [this, drive, connected, autoConnect, status, weakRefresh] {
                         QStringList arguments{QStringLiteral("/usr/lib/eczos-network-optical/helper"),
                                               connected ? QStringLiteral("disconnect") : QStringLiteral("connect"),
                                               QStringLiteral("--host"), drive.value(QStringLiteral("address")).toString(),
@@ -907,9 +934,9 @@ private:
                         setTaskFeedback(status);
                         startTask(QStringLiteral("network-optical-connect"), QStringLiteral("/usr/bin/pkexec"), arguments,
                                   connected ? tr("Disconnecting safely…") : tr("Connecting…"),
-                                  [status, refreshData](int result, const QByteArray &, const QByteArray &taskErrors) {
+                                  [status, weakRefresh](int result, const QByteArray &, const QByteArray &taskErrors) {
                             if (result == 0) {
-                                (*refreshData)();
+                                if (const auto action = weakRefresh.lock()) (*action)();
                             } else {
                                 const QString detail = QString::fromUtf8(taskErrors).trimmed();
                                 status->setText(detail.isEmpty() ? QObject::tr("The operation failed.") : detail.section('\n', -1));
@@ -928,10 +955,14 @@ private:
                 status->setText(tr("Lists updated"));
             });
         };
-        connect(refresh, &QPushButton::clicked, this, [refreshData] { (*refreshData)(); });
+        connect(refresh, &QPushButton::clicked, this, [weakRefresh] {
+            if (const auto action = weakRefresh.lock()) (*action)();
+        });
         auto *timer = new QTimer(page);
         timer->setInterval(5000);
-        connect(timer, &QTimer::timeout, page, [refreshData] { (*refreshData)(); });
+        connect(timer, &QTimer::timeout, page, [weakRefresh] {
+            if (const auto action = weakRefresh.lock()) (*action)();
+        });
         timer->start();
         setCustomContent(page, tr("Network optical drives"),
                          tr("Use physical CD, DVD and Blu-ray drives from another ECZOS computer as normal local devices."));

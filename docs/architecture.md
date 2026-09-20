@@ -21,6 +21,11 @@ break distribution detection.
 5. **ECZ Services** — optional backup, device, cloud and support integrations.
 6. **ECZ Distribution** — signed repository, installer, images and releases.
 
+Network optical drives follow the same native-settings boundary. The Settings
+page is unprivileged, a read-only JSON backend discovers state, and a narrowly
+scoped Polkit helper controls Linux LIO/pSCSI, Open-iSCSI and Avahi. See
+`docs/network-optical-drives.md` for the data flow and exclusivity model.
+
 ## Ownership boundaries
 
 ECZOS packages may install their own files under these namespaces:

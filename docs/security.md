@@ -39,3 +39,12 @@ Windows applications and ECZOS desktop tools run unprivileged. A small privilege
 helper may exist later for narrowly defined package or system operations, using
 polkit and explicit authorization. It must not accept arbitrary commands or
 paths from an unprivileged caller.
+
+The network-optical-drive helper is the first implementation of this boundary.
+It accepts only enumerated operations and validated optical devices, IQNs and
+private-LAN endpoints. The GUI and read-only discovery CLI stay unprivileged.
+The first-client LIO claim prevents normal concurrent use but is not strong
+authentication; the feature must be used only on a trusted private LAN. Its
+initial dynamic-ACL claim interval is documented in
+`docs/network-optical-drives.md` and must not be marketed as hostile-LAN
+protection.

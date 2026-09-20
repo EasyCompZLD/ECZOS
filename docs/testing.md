@@ -98,3 +98,25 @@ boot, live-session, installer, installed-system and removal tests.
 - VM boot and shutdown succeed;
 - an ordinary Debian update does not remove ECZOS-owned files;
 - removing an ECZOS cosmetic package does not damage the desktop or boot path.
+
+## Network optical drives
+
+Run `scripts/stage-network-optical-vm.sh` as root on the Debian 13 development
+machine. It installs the runtime dependencies, builds the complete final-version
+package set, installs it and runs the package smoke tests. Then validate with
+two physical ECZOS machines:
+
+1. Share one local optical drive from ECZOS Settings and confirm its Avahi
+   service and LIO pSCSI target appear.
+2. Connect from the second machine and confirm a new iSCSI-backed `/dev/srN`
+   appears and can read real media.
+3. Confirm a second simultaneous client is rejected and the first claim is
+   released after a clean disconnect and grace period.
+4. Confirm busy disconnect and busy unshare are refused, then confirm clean
+   disconnect, eject and unshare.
+5. Reboot both roles and verify shared-server state, manual startup by default,
+   and automatic startup only after the user enables it.
+
+Do not remove or overwrite a manually configured LIO proof-of-concept target
+until its configuration has been backed up and the managed package has passed
+its installation smoke test.

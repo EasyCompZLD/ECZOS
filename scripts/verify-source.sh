@@ -201,6 +201,18 @@ import sys
 compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
 PY
 
+for network_optical_python in \
+    "$ROOT_DIR/packages/eczos-network-optical/bin/eczos-network-optical" \
+    "$ROOT_DIR/packages/eczos-network-optical/lib/helper" \
+    "$ROOT_DIR/packages/eczos-network-optical/lib/guard"; do
+    python3 - "$network_optical_python" <<'PY' || \
+        fail "invalid network optical drive Python source: ${network_optical_python#"$ROOT_DIR/"}"
+import pathlib
+import sys
+compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
+PY
+done
+
 grep -Fxq 'Theme=org.eczos.desktop' \
     "$ROOT_DIR/packages/eczos-desktop-defaults/config/ksplashrc" || \
     fail 'ECZOS splash is not selected system-wide'
