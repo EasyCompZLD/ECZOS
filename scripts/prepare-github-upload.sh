@@ -42,8 +42,12 @@ install -d -m 0755 "$UPLOAD_ROOT"
 install -m 0644 "$NOTES" "$UPLOAD_ROOT/RELEASE-NOTES.md"
 install -m 0644 "$CHECKSUM" "$UPLOAD_ROOT/$IMAGE_NAME.sha256"
 
+source_ref="v$VERSION"
 commit=unavailable
-if git -C "$ROOT_DIR" rev-parse --verify HEAD >/dev/null 2>&1; then
+if git -C "$ROOT_DIR" rev-parse --verify "refs/tags/$source_ref" >/dev/null 2>&1; then
+    commit=$(git -C "$ROOT_DIR" rev-list -n 1 "$source_ref")
+elif git -C "$ROOT_DIR" rev-parse --verify HEAD >/dev/null 2>&1; then
+    source_ref=HEAD
     commit=$(git -C "$ROOT_DIR" rev-parse HEAD)
 fi
 
@@ -55,6 +59,7 @@ ECZOS GitHub release upload set
 Release tag:   v$VERSION
 Release title: ECZOS $VERSION
 Source commit: $commit
+Source ref:    $source_ref
 
 1. Paste the contents of RELEASE-NOTES.md into the GitHub release description.
 2. Upload $IMAGE_NAME.sha256 as the release asset.
