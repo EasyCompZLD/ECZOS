@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -u
+
+ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+ECZOS_GITHUB_UPLOAD_QUIET=1 "$ROOT_DIR/scripts/prepare-github-upload.sh" || \
+    printf 'Warning: ECZOS GitHub upload directory could not be refreshed.\n' >&2
+exit 0

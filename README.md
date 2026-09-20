@@ -89,7 +89,7 @@ The allowlisted files for the latest GitHub release are generated in
 make github-upload
 ```
 
-This checkout also uses the tracked `.githooks/post-commit` hook to refresh the
-directory after every commit. Only the release notes, checksum and upload
+This checkout also uses tracked Git hooks to refresh the directory after every
+commit, branch checkout and merge. Only the release notes, checksum and upload
 instructions are copied. ISO images, credentials, signing keys and build caches
 are deliberately excluded.
