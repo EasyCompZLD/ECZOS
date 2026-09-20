@@ -27,8 +27,11 @@ touch "$agent_config"
 chmod 0600 "$agent_config"
 if ! grep -qxF 'allow-preset-passphrase' "$agent_config"; then
     printf 'allow-preset-passphrase\n' >> "$agent_config"
-    gpgconf --kill gpg-agent
 fi
+# Always restart the agent. A long-running desktop or SSH session may have
+# launched it before allow-preset-passphrase was present, in which case merely
+# updating the configuration file is not sufficient.
+gpgconf --kill gpg-agent || true
 gpgconf --launch gpg-agent
 
 keygrip=$(gpg --batch --with-colons --with-keygrip --list-secret-keys |

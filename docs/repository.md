@@ -64,6 +64,11 @@ cd /srv/eczos
 ```
 
 Both commands stop until the formal ECZOS 0.1.0 asset-rights gate is approved.
+The combined `finalize-release-0.1.0-vm.sh` runner may be started as root, but
+automatically drops to the external repository directory's owner for signing
+and publication. This keeps the GPG agent, secret-key home and generated
+repository files under the `ecz` repository account even when the ISO build
+requires root privileges.
 
 ## Publication
 

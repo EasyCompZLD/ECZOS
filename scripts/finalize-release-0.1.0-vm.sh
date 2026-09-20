@@ -43,7 +43,15 @@ else
 fi
 
 printf '\n[3/3] Signing and publishing the stable APT repository\n'
-"$ROOT_DIR/scripts/publish-release-0.1.0-vm.sh"
+REPOSITORY_DIR=${ECZOS_REPOSITORY_DIR:-/srv/eczos-apt-repository}
+REPOSITORY_USER=$(stat -c '%U' "$REPOSITORY_DIR")
+if [[ $REPOSITORY_USER != root ]]; then
+    printf 'Publishing as repository owner %s.\n' "$REPOSITORY_USER"
+    runuser -u "$REPOSITORY_USER" -- \
+        bash "$ROOT_DIR/scripts/publish-release-0.1.0-vm.sh"
+else
+    "$ROOT_DIR/scripts/publish-release-0.1.0-vm.sh"
+fi
 
 printf '\nECZOS 0.1.0 release finalization completed successfully.\n'
 printf 'Packages: %s/packages\n' "$RELEASE_DIR"
