@@ -1,6 +1,7 @@
 eczos-desktop (0.1.0) trixie; urgency=medium
 
   * Release the complete ECZOS 0.1 desktop product layer.
+  * Include integrated LAN optical-drive sharing and client support.
 
  -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 16:00:00 +0200
 

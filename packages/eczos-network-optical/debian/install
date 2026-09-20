@@ -1,0 +1,5 @@
+bin/* usr/bin/
+lib/* usr/lib/eczos-network-optical/
+polkit/* usr/share/polkit-1/actions/
+systemd/* usr/lib/systemd/system/
+config/* etc/eczos/

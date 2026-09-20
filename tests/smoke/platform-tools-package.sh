@@ -44,8 +44,8 @@ grep -Fx 'Exec=eczos-system-settings --module eczos:migration' /usr/share/applic
 grep -F 'os.execv(str(native_host), [str(native_host), "--module", native_page])' /usr/bin/eczos-ui
 /usr/bin/eczos-ui --list-kcms-json | jq -e '.schemaVersion == 1 and (.modules | type == "array") and (.modules | length > 10)' >/dev/null
 QT_QPA_PLATFORM=offscreen /usr/bin/eczos-system-settings --list-json | jq -e '
-    .schemaVersion == 1 and (.eczosPages | length == 7) and
-    ([.eczosPages[].id] | contains(["eczos:overview", "eczos:windows", "eczos:gaming", "eczos:recovery", "eczos:migration", "eczos:diagnostics", "eczos:support"])) and
+    .schemaVersion == 1 and (.eczosPages | length == 8) and
+    ([.eczosPages[].id] | contains(["eczos:overview", "eczos:windows", "eczos:gaming", "eczos:network-optical", "eczos:recovery", "eczos:migration", "eczos:diagnostics", "eczos:support"])) and
     (.modules | length >= 80) and
     ([.modules[].id] | contains(["kcm_users", "kcm_networkmanagement", "kcm_kscreen", "kcm_printer_manager", "kcm_updates"]))
 ' >/dev/null

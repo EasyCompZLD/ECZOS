@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod 0755 debian/eczos-network-optical/usr/lib/eczos-network-optical/helper
+	chmod 0755 debian/eczos-network-optical/usr/lib/eczos-network-optical/guard

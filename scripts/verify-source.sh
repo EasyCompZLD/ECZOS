@@ -69,6 +69,12 @@ for required in \
     packages/eczos-gaming-core/po/de.po \
     packages/eczos-gaming-core/po/fr.po \
     packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json \
+    packages/eczos-network-optical/debian/control \
+    packages/eczos-network-optical/bin/eczos-network-optical \
+    packages/eczos-network-optical/lib/helper \
+    packages/eczos-network-optical/lib/guard \
+    packages/eczos-network-optical/polkit/org.eczos.networkoptical.policy \
+    packages/eczos-network-optical/systemd/eczos-network-optical-guard.service \
     packages/eczos-platform-tools/debian/control \
     packages/eczos-platform-tools/bin/eczos-control-center \
     packages/eczos-platform-tools/bin/eczos-ui \
@@ -138,6 +144,7 @@ for required in \
     scripts/stage-prebuild-experience-vm.sh \
     scripts/stage-ux-batch-vm.sh \
     scripts/stage-settings-gaming-batch-vm.sh \
+    scripts/stage-network-optical-vm.sh \
     scripts/stage-embedded-settings-hotfix-vm.sh \
     scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
@@ -287,6 +294,18 @@ grep -Fq 'branding/screenshots/oobe-welcome.png' \
 grep -Fq 'eczos-system-settings.sock' \
     "$ROOT_DIR/packages/eczos-platform-tools/native/main.cpp" || \
     fail 'ECZOS Settings is not single-instance'
+grep -Fq 'eczos:network-optical' \
+    "$ROOT_DIR/packages/eczos-platform-tools/native/main.cpp" || \
+    fail 'ECZOS Settings does not expose network optical drives'
+grep -Fq '_eczos-optical._tcp' \
+    "$ROOT_DIR/packages/eczos-network-optical/bin/eczos-network-optical" || \
+    fail 'network optical discovery does not use the ECZOS DNS-SD service'
+grep -Fq 'PSCSIStorageObject' \
+    "$ROOT_DIR/packages/eczos-network-optical/lib/helper" || \
+    fail 'network optical sharing does not use an LIO pSCSI backstore'
+grep -Fq 'generate_node_acls' \
+    "$ROOT_DIR/packages/eczos-network-optical/lib/guard" || \
+    fail 'network optical sharing lacks the exclusive-access ACL guard'
 grep -Fq 'LookAndFeelPackage' \
     "$ROOT_DIR/packages/eczos-desktop-defaults/bin/eczos-theme-switch" || \
     fail 'ECZOS appearance selection does not persist its global theme'

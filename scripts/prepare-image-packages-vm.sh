@@ -26,6 +26,7 @@ PACKAGES=(
     eczos-release
     eczos-windows-core
     eczos-gaming-core
+    eczos-network-optical
     eczos-platform-tools
     eczos-recovery-media
     eczos-installer

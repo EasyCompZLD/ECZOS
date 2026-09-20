@@ -6,6 +6,7 @@
 #include <QButtonGroup>
 #include <QCloseEvent>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QCommandLineParser>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
@@ -18,6 +19,7 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QInputDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -41,6 +43,8 @@
 #include <QSplitter>
 #include <QStandardPaths>
 #include <QSet>
+#include <QTabWidget>
+#include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItemIterator>
 #include <QUrl>
@@ -74,6 +78,7 @@ const QList<EczosPage> &eczosPages()
         {QStringLiteral("eczos:overview"), QObject::tr("Overview"), QObject::tr("Everything for your computer"), QStringLiteral("go-home")},
         {QStringLiteral("eczos:windows"), QObject::tr("Windows apps"), QObject::tr("Manage Windows programs"), QStringLiteral("application-x-ms-dos-executable")},
         {QStringLiteral("eczos:gaming"), QObject::tr("Gaming"), QObject::tr("Check Steam, Proton and Vulkan"), QStringLiteral("applications-games")},
+        {QStringLiteral("eczos:network-optical"), QObject::tr("Network optical drives"), QObject::tr("Share and connect CD, DVD and Blu-ray drives"), QStringLiteral("media-optical")},
         {QStringLiteral("eczos:recovery"), QObject::tr("Recovery media"), QObject::tr("Create an ECZOS medium"), QStringLiteral("drive-removable-media")},
         {QStringLiteral("eczos:migration"), QObject::tr("Transfer files"), QObject::tr("Bring files over from Windows"), QStringLiteral("folder-sync")},
         {QStringLiteral("eczos:diagnostics"), QObject::tr("Diagnostics"), QObject::tr("Check your computer"), QStringLiteral("tools-report-bug")},
@@ -729,6 +734,210 @@ private:
         checkGaming();
     }
 
+    void showNetworkOpticalPage()
+    {
+        auto *page = new QWidget;
+        auto *layout = pageLayout(page);
+        auto *tabs = new QTabWidget(page);
+        auto *localPage = new QWidget(tabs);
+        auto *networkPage = new QWidget(tabs);
+        auto *localLayout = new QVBoxLayout(localPage);
+        auto *networkLayout = new QVBoxLayout(networkPage);
+        auto *status = new QLabel(tr("Looking for optical drives on this computer and local network…"), page);
+        status->setWordWrap(true);
+        auto *refresh = new QPushButton(tr("Refresh"), page);
+        tabs->addTab(localPage, tr("Share my drives"));
+        tabs->addTab(networkPage, tr("Network drives"));
+        layout->addWidget(tabs, 1);
+        auto *actions = new QHBoxLayout;
+        actions->addWidget(status, 1);
+        actions->addWidget(refresh);
+        layout->addLayout(actions);
+
+        const auto clearCards = [](QVBoxLayout *target) {
+            while (QLayoutItem *item = target->takeAt(0)) {
+                delete item->widget();
+                delete item;
+            }
+        };
+        auto refreshData = std::make_shared<std::function<void()>>();
+        *refreshData = [this, page, localLayout, networkLayout, status, clearCards, refreshData] {
+            if (!page->isVisible() || (m_task && m_task->state() != QProcess::NotRunning)) {
+                return;
+            }
+            setTaskFeedback(status);
+            startTask(QStringLiteral("network-optical-status"), QStringLiteral("/usr/bin/eczos-network-optical"),
+                      {QStringLiteral("status"), QStringLiteral("--json")}, tr("Looking for optical drives…"),
+                      [this, page, localLayout, networkLayout, status, clearCards, refreshData]
+                      (int code, const QByteArray &output, const QByteArray &errors) {
+                if (!page->isVisible()) {
+                    return;
+                }
+                const QJsonObject data = QJsonDocument::fromJson(output).object();
+                if (code != 0 || data.isEmpty()) {
+                    const QString detail = QString::fromUtf8(errors).trimmed();
+                    status->setText(detail.isEmpty() ? tr("The network optical drive service is unavailable.")
+                                                     : detail.section('\n', -1));
+                    return;
+                }
+                clearCards(localLayout);
+                clearCards(networkLayout);
+                const QJsonArray local = data.value(QStringLiteral("local")).toArray();
+                for (const QJsonValue &value : local) {
+                    const QJsonObject drive = value.toObject();
+                    auto *card = new QGroupBox(drive.value(QStringLiteral("label")).toString(tr("Optical drive")), page);
+                    auto *cardLayout = new QVBoxLayout(card);
+                    auto *summary = new QLabel(
+                        drive.value(QStringLiteral("capabilities")).toString() + QStringLiteral("\n")
+                        + drive.value(QStringLiteral("device")).toString(), card);
+                    summary->setWordWrap(true);
+                    cardLayout->addWidget(summary);
+                    const bool shared = drive.value(QStringLiteral("shared")).toBool();
+                    auto *state = new QLabel(shared
+                        ? tr("● Shared on the local network as %1").arg(drive.value(QStringLiteral("shareName")).toString())
+                        : tr("Not shared"), card);
+                    state->setStyleSheet(shared ? QStringLiteral("color: #15956f; font-weight: 600;") : QString());
+                    cardLayout->addWidget(state);
+                    auto *details = new QLabel(
+                        tr("Device: %1\nSCSI generic: %2\nTarget: %3\nProtocol: iSCSI · Port: %4\nBackend: Linux LIO / pSCSI")
+                            .arg(drive.value(QStringLiteral("device")).toString(),
+                                 drive.value(QStringLiteral("generic")).toString(tr("not available")),
+                                 drive.value(QStringLiteral("iqn")).toString(tr("not active")),
+                                 QString::number(drive.value(QStringLiteral("port")).toInt(3260))), card);
+                    details->setTextInteractionFlags(Qt::TextSelectableByMouse);
+                    details->setVisible(false);
+                    auto *advanced = new QPushButton(tr("Advanced information"), card);
+                    advanced->setCheckable(true);
+                    connect(advanced, &QPushButton::toggled, details, &QWidget::setVisible);
+                    cardLayout->addWidget(advanced, 0, Qt::AlignLeft);
+                    cardLayout->addWidget(details);
+                    auto *button = new QPushButton(shared ? tr("Stop sharing") : tr("Share drive"), card);
+                    connect(button, &QPushButton::clicked, this, [this, drive, shared, status, refreshData] {
+                        QStringList arguments{QStringLiteral("/usr/lib/eczos-network-optical/helper")};
+                        if (shared) {
+                            if (QMessageBox::question(this, tr("Stop sharing this drive?"),
+                                                      tr("Connected computers must disconnect before sharing can stop.")) != QMessageBox::Yes) {
+                                return;
+                            }
+                            arguments << QStringLiteral("unshare") << QStringLiteral("--id")
+                                      << drive.value(QStringLiteral("id")).toString();
+                        } else {
+                            bool accepted = false;
+                            const QString defaultName = drive.value(QStringLiteral("label")).toString(tr("ECZOS optical drive"));
+                            const QString name = QInputDialog::getText(this, tr("Share optical drive"), tr("Name on the local network:"),
+                                                                      QLineEdit::Normal, defaultName, &accepted).trimmed();
+                            if (!accepted || name.isEmpty()) {
+                                return;
+                            }
+                            arguments << QStringLiteral("share") << QStringLiteral("--device")
+                                      << drive.value(QStringLiteral("device")).toString()
+                                      << QStringLiteral("--name") << name;
+                        }
+                        setTaskFeedback(status);
+                        startTask(QStringLiteral("network-optical-manage"), QStringLiteral("/usr/bin/pkexec"), arguments,
+                                  shared ? tr("Stopping the share…") : tr("Sharing the drive…"),
+                                  [status, refreshData](int result, const QByteArray &, const QByteArray &taskErrors) {
+                            if (result == 0) {
+                                (*refreshData)();
+                            } else {
+                                const QString detail = QString::fromUtf8(taskErrors).trimmed();
+                                status->setText(detail.isEmpty() ? QObject::tr("The operation failed.") : detail.section('\n', -1));
+                            }
+                        });
+                    });
+                    cardLayout->addWidget(button, 0, Qt::AlignLeft);
+                    localLayout->addWidget(card);
+                }
+                if (local.isEmpty()) {
+                    auto *empty = new QLabel(tr("No local physical CD, DVD or Blu-ray drive was found."), page);
+                    empty->setAlignment(Qt::AlignCenter);
+                    empty->setMinimumHeight(120);
+                    localLayout->addWidget(empty);
+                }
+                localLayout->addStretch(1);
+
+                const QJsonArray network = data.value(QStringLiteral("network")).toArray();
+                for (const QJsonValue &value : network) {
+                    const QJsonObject drive = value.toObject();
+                    auto *card = new QGroupBox(drive.value(QStringLiteral("name")).toString(tr("Network optical drive")), page);
+                    auto *cardLayout = new QVBoxLayout(card);
+                    const bool connected = drive.value(QStringLiteral("connected")).toBool();
+                    auto *summary = new QLabel(
+                        drive.value(QStringLiteral("host")).toString() + QStringLiteral("\n")
+                        + drive.value(QStringLiteral("vendor")).toString() + QStringLiteral(" ")
+                        + drive.value(QStringLiteral("model")).toString() + QStringLiteral("\n")
+                        + (connected ? tr("● Connected · Local device: %1").arg(drive.value(QStringLiteral("device")).toString())
+                                     : tr("Available")), card);
+                    summary->setWordWrap(true);
+                    summary->setStyleSheet(connected ? QStringLiteral("color: #15956f;") : QString());
+                    cardLayout->addWidget(summary);
+                    auto *autoConnect = new QCheckBox(tr("Connect automatically at startup"), card);
+                    autoConnect->setChecked(false);
+                    autoConnect->setToolTip(tr("Off by default because a physical drive can be used by only one computer at a time."));
+                    cardLayout->addWidget(autoConnect);
+                    auto *buttons = new QHBoxLayout;
+                    auto *primary = new QPushButton(connected ? tr("Disconnect") : tr("Connect"), card);
+                    buttons->addWidget(primary);
+                    if (connected) {
+                        auto *eject = new QPushButton(tr("Eject"), card);
+                        connect(eject, &QPushButton::clicked, this, [this, drive, status, refreshData] {
+                            setTaskFeedback(status);
+                            startTask(QStringLiteral("network-optical-eject"), QStringLiteral("/usr/bin/pkexec"),
+                                      {QStringLiteral("/usr/lib/eczos-network-optical/helper"), QStringLiteral("eject"),
+                                       QStringLiteral("--device"), drive.value(QStringLiteral("device")).toString()},
+                                      tr("Ejecting media…"), [status, refreshData](int result, const QByteArray &, const QByteArray &taskErrors) {
+                                status->setText(result == 0 ? QObject::tr("Media ejected")
+                                    : QString::fromUtf8(taskErrors).trimmed().section('\n', -1));
+                                if (result == 0) (*refreshData)();
+                            });
+                        });
+                        buttons->addWidget(eject);
+                    }
+                    buttons->addStretch(1);
+                    cardLayout->addLayout(buttons);
+                    connect(primary, &QPushButton::clicked, this, [this, drive, connected, autoConnect, status, refreshData] {
+                        QStringList arguments{QStringLiteral("/usr/lib/eczos-network-optical/helper"),
+                                              connected ? QStringLiteral("disconnect") : QStringLiteral("connect"),
+                                              QStringLiteral("--host"), drive.value(QStringLiteral("address")).toString(),
+                                              QStringLiteral("--port"), QString::number(drive.value(QStringLiteral("port")).toInt(3260)),
+                                              QStringLiteral("--iqn"), drive.value(QStringLiteral("iqn")).toString()};
+                        if (!connected && autoConnect->isChecked()) {
+                            arguments << QStringLiteral("--auto");
+                        }
+                        setTaskFeedback(status);
+                        startTask(QStringLiteral("network-optical-connect"), QStringLiteral("/usr/bin/pkexec"), arguments,
+                                  connected ? tr("Disconnecting safely…") : tr("Connecting…"),
+                                  [status, refreshData](int result, const QByteArray &, const QByteArray &taskErrors) {
+                            if (result == 0) {
+                                (*refreshData)();
+                            } else {
+                                const QString detail = QString::fromUtf8(taskErrors).trimmed();
+                                status->setText(detail.isEmpty() ? QObject::tr("The operation failed.") : detail.section('\n', -1));
+                            }
+                        });
+                    });
+                    networkLayout->addWidget(card);
+                }
+                if (network.isEmpty()) {
+                    auto *empty = new QLabel(tr("No shared ECZOS optical drives are currently visible on the local network."), page);
+                    empty->setAlignment(Qt::AlignCenter);
+                    empty->setMinimumHeight(120);
+                    networkLayout->addWidget(empty);
+                }
+                networkLayout->addStretch(1);
+                status->setText(tr("Lists updated"));
+            });
+        };
+        connect(refresh, &QPushButton::clicked, this, [refreshData] { (*refreshData)(); });
+        auto *timer = new QTimer(page);
+        timer->setInterval(5000);
+        connect(timer, &QTimer::timeout, page, [refreshData] { (*refreshData)(); });
+        timer->start();
+        setCustomContent(page, tr("Network optical drives"),
+                         tr("Use physical CD, DVD and Blu-ray drives from another ECZOS computer as normal local devices."));
+        (*refreshData)();
+    }
+
     void showDiagnosticsPage()
     {
         auto *page = new QWidget;
@@ -1066,6 +1275,8 @@ private:
             showWindowsPage();
         } else if (id == QStringLiteral("eczos:gaming")) {
             showGamingPage();
+        } else if (id == QStringLiteral("eczos:network-optical")) {
+            showNetworkOpticalPage();
         } else if (id == QStringLiteral("eczos:recovery")) {
             showRecoveryPage();
         } else if (id == QStringLiteral("eczos:migration")) {

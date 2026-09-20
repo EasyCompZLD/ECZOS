@@ -1,0 +1,7 @@
+eczos-network-optical (0.1.0) trixie; urgency=medium
+
+  * Add LAN discovery, LIO sharing and Open-iSCSI connection management for
+    physical optical drives.
+  * Enforce a single active initiator with a server-side ACL guard.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 18:00:00 +0200

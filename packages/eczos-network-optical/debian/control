@@ -1,0 +1,32 @@
+Source: eczos-network-optical
+Section: admin
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-network-optical
+Architecture: all
+Depends:
+ ${misc:Depends},
+ avahi-daemon,
+ avahi-utils,
+ eject,
+ iproute2,
+ lsscsi,
+ open-iscsi,
+ pkexec,
+ polkitd,
+ psmisc,
+ python3,
+ python3-rtslib-fb,
+ sg3-utils,
+ targetcli-fb,
+ udev,
+ udisks2
+Description: share physical optical drives between ECZOS computers
+ Discovers local CD, DVD and Blu-ray drives, publishes explicitly shared drives
+ over DNS-SD, exports them through Linux LIO pSCSI and connects remote drives
+ through Open-iSCSI as normal local SCSI optical devices.

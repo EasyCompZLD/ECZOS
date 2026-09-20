@@ -15,6 +15,7 @@ Depends:
  eczos-desktop-defaults (>= 0.1.0),
  eczos-desktop-apps (>= 0.1.0),
  eczos-gaming-core (>= 0.1.0),
+ eczos-network-optical (>= 0.1.0),
  eczos-platform-tools (>= 0.1.0),
  eczos-plymouth-theme (>= 0.1.0),
  eczos-recovery-media (>= 0.1.0),

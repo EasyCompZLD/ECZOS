@@ -15,8 +15,8 @@ PRIMARY_TARGET=${ECZOS_REPOSITORY_TARGET:-192.168.1.28:.}
 
 mapfile -t release_packages < <(find "$BUNDLE_DIR" -maxdepth 1 -type f \
     -name 'eczos-*.deb' -print | sort)
-[[ ${#release_packages[@]} -eq 14 ]] || {
-    printf 'Expected 14 ECZOS packages, found %d.\n' "${#release_packages[@]}" >&2
+[[ ${#release_packages[@]} -eq 15 ]] || {
+    printf 'Expected 15 ECZOS packages, found %d.\n' "${#release_packages[@]}" >&2
     exit 1
 }
 

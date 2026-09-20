@@ -26,6 +26,7 @@ Depends:
  ${shlibs:Depends},
  eczos-branding (>= 0.1.0),
  eczos-desktop-defaults (>= 0.1.0),
+ eczos-network-optical (>= 0.1.0),
  gettext-base,
  jq,
  pciutils,

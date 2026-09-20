@@ -54,7 +54,7 @@ cd /srv/eczos
 ./scripts/build-release-packages-vm.sh
 ```
 
-After that succeeds, publish its 14 ECZOS packages to stable as the `ecz`
+After that succeeds, publish its 15 ECZOS packages to stable as the `ecz`
 development user. The existing password and signing-key files below
 `/srv/eczos-repository-secrets` are detected automatically:
 

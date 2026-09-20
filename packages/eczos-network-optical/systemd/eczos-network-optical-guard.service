@@ -1,0 +1,22 @@
+[Unit]
+Description=ECZOS network optical drive exclusive-access guard
+After=network-online.target rtslib-fb-targetctl.service
+Wants=network-online.target
+ConditionPathExists=/var/lib/eczos/network-optical/state.json
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/eczos-network-optical/guard
+Restart=on-failure
+RestartSec=2
+StateDirectory=eczos/network-optical
+StateDirectoryMode=0755
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=false
+ReadWritePaths=/var/lib/eczos/network-optical /etc/avahi/services /etc/rtslib-fb-target /sys/kernel/config
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

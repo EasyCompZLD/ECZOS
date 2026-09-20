@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>EasyComp Zeeland</vendor>
+  <vendor_url>https://easycompzeeland.nl/</vendor_url>
+  <action id="org.eczos.networkoptical.manage">
+    <description>Manage ECZOS network optical drives</description>
+    <description xml:lang="nl">ECZOS-netwerkstations voor cd, dvd en Blu-ray beheren</description>
+    <description xml:lang="de">Optische ECZOS-Netzlaufwerke verwalten</description>
+    <description xml:lang="fr">Gérer les lecteurs optiques réseau ECZOS</description>
+    <message>Authentication is required to share or connect an optical drive.</message>
+    <message xml:lang="nl">Authenticatie is nodig om een optisch station te delen of te verbinden.</message>
+    <message xml:lang="de">Zum Freigeben oder Verbinden eines optischen Laufwerks ist eine Authentifizierung erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour partager ou connecter un lecteur optique.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/lib/eczos-network-optical/helper</annotate>
+  </action>
+</policyconfig>
