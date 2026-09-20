@@ -45,6 +45,7 @@ publish_target() {
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/pool/" "$target/pool/"
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/keys/" "$target/keys/"
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/images/" "$target/images/"
+    rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/assets/" "$target/assets/"
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/releases.json" "$target/releases.json"
     rsync -a --chmod=D755,F644 "$REPOSITORY_DIR/index.html" "$target/index.html"
     rsync -a --delete-delay --chmod=D755,F644 \
