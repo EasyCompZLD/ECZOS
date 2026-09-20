@@ -14,6 +14,13 @@ Rectangle {
         asynchronous: true
     }
 
+    Image {
+        anchors.fill: parent
+        source: Qt.resolvedUrl("eczos-startup-poster.png")
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: false
+    }
+
     VideoOutput {
         id: videoOutput
         anchors.fill: parent
@@ -24,8 +31,20 @@ Rectangle {
         id: startupAnimation
         source: Qt.resolvedUrl("eczos-startup.mp4")
         videoOutput: videoOutput
-        loops: MediaPlayer.Infinite
-        Component.onCompleted: play()
+        playbackRate: 2.0
+        loops: 1
+
+        onMediaStatusChanged: {
+            if (mediaStatus === MediaPlayer.LoadedMedia) {
+                position = 4000
+                play()
+            }
+        }
+
+        onPositionChanged: {
+            if (startupAnimation.position >= 9000)
+                pause()
+        }
     }
 
     Rectangle {

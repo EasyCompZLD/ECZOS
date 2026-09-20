@@ -1,3 +1,12 @@
+eczos-oobe (0.1.0~dev8) UNRELEASED; urgency=medium
+
+  * Open networking in ECZOS Settings and show the matching current capture.
+  * Add a live visual preview for every browser choice.
+  * Focus Discover on free open-source apps and use accurate Discover, Vaults
+    and Steam screenshots throughout the first-run tour.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 11:30:00 +0200
+
 eczos-oobe (0.1.0~dev7) UNRELEASED; urgency=medium
 
   * Add current screenshots to every relevant first-run page.

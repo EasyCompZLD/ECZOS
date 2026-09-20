@@ -13,8 +13,8 @@ Package: eczos-oobe
 Architecture: all
 Depends:
  ${misc:Depends},
- eczos-branding (>= 0.1.0~dev8),
- eczos-desktop-defaults (>= 0.1.0~dev10),
+ eczos-branding (>= 0.1.0~dev9),
+ eczos-desktop-defaults (>= 0.1.0~dev11),
  eczos-platform-tools (>= 0.1.0~dev15),
  konqueror,
  python3,

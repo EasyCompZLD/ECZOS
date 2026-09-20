@@ -21,7 +21,8 @@ done
 
 for screenshot in settings windows-apps gaming migration recovery diagnostics \
     system-appearance system-display system-network application-menu desktop-clean \
-    desktop-dark desktop-light game-running about-system steam-library-content; do
+    desktop-dark desktop-light game-running about-system steam-library-content \
+    browser-firefox browser-chrome browser-edge browser-konqueror discover plasma-vaults; do
     test -s "/usr/share/eczos/branding/screenshots/$screenshot.png"
 done
 

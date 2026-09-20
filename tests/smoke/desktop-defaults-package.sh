@@ -31,6 +31,9 @@ grep -F 'org.kde.KGlobalSettings.notifyChange' /usr/bin/eczos-theme-switch
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/metadata.json
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/Splash.qml
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/eczos-startup.mp4
+test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/eczos-startup-poster.png
+grep -F 'playbackRate: 2.0' /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/Splash.qml
+grep -F 'position = 4000' /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/Splash.qml
 for wallpaper in \
     eczoswallpaper.png \
     eczoswallpaper-light.png \

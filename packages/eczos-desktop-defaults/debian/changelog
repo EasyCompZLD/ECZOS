@@ -1,3 +1,10 @@
+eczos-desktop-defaults (0.1.0~dev11) UNRELEASED; urgency=medium
+
+  * Start the meaningful ECZOS sunrise sequence immediately on fast systems.
+  * Keep a visible ECZOS poster frame while the splash video decoder starts.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 20 Sep 2026 11:30:00 +0200
+
 eczos-desktop-defaults (0.1.0~dev10) UNRELEASED; urgency=medium
 
   * Serialize appearance changes and notify running applications reliably.

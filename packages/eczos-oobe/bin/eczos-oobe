@@ -48,8 +48,9 @@ class OobeBridge(QObject):
 
     @Slot()
     def openNetworkSettings(self):
-        if not self._start("systemsettings", ["kcm_networkmanagement"]):
-            self._start("kcmshell6", ["kcm_networkmanagement"])
+        if not self._start("eczos-system-settings", ["--module", "kcm_networkmanagement"]):
+            if not self._start("systemsettings", ["kcm_networkmanagement"]):
+                self._start("kcmshell6", ["kcm_networkmanagement"])
 
     @Slot()
     def openSystemSettings(self):

@@ -26,8 +26,8 @@
     <message><source>This browser is already included with the ECZOS desktop.</source><translation>Dieser Browser ist bereits im ECZOS-Desktop enthalten.</translation></message>
     <message><source>Microsoft Edge through ECZ Windows</source><translation>Microsoft Edge über ECZ Windows</translation></message>
     <message><source>Find apps with Discover</source><translation>Apps mit Discover finden</translation></message>
-    <message><source>Discover brings apps, games, system updates and firmware together in one place. Search by name and select Install.</source><translation>Discover vereint Apps, Spiele, Systemaktualisierungen und Firmware an einem Ort. Suchen Sie nach dem Namen und wählen Sie Installieren.</translation></message>
-    <message><source>ECZOS supports regular Debian packages and Flatpak apps.</source><translation>ECZOS unterstützt reguläre Debian-Pakete und Flatpak-Apps.</translation></message>
+    <message><source>Explore a huge collection of free and open-source apps, games and creative tools. Search by name and select Install.</source><translation>Entdecken Sie eine riesige Auswahl an kostenlosen Open-Source-Apps, Spielen und Kreativwerkzeugen. Suchen Sie nach dem Namen und wählen Sie Installieren.</translation></message>
+    <message><source>Discover also brings ECZOS updates and firmware together in one place.</source><translation>Discover bündelt außerdem ECZOS-Aktualisierungen und Firmware an einem Ort.</translation></message>
     <message><source>Open Discover</source><translation>Discover öffnen</translation></message>
     <message><source>Keep your files safe</source><translation>Dateien sicher aufbewahren</translation></message>
     <message><source>Plasma Vaults lets you create encrypted vaults for private files.</source><translation>Mit Plasma-Tresoren können Sie verschlüsselte Tresore für private Dateien erstellen.</translation></message>

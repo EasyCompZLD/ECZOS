@@ -20,6 +20,11 @@ grep -F 'branding/screenshots/settings.png' /usr/share/eczos/oobe/Main.qml
 grep -F 'branding/screenshots/about-system.png' /usr/share/eczos/oobe/Main.qml
 grep -F 'branding/screenshots/desktop-light.png' /usr/share/eczos/oobe/Main.qml
 grep -F 'branding/screenshots/desktop-dark.png' /usr/share/eczos/oobe/Main.qml
+for screenshot in browser-firefox browser-chrome browser-edge browser-konqueror \
+    discover plasma-vaults steam-library-content; do
+    grep -F "branding/screenshots/$screenshot.png" /usr/share/eczos/oobe/Main.qml
+done
+grep -F 'eczos-system-settings", ["--module", "kcm_networkmanagement"]' /usr/bin/eczos-oobe
 for browser in 'Firefox' 'Google Chrome' 'Microsoft Edge through ECZ Windows' 'Konqueror'; do
     grep -F "$browser" /usr/share/eczos/oobe/Main.qml
 done

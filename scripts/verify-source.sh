@@ -33,6 +33,12 @@ for required in \
     packages/eczos-branding/assets/screenshots/system-appearance.png \
     packages/eczos-branding/assets/screenshots/system-display.png \
     packages/eczos-branding/assets/screenshots/system-network.png \
+    packages/eczos-branding/assets/screenshots/browser-firefox.png \
+    packages/eczos-branding/assets/screenshots/browser-chrome.png \
+    packages/eczos-branding/assets/screenshots/browser-edge.png \
+    packages/eczos-branding/assets/screenshots/browser-konqueror.png \
+    packages/eczos-branding/assets/screenshots/discover.png \
+    packages/eczos-branding/assets/screenshots/plasma-vaults.png \
     packages/eczos-sddm-theme/debian/control \
     packages/eczos-plymouth-theme/debian/control \
     packages/eczos-plymouth-theme/debian/preinst \
@@ -100,6 +106,7 @@ for required in \
     packages/eczos-oobe/assets/new-dawn.m4a \
     packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/Splash.qml \
     packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/eczos-startup.mp4 \
+    packages/eczos-desktop-defaults/lookandfeel/org.eczos.desktop/contents/splash/eczos-startup-poster.png \
     image/config/bootloaders/grub-pc/grub.cfg \
     image/config/bootloaders/grub-pc/splash.png \
     image/config/bootloaders/grub-pc/live-theme/theme.txt \
@@ -237,13 +244,23 @@ done
 
 for screenshot in settings windows-apps gaming migration recovery diagnostics \
     system-appearance system-display system-network application-menu desktop-clean \
-    desktop-dark desktop-light game-running about-system steam-library-content; do
+    desktop-dark desktop-light game-running about-system steam-library-content \
+    browser-firefox browser-chrome browser-edge browser-konqueror discover plasma-vaults; do
     [[ -s "$ROOT_DIR/packages/eczos-branding/assets/screenshots/$screenshot.png" ]] || \
         fail "missing product screenshot: $screenshot.png"
 done
 grep -Fq 'branding/screenshots/settings.png' \
     "$ROOT_DIR/packages/eczos-oobe/qml/Main.qml" || \
     fail 'ECZOS OOBE does not use product screenshots'
+for screenshot in browser-firefox browser-chrome browser-edge browser-konqueror \
+    discover plasma-vaults steam-library-content; do
+    grep -Fq "branding/screenshots/$screenshot.png" \
+        "$ROOT_DIR/packages/eczos-oobe/qml/Main.qml" || \
+        fail "ECZOS OOBE does not use $screenshot.png"
+done
+grep -Fq 'eczos-system-settings", ["--module", "kcm_networkmanagement"]' \
+    "$ROOT_DIR/packages/eczos-oobe/bin/eczos-oobe" || \
+    fail 'ECZOS OOBE networking does not open in ECZOS Settings'
 grep -Fq 'branding/screenshots/windows-apps.png' \
     "$ROOT_DIR/packages/eczos-installer/branding/eczos/show.qml" || \
     fail 'ECZOS installer does not use product screenshots'

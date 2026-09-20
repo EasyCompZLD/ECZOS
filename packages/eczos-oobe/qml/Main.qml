@@ -141,6 +141,14 @@ ApplicationWindow {
             OobePage {
                 heading: qsTr("Choose your browser")
                 body: qsTr("Select which browser should open web pages by default.")
+                visualPreferredHeight: Math.min(260, window.height * 0.24)
+                visual: window.selectedBrowser === "chrome"
+                    ? "file:///usr/share/eczos/branding/screenshots/browser-chrome.png"
+                    : window.selectedBrowser === "edge-windows"
+                      ? "file:///usr/share/eczos/branding/screenshots/browser-edge.png"
+                      : window.selectedBrowser === "konqueror"
+                        ? "file:///usr/share/eczos/branding/screenshots/browser-konqueror.png"
+                        : "file:///usr/share/eczos/branding/screenshots/browser-firefox.png"
                 detail: window.selectedBrowser === "chrome"
                     ? qsTr("If Chrome is not installed yet, ECZOS will open the official download page when setup is complete.")
                     : window.selectedBrowser === "edge-windows"
@@ -185,9 +193,9 @@ ApplicationWindow {
 
             OobePage {
                 heading: qsTr("Find apps with Discover")
-                body: qsTr("Discover brings apps, games, system updates and firmware together in one place. Search by name and select Install.")
-                detail: qsTr("ECZOS supports regular Debian packages and Flatpak apps.")
-                visual: "file:///usr/share/eczos/branding/screenshots/application-menu.png"
+                body: qsTr("Explore a huge collection of free and open-source apps, games and creative tools. Search by name and select Install.")
+                detail: qsTr("Discover also brings ECZOS updates and firmware together in one place.")
+                visual: "file:///usr/share/eczos/branding/screenshots/discover.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: qsTr("Open Discover")
@@ -199,7 +207,7 @@ ApplicationWindow {
                 heading: qsTr("Keep your files safe")
                 body: qsTr("Plasma Vaults lets you create encrypted vaults for private files.")
                 detail: qsTr("Use the Start menu search to quickly find apps and files. Manage backups and recovery media in ECZOS Settings.")
-                visual: "file:///usr/share/eczos/branding/screenshots/desktop-clean.png"
+                visual: "file:///usr/share/eczos/branding/screenshots/plasma-vaults.png"
             }
 
             OobePage {
@@ -218,7 +226,7 @@ ApplicationWindow {
                 heading: qsTr("Windows apps and games")
                 body: qsTr("Open .exe and .msi files with ECZ Windows. Gaming checks help with Vulkan, controllers and Windows games.")
                 detail: qsTr("Each managed Windows app gets its own environment and then appears in the Start menu.")
-                visual: "file:///usr/share/eczos/branding/screenshots/game-running.png"
+                visual: "file:///usr/share/eczos/branding/screenshots/steam-library-content.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
                     text: qsTr("Open ECZOS Settings")
@@ -294,6 +302,7 @@ ApplicationWindow {
         property string body
         property string detail: ""
         property url visual: ""
+        property real visualPreferredHeight: Math.min(410, window.height * 0.37)
         spacing: 22
 
         Item { Layout.fillHeight: true }
@@ -330,7 +339,7 @@ ApplicationWindow {
         Rectangle {
             visible: pageLayout.visual.toString().length > 0
             Layout.preferredWidth: Math.min(980, window.width * 0.72)
-            Layout.preferredHeight: Math.min(410, window.height * 0.37)
+            Layout.preferredHeight: pageLayout.visualPreferredHeight
             Layout.alignment: Qt.AlignHCenter
             radius: 14
             color: "#d9071829"
