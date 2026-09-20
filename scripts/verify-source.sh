@@ -132,6 +132,7 @@ for required in \
     scripts/build-release-packages-vm.sh \
     scripts/publish-release-0.1.0-vm.sh \
     scripts/build-release-image-vm.sh \
+    scripts/finalize-release-0.1.0-vm.sh \
     scripts/unlock-eczos-repository-key.sh \
     scripts/test-windows-msi-lifecycle-vm.sh \
     scripts/audit-visible-branding-vm.sh \

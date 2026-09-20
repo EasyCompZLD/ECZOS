@@ -11,6 +11,7 @@ source /etc/os-release
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 RELEASE_DIR=${ECZOS_RELEASE_DIR:-/srv/eczos-releases/0.1.0}
 BUNDLE_DIR="$RELEASE_DIR/packages"
+IMAGE_DIR="$RELEASE_DIR/images"
 BUILD_BASE=${ECZOS_BUILD_BASE:-/srv/eczos-builds}
 PREPARE_ONLY=false
 case ${1:-} in
@@ -93,5 +94,8 @@ fi
 ISO_NAME="ECZOS-0.1.0-amd64.iso"
 install -m 0644 live-image-amd64.hybrid.iso "$RUN_DIR/artifacts/$ISO_NAME"
 (cd "$RUN_DIR/artifacts" && sha256sum "$ISO_NAME" > "$ISO_NAME.sha256")
-printf 'Release ISO completed: %s\n' "$RUN_DIR/artifacts/$ISO_NAME"
-cat "$RUN_DIR/artifacts/$ISO_NAME.sha256"
+install -d -m 2775 "$IMAGE_DIR"
+install -m 0644 "$RUN_DIR/artifacts/$ISO_NAME" "$IMAGE_DIR/$ISO_NAME"
+(cd "$IMAGE_DIR" && sha256sum "$ISO_NAME" > "$ISO_NAME.sha256")
+printf 'Release ISO completed: %s\n' "$IMAGE_DIR/$ISO_NAME"
+cat "$IMAGE_DIR/$ISO_NAME.sha256"
