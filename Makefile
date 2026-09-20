@@ -1,4 +1,4 @@
-.PHONY: test package image
+.PHONY: test package image github-upload
 
 test:
 	./scripts/verify-source.sh
@@ -8,3 +8,6 @@ package:
 
 image:
 	./scripts/build-image-vm.sh
+
+github-upload:
+	./scripts/prepare-github-upload.sh

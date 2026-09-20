@@ -79,3 +79,17 @@ After that reviewed gate is removed, build on Debian 13 with:
 ```sh
 sudo ./scripts/build-image-vm.sh
 ```
+
+## GitHub release upload directory
+
+The allowlisted files for the latest GitHub release are generated in
+`Build/GitHub/UPLOAD-THIS-TO-GITHUB/`. Refresh the directory manually with:
+
+```sh
+make github-upload
+```
+
+This checkout also uses the tracked `.githooks/post-commit` hook to refresh the
+directory after every commit. Only the release notes, checksum and upload
+instructions are copied. ISO images, credentials, signing keys and build caches
+are deliberately excluded.
