@@ -993,6 +993,11 @@ Backend: Linux LIO / pSCSI</translation>
         <translation>Optisch netwerkstation</translation>
     </message>
     <message>
+        <location filename="../main.cpp" line="875"/>
+        <source>Connected through an existing iSCSI configuration. It can be used normally and will be migrated when its server enables ECZOS sharing.</source>
+        <translation>Verbonden via een bestaande iSCSI-configuratie. Het station kan normaal worden gebruikt en wordt gemigreerd zodra de server ECZOS-delen inschakelt.</translation>
+    </message>
+    <message>
         <location filename="../main.cpp" line="873"/>
         <source>● Connected · Local device: %1</source>
         <translation>● Verbonden · Lokaal apparaat: %1</translation>

@@ -875,6 +875,12 @@ private:
                     summary->setWordWrap(true);
                     summary->setStyleSheet(connected ? QStringLiteral("color: #15956f;") : QString());
                     cardLayout->addWidget(summary);
+                    if (!drive.value(QStringLiteral("managed")).toBool(true)) {
+                        auto *legacy = new QLabel(tr("Connected through an existing iSCSI configuration. It can be used normally and will be migrated when its server enables ECZOS sharing."), card);
+                        legacy->setWordWrap(true);
+                        legacy->setStyleSheet(QStringLiteral("color: palette(mid);"));
+                        cardLayout->addWidget(legacy);
+                    }
                     auto *autoConnect = new QCheckBox(tr("Connect automatically at startup"), card);
                     autoConnect->setChecked(drive.value(QStringLiteral("automatic")).toBool());
                     autoConnect->setToolTip(tr("Off by default because a physical drive can be used by only one computer at a time."));

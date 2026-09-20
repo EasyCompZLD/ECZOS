@@ -581,6 +581,11 @@ Backend: Linux LIO / pSCSI</translation>
         <translation>Optisches Netzlaufwerk</translation>
     </message>
     <message>
+        <location filename="../main.cpp" line="875"/>
+        <source>Connected through an existing iSCSI configuration. It can be used normally and will be migrated when its server enables ECZOS sharing.</source>
+        <translation>Über eine vorhandene iSCSI-Konfiguration verbunden. Das Laufwerk kann normal verwendet werden und wird migriert, sobald der Server die ECZOS-Freigabe aktiviert.</translation>
+    </message>
+    <message>
         <location filename="../main.cpp" line="873"/>
         <source>● Connected · Local device: %1</source>
         <translation>● Verbunden · Lokales Gerät: %1</translation>

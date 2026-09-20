@@ -581,6 +581,11 @@ Moteur : Linux LIO / pSCSI</translation>
         <translation>Lecteur optique réseau</translation>
     </message>
     <message>
+        <location filename="../main.cpp" line="875"/>
+        <source>Connected through an existing iSCSI configuration. It can be used normally and will be migrated when its server enables ECZOS sharing.</source>
+        <translation>Connecté via une configuration iSCSI existante. Le lecteur peut être utilisé normalement et sera migré lorsque son serveur activera le partage ECZOS.</translation>
+    </message>
+    <message>
         <location filename="../main.cpp" line="873"/>
         <source>● Connected · Local device: %1</source>
         <translation>● Connecté · Périphérique local : %1</translation>

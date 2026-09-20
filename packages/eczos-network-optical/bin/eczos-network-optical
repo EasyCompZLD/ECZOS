@@ -119,7 +119,21 @@ def sessions():
         devices = []
         for block in session.glob("device/target*/*/block/sr*"):
             devices.append(f"/dev/{block.name}")
-        found[iqn] = devices
+        session_number = session.name.removeprefix("session")
+        connections = sorted(Path("/sys/class/iscsi_connection").glob(f"connection{session_number}:*"))
+        address = ""
+        port = 3260
+        if connections:
+            try:
+                address = (connections[0] / "persistent_address").read_text().strip()
+                port = int((connections[0] / "persistent_port").read_text().strip())
+            except (OSError, ValueError):
+                try:
+                    address = (connections[0] / "address").read_text().strip()
+                    port = int((connections[0] / "port").read_text().strip())
+                except (OSError, ValueError):
+                    address, port = "", 3260
+        found[iqn] = {"devices": devices, "address": address, "port": port}
     return found
 
 
@@ -167,8 +181,9 @@ def network_drives():
             "writable": txt.get("write") == "true",
             "connected": iqn in active,
             "automatic": iqn in automatic,
-            "device": (active.get(iqn) or [""])[0],
+            "device": (active.get(iqn, {}).get("devices") or [""])[0],
             "status": "connected" if iqn in active else "available",
+            "managed": True,
         }
         previous = records.get(iqn)
         try:
@@ -178,6 +193,38 @@ def network_drives():
             candidate_is_v4 = previous_is_v4 = False
         if not previous or candidate_is_v4 or not previous_is_v4:
             records[iqn] = candidate
+
+    # A session created before ECZOS discovery support has no Avahi record. It
+    # must still be visible while connected so the user is never left with an
+    # invisible remote device that can only be controlled from a terminal.
+    for iqn, session in active.items():
+        if iqn in records or not session["devices"]:
+            continue
+        device = session["devices"][0]
+        props = udev_properties(device)
+        if props.get("ID_CDROM") != "1":
+            continue
+        vendor = (props.get("ID_VENDOR") or "").replace("_", " ").strip()
+        model = (props.get("ID_MODEL") or "Optical drive").replace("_", " ").strip()
+        records[iqn] = {
+            "name": " ".join(value for value in (vendor, model) if value).strip(),
+            "host": session["address"],
+            "address": session["address"],
+            "port": session["port"],
+            "iqn": iqn,
+            "vendor": vendor,
+            "model": model,
+            "capabilities": capability_summary(props),
+            "writable": any(props.get(key) == "1" for key in (
+                "ID_CDROM_CD_R", "ID_CDROM_CD_RW", "ID_CDROM_DVD_R",
+                "ID_CDROM_DVD_RW", "ID_CDROM_DVD_PLUS_R", "ID_CDROM_DVD_PLUS_RW",
+                "ID_CDROM_DVD_RAM", "ID_CDROM_BD_R", "ID_CDROM_BD_RE")),
+            "connected": True,
+            "automatic": iqn in automatic,
+            "device": device,
+            "status": "connected",
+            "managed": False,
+        }
     return sorted(records.values(), key=lambda item: (item["name"].casefold(), item["host"]))
 
 
