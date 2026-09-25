@@ -7,17 +7,23 @@ The project is not a fork of Debian and must not replace Debian-owned files for
 branding alone. ECZOS-specific behaviour is delivered through versioned Debian
 packages, declarative profiles and a reproducible image configuration.
 
+## Download ECZOS 0.1.0
+
+- [Official ECZOS website](https://eczos.net/)
+- [Download ECZOS 0.1.0 for amd64](https://repo.easycomp.cloud/eczos/images/ECZOS-0.1.0-amd64.iso)
+- [SHA-256 checksum](https://repo.easycomp.cloud/eczos/images/ECZOS-0.1.0-amd64.iso.sha256)
+- [ECZOS software repository](https://repo.easycomp.cloud/eczos/)
+
+The installation image supports BIOS and UEFI systems and can be written to a
+USB drive, SD card or other installation medium with ECZOS Recovery Media
+Creator or another image-writing tool.
+
 ## Current status
 
-This repository is the clean-source replacement for an earlier collection of
-machine snapshots and experimental ISO builds. The historical material remains
-on the share for reference, but is intentionally excluded from Git.
-
-The first components are `eczos-branding`, which installs EasyComp-owned assets
-below `/usr/share/eczos/branding`, and `eczos-sddm-theme`, which selects an
-ECZOS login theme while inheriting Debian's packaged Breeze implementation.
-The animated Plymouth theme and one-time Plasma defaults extend that visible
-prototype without replacing files owned by Debian packages.
+ECZOS 0.1.0 is the first public release. This repository contains the complete
+source for the ECZOS product layer, native tools, installer presentation,
+first-start experience, desktop integration and reproducible image pipeline.
+Historical machine snapshots and experimental builds remain outside Git.
 
 ## Layout
 
@@ -72,9 +78,7 @@ visible-branding audit.
 No production image should include the historical remote-support package. See
 `docs/security.md`.
 
-The complete image pipeline is present, but `image/BUILD_BLOCKED.md` prevents a
-premature ISO build until the remaining desktop and ECZ Windows gates pass.
-After that reviewed gate is removed, build on Debian 13 with:
+Build a reviewed image on Debian 13 with:
 
 ```sh
 sudo ./scripts/build-image-vm.sh
