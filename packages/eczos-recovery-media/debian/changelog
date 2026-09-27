@@ -1,4 +1,4 @@
-eczos-recovery-media (0.1.2~dev1) UNRELEASED; urgency=medium
+eczos-recovery-media (0.1.2) trixie; urgency=medium
 
   * Start the next recovery-media qualification series with a unique build.
 

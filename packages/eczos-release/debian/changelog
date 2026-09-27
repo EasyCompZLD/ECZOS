@@ -1,6 +1,6 @@
-eczos-release (0.1.1~dev1) UNRELEASED; urgency=medium
+eczos-release (0.1.1) trixie; urgency=medium
 
-  * Identify the next post-0.1 qualification image and package set uniquely.
+  * Publish the stable ECZOS 0.1.1 product identity and package set.
 
  -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 07:30:00 +0200
 

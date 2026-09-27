@@ -1,4 +1,4 @@
-eczos-desktop (0.1.1~dev4) UNRELEASED; urgency=medium
+eczos-desktop (0.1.1) trixie; urgency=medium
 
   * Recommend removable safe multiboot detection and GRUB menu tooling.
 

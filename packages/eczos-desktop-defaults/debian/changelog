@@ -1,4 +1,4 @@
-eczos-desktop-defaults (0.1.1~dev2) UNRELEASED; urgency=medium
+eczos-desktop-defaults (0.1.1) trixie; urgency=medium
 
   * Give the next qualification image a unique package build.
 

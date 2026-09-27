@@ -92,9 +92,9 @@ Presentation {
     Slide {
         Feature {
             anchors.fill: parent
-            heading: qsTr("You stay in control")
-            body: qsTr("Create recovery media whenever you want. ECZOS never shares a support report without your choice.")
-            screenshot: "file:///usr/share/eczos/branding/screenshots/recovery.png"
+            heading: qsTr("Safe updates and recovery")
+            body: qsTr("Install signed ECZOS updates with Discover. Built-in diagnostics and recovery media help keep your computer ready.")
+            screenshot: "file:///usr/share/eczos/branding/screenshots/updates.png"
         }
     }
 }

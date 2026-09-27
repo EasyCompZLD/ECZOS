@@ -1,4 +1,4 @@
-eczos-windows-core (0.1.1~dev21) UNRELEASED; urgency=medium
+eczos-windows-core (0.1.1) trixie; urgency=medium
 
   * Add a validated per-application executable override that only accepts an
     existing EXE inside the app's isolated Windows environment.

@@ -1,4 +1,4 @@
-eczos-boot-tools (0.1.0~dev1) UNRELEASED; urgency=medium
+eczos-boot-tools (0.1.0) trixie; urgency=medium
 
   * Detect UEFI/BIOS mode, firmware entries and other operating systems.
   * Validate discovered block devices and EFI boot files before presenting them.

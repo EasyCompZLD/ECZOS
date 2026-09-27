@@ -11,10 +11,10 @@
     <message><source>You can always change these choices later in ECZOS Settings.</source><translation>Je kunt deze keuzes later altijd wijzigen via ECZOS Instellingen.</translation></message>
     <message><source>Connect to a network</source><translation>Maak verbinding</translation></message>
     <message><source>An internet connection is needed for updates, new apps, browsers and online services.</source><translation>Internet is nodig voor updates, nieuwe apps, browsers en online diensten.</translation></message>
-    <message><source>Manage Wi-Fi and wired connections from the network icon or System Settings.</source><translation>Wifi en bekabelde verbindingen beheer je vanuit het netwerkicoon of Systeeminstellingen.</translation></message>
+    <message><source>Manage Wi-Fi and wired connections from the network icon or ECZOS Settings.</source><translation>Wifi en bekabelde verbindingen beheer je vanuit het netwerkicoon of ECZOS Instellingen.</translation></message>
     <message><source>Open network settings</source><translation>Netwerkinstellingen openen</translation></message>
     <message><source>Make ECZOS yours</source><translation>Maak ECZOS van jou</translation></message>
-    <message><source>Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in System Settings.</source><translation>Kies een lichte, donkere of automatisch wisselende weergave. Achtergronden, pictogrammen, energiebeheer en toegankelijkheid vind je in Systeeminstellingen.</translation></message>
+    <message><source>Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in ECZOS Settings.</source><translation>Kies een lichte, donkere of automatisch wisselende weergave. Achtergronden, pictogrammen, energiebeheer en toegankelijkheid vind je in ECZOS Instellingen.</translation></message>
     <message><source>Automatic</source><translation>Automatisch</translation></message>
     <message><source>Light</source><translation>Licht</translation></message>
     <message><source>Dark</source><translation>Donker</translation></message>

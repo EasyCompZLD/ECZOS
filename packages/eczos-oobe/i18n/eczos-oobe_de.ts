@@ -11,10 +11,10 @@
     <message><source>You can always change these choices later in ECZOS Settings.</source><translation>Sie können diese Einstellungen später jederzeit in den ECZOS-Einstellungen ändern.</translation></message>
     <message><source>Connect to a network</source><translation>Mit einem Netzwerk verbinden</translation></message>
     <message><source>An internet connection is needed for updates, new apps, browsers and online services.</source><translation>Für Aktualisierungen, neue Apps, Browser und Online-Dienste wird eine Internetverbindung benötigt.</translation></message>
-    <message><source>Manage Wi-Fi and wired connections from the network icon or System Settings.</source><translation>WLAN- und Kabelverbindungen verwalten Sie über das Netzwerksymbol oder die Systemeinstellungen.</translation></message>
+    <message><source>Manage Wi-Fi and wired connections from the network icon or ECZOS Settings.</source><translation>WLAN- und Kabelverbindungen verwalten Sie über das Netzwerksymbol oder die ECZOS-Einstellungen.</translation></message>
     <message><source>Open network settings</source><translation>Netzwerkeinstellungen öffnen</translation></message>
     <message><source>Make ECZOS yours</source><translation>ECZOS persönlich gestalten</translation></message>
-    <message><source>Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in System Settings.</source><translation>Wählen Sie ein helles, dunkles oder automatisches Erscheinungsbild. Hintergrundbilder, Symbole, Energieverwaltung und Barrierefreiheit finden Sie in den Systemeinstellungen.</translation></message>
+    <message><source>Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in ECZOS Settings.</source><translation>Wählen Sie ein helles, dunkles oder automatisches Erscheinungsbild. Hintergrundbilder, Symbole, Energieverwaltung und Barrierefreiheit finden Sie in den ECZOS-Einstellungen.</translation></message>
     <message><source>Automatic</source><translation>Automatisch</translation></message>
     <message><source>Light</source><translation>Hell</translation></message>
     <message><source>Dark</source><translation>Dunkel</translation></message>

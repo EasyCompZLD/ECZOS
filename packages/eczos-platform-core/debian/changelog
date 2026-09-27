@@ -1,4 +1,4 @@
-eczos-platform-core (0.1.0~dev2) UNRELEASED; urgency=medium
+eczos-platform-core (0.1.0) trixie; urgency=medium
 
   * Preflight every requested migration before changing system state.
   * Record failed migrations machine-readably and retain retry safety.

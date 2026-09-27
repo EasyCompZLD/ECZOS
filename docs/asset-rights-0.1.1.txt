@@ -1,0 +1,20 @@
+ECZOS 0.1.1 asset-rights declaration
+====================================
+
+Status: approved-for-eczos-0.1.1
+Record date: 2026-09-27
+
+This release continues to use the ECZOS logos, wallpapers, boot animations,
+OOBE video and OOBE music covered by the ECZOS 0.1.0 declaration. The project
+owner previously confirmed that those original assets were created for
+EasyComp Zeeland and may be redistributed in official ECZOS releases.
+
+The product screenshots refreshed for ECZOS 0.1.1 were captured from the
+project-owned ECZOS GamePC on 2026-09-27. They contain ECZOS and third-party
+application interfaces only, with no personal files, credentials or private
+messages. Third-party names and interface elements remain the property of
+their respective owners and are shown solely to describe interoperability and
+included functionality.
+
+This record approves those assets for redistribution, unmodified, in official
+ECZOS 0.1.1 packages, installation images, recovery media and release pages.

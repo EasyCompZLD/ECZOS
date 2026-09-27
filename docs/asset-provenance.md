@@ -13,6 +13,6 @@ asset group; it does not override third-party licenses.
 | Plymouth animation and support images | created by the EasyComp Zeeland project owner | approved for official ECZOS distribution in the 0.1.0 declaration |
 | Plasma startup animation | created by the EasyComp Zeeland project owner; historical ECZOS OOBE sunrise video and generated poster | approved for official ECZOS distribution in the 0.1.0 declaration |
 | OOBE background video and music | created by the EasyComp Zeeland project owner; historical `Assets/Oobe/` media | approved for official ECZOS distribution in the 0.1.0 declaration |
-| Product screenshots | captured from ECZOS on the project GamePC on 2026-09-19 and 2026-09-20 | ECZOS project-owned output; reviewed to contain no personal data; third-party application interfaces and marks remain the property of their respective owners |
+| Product screenshots | captured from ECZOS on the project GamePC on 2026-09-19, 2026-09-20 and 2026-09-27 | ECZOS project-owned output; reviewed to contain no personal data; third-party application interfaces and marks remain the property of their respective owners |
 
 No asset enters a public image merely because it exists in the old overlay.

@@ -1,4 +1,4 @@
-eczos-gaming-core (0.1.1~dev1) UNRELEASED; urgency=medium
+eczos-gaming-core (0.1.1) trixie; urgency=medium
 
   * Start the post-0.1 qualification series with a unique package build.
 

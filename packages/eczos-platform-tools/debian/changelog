@@ -1,4 +1,4 @@
-eczos-platform-tools (0.1.2~dev24) UNRELEASED; urgency=medium
+eczos-platform-tools (0.1.2) trixie; urgency=medium
 
   * Install every ECZOS component used by the integrated hardware, network
     share and boot settings pages as a required dependency during upgrades.

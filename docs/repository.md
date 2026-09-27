@@ -76,6 +76,22 @@ and publication. This keeps the GPG agent, secret-key home and generated
 repository files under the `ecz` repository account even when the ISO build
 requires root privileges.
 
+## ECZOS 0.1.1 release publication
+
+ECZOS 0.1.1 uses a 19-package stable bundle. On `ECZ-GamePC`, the combined
+runner verifies the source and release metadata, rebuilds the immutable package
+bundle, builds and inspects the hybrid ISO, and publishes the signed stable
+repository only after those stages pass:
+
+```sh
+cd /srv/eczos
+bash ./scripts/finalize-release-0.1.1-vm.sh
+```
+
+Use `--resume` only to reuse an already checksummed 0.1.1 bundle or ISO after a
+publication interruption. It never treats an unverified partial build as a
+release artifact.
+
 ## Publication
 
 The Virtualmin document root for the primary endpoint is
@@ -105,6 +121,10 @@ remains hosted at `repo.easycomp.cloud`. Create the GitHub release manually with
 tag `v0.1.0`, use `docs/releases/0.1.0.md` as its release notes, attach the
 small `.sha256` file, and retain the official HTTPS ISO link in those notes.
 The Git repository itself must not contain ISO or Debian package binaries.
+
+For ECZOS 0.1.1, create tag `v0.1.1`, use `docs/releases/0.1.1.md` as the
+release notes and attach only the small `.sha256` file. The ISO remains on the
+official ECZOS repository and is linked from the release notes.
 
 The client source and `eczos-archive-keyring` package are enabled only after a
 clean machine can retrieve and authenticate both suites over HTTPS. Existing

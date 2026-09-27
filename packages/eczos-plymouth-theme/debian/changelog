@@ -1,4 +1,4 @@
-eczos-plymouth-theme (0.1.1~dev1) UNRELEASED; urgency=medium
+eczos-plymouth-theme (0.1.1) trixie; urgency=medium
 
   * Start the post-0.1 qualification series with a unique package build.
 

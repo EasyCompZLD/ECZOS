@@ -1,4 +1,4 @@
-eczos-network-shares (0.1.0~dev2) UNRELEASED; urgency=medium
+eczos-network-shares (0.1.0) trixie; urgency=medium
 
   * Discover SMB servers through the same KIO browser used by Dolphin in
     addition to DNS-SD/Avahi discovery.

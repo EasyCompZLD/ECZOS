@@ -26,4 +26,4 @@ fi
 
 export QT_AUTO_SCREEN_SCALE_FACTOR=1
 xhost +si:localuser:root >/dev/null
-pkexec calamares
+pkexec calamares --config /usr/share/eczos/installer/calamares

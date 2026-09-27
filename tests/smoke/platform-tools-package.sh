@@ -6,9 +6,9 @@ dpkg-query -W -f='${Status}\n' eczos-platform-tools | grep -Fx 'install ok insta
 for component in eczos-boot-tools eczos-hardware-tools eczos-network-shares; do
     dpkg-query -W -f='${Status}\n' "$component" | grep -Fx 'install ok installed'
 done
-dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-boot-tools)" ge 0.1.0~dev1
-dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-hardware-tools)" ge 0.1.0~dev3
-dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-network-shares)" ge 0.1.0~dev2
+dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-boot-tools)" ge 0.1.0
+dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-hardware-tools)" ge 0.1.0
+dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-network-shares)" ge 0.1.0
 for command in eczos-control-center eczos-doctor eczos-migrate eczos-support-report eczos-remote-input eczos-time; do
     test -x "/usr/bin/$command"
     bash -n "/usr/bin/$command"

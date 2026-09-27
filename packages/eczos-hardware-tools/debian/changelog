@@ -1,4 +1,4 @@
-eczos-hardware-tools (0.1.0~dev3) UNRELEASED; urgency=medium
+eczos-hardware-tools (0.1.0) trixie; urgency=medium
 
   * Advertise automatic repair only for problems with a bounded, verifiable
     solution.

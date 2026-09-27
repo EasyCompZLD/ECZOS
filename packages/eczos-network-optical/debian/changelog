@@ -1,4 +1,4 @@
-eczos-network-optical (0.1.1~dev2) UNRELEASED; urgency=medium
+eczos-network-optical (0.1.1) trixie; urgency=medium
 
   * Disable unconfigured target-level CHAP authentication for the documented
     private-LAN, single-client sharing model.

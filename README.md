@@ -7,11 +7,11 @@ The project is not a fork of Debian and must not replace Debian-owned files for
 branding alone. ECZOS-specific behaviour is delivered through versioned Debian
 packages, declarative profiles and a reproducible image configuration.
 
-## Download ECZOS 0.1.0
+## Download ECZOS 0.1.1
 
 - [Official ECZOS website](https://eczos.net/)
-- [Download ECZOS 0.1.0 for amd64](https://repo.easycomp.cloud/eczos/images/ECZOS-0.1.0-amd64.iso)
-- [SHA-256 checksum](https://repo.easycomp.cloud/eczos/images/ECZOS-0.1.0-amd64.iso.sha256)
+- [Download ECZOS 0.1.1 for amd64](https://repo.easycomp.cloud/eczos/images/ECZOS-0.1.1-amd64.iso)
+- [SHA-256 checksum](https://repo.easycomp.cloud/eczos/images/ECZOS-0.1.1-amd64.iso.sha256)
 - [ECZOS software repository](https://repo.easycomp.cloud/eczos/)
 
 The installation image supports BIOS and UEFI systems and can be written to a
@@ -20,10 +20,11 @@ Creator or another image-writing tool.
 
 ## Current status
 
-ECZOS 0.1.0 is the first public release. This repository contains the complete
-source for the ECZOS product layer, native tools, installer presentation,
-first-start experience, desktop integration and reproducible image pipeline.
-Historical machine snapshots and experimental builds remain outside Git.
+ECZOS 0.1.1 is the current stable maintenance release. This repository
+contains the complete source for the ECZOS product layer, native tools,
+installer presentation, first-start experience, desktop integration and
+reproducible image pipeline. Historical machine snapshots and experimental
+builds remain outside Git.
 
 ## Layout
 

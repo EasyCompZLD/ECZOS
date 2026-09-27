@@ -13,7 +13,7 @@
     <message><source>Steam is ready for you. Many Windows games work through the built-in compatibility layer.</source><translation>Steam est prêt à l’emploi. De nombreux jeux Windows fonctionnent grâce à la couche de compatibilité intégrée.</translation></message>
     <message><source>Bring your files with you</source><translation>Emportez vos fichiers</translation></message>
     <message><source>The migration assistant helps transfer documents, photos and music from a Windows drive. You always see what will happen first.</source><translation>L’assistant de migration vous aide à transférer documents, photos et musique depuis un disque Windows. Vous voyez toujours d’abord ce qui va se passer.</translation></message>
-    <message><source>You stay in control</source><translation>Vous gardez le contrôle</translation></message>
-    <message><source>Create recovery media whenever you want. ECZOS never shares a support report without your choice.</source><translation>Créez un support de récupération quand vous le souhaitez. ECZOS ne partage jamais de rapport d’assistance sans votre accord.</translation></message>
+    <message><source>Safe updates and recovery</source><translation>Mises à jour sûres et récupération</translation></message>
+    <message><source>Install signed ECZOS updates with Discover. Built-in diagnostics and recovery media help keep your computer ready.</source><translation>Installez les mises à jour ECZOS signées avec Discover. Les outils intégrés de diagnostic et de récupération aident à garder votre ordinateur opérationnel.</translation></message>
   </context>
 </TS>

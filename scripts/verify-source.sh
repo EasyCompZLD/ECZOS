@@ -15,6 +15,7 @@ for required in \
     config/supported-languages.tsv \
     docs/architecture.md \
     docs/asset-rights-0.1.0.txt \
+    docs/asset-rights-0.1.1.txt \
     docs/asset-provenance.md \
     docs/repository.md \
     docs/security.md \
@@ -35,6 +36,7 @@ for required in \
     packages/eczos-branding/assets/screenshots/system-appearance.png \
     packages/eczos-branding/assets/screenshots/system-display.png \
     packages/eczos-branding/assets/screenshots/system-network.png \
+    packages/eczos-branding/assets/screenshots/updates.png \
     packages/eczos-branding/assets/screenshots/browser-firefox.png \
     packages/eczos-branding/assets/screenshots/browser-chrome.png \
     packages/eczos-branding/assets/screenshots/browser-edge.png \
@@ -124,6 +126,10 @@ for required in \
     packages/eczos-desktop/debian/control \
     packages/eczos-installer/debian/control \
     packages/eczos-installer/bin/eczos-installer \
+    packages/eczos-installer/config/calamares/settings.conf \
+    packages/eczos-installer/config/calamares/modules/bootloader.conf \
+    packages/eczos-installer/config/calamares/modules/packages.conf \
+    packages/eczos-installer/config/calamares/modules/users.conf \
     packages/eczos-installer/debian/prerm \
     packages/eczos-installer/branding/eczos/branding.desc \
     packages/eczos-installer/i18n/calamares-eczos_nl.ts \
@@ -161,6 +167,11 @@ for required in \
     scripts/prepare-github-source.sh \
     scripts/verify-release-0.1.0.sh \
     scripts/build-release-packages-vm.sh \
+    scripts/build-release-packages-0.1.1-vm.sh \
+    scripts/build-release-image-0.1.1-vm.sh \
+    scripts/publish-release-0.1.1-vm.sh \
+    scripts/finalize-release-0.1.1-vm.sh \
+    scripts/verify-release-0.1.1.sh \
     scripts/publish-release-0.1.0-vm.sh \
     scripts/build-release-image-vm.sh \
     scripts/finalize-release-0.1.0-vm.sh \
@@ -177,12 +188,31 @@ for required in \
     scripts/verify-source-package-versions-vm.sh \
     scripts/verify-staged-package-versions-vm.sh \
     scripts/stage-prebuild-experience-vm.sh \
+    scripts/stage-installer-branding-vm.sh \
     scripts/stage-ux-batch-vm.sh \
     scripts/stage-settings-gaming-batch-vm.sh \
     scripts/stage-network-optical-vm.sh \
     scripts/stage-embedded-settings-hotfix-vm.sh \
     scripts/rebuild-hardware-qualification-from-cache-vm.sh; do
     [[ -f "$ROOT_DIR/$required" ]] || fail "missing $required"
+done
+
+# The live-build overlay and the installer package must carry one identical
+# Calamares configuration. The package-owned copy is what the launcher uses,
+# so Debian package upgrades cannot silently switch the branding back.
+cmp -s \
+    "$ROOT_DIR/packages/eczos-installer/config/calamares/settings.conf" \
+    "$ROOT_DIR/image/config/includes.chroot/etc/calamares/settings.conf" || {
+    printf 'Installer package and image settings.conf differ.\n' >&2
+    exit 1
+}
+for calamares_module in bootloader.conf packages.conf users.conf; do
+    cmp -s \
+        "$ROOT_DIR/packages/eczos-installer/config/calamares/modules/$calamares_module" \
+        "$ROOT_DIR/image/config/includes.chroot/etc/calamares/modules/$calamares_module" || {
+        printf 'Installer package and image module differ: %s\n' "$calamares_module" >&2
+        exit 1
+    }
 done
 
 LANGUAGE_MATRIX="$ROOT_DIR/config/supported-languages.tsv"

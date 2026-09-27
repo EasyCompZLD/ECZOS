@@ -113,7 +113,7 @@ ApplicationWindow {
             OobePage {
                 heading: qsTr("Connect to a network")
                 body: qsTr("An internet connection is needed for updates, new apps, browsers and online services.")
-                detail: qsTr("Manage Wi-Fi and wired connections from the network icon or System Settings.")
+                detail: qsTr("Manage Wi-Fi and wired connections from the network icon or ECZOS Settings.")
                 visual: "file:///usr/share/eczos/branding/screenshots/system-network.png"
                 OobeButton {
                     Layout.alignment: Qt.AlignHCenter
@@ -124,7 +124,7 @@ ApplicationWindow {
 
             OobePage {
                 heading: qsTr("Make ECZOS yours")
-                body: qsTr("Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in System Settings.")
+                body: qsTr("Choose a light, dark or automatic appearance. Wallpapers, icons, power management and accessibility are available in ECZOS Settings.")
                 visual: window.selectedTheme === "dark"
                     ? "file:///usr/share/eczos/branding/screenshots/desktop-dark.png"
                     : "file:///usr/share/eczos/branding/screenshots/desktop-light.png"

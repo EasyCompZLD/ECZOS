@@ -2,5 +2,6 @@ bin/eczos-installer usr/bin/
 bin/eczos-add-installer-icon usr/bin/
 applications/org.eczos.Installer.desktop usr/share/applications/
 branding/eczos usr/share/calamares/branding/
+config/calamares usr/share/eczos/installer/
 xdg/org.eczos.InstallerAuto.desktop etc/xdg/autostart/
 xdg/org.eczos.InstallerDesktopIcon.desktop etc/xdg/autostart/
