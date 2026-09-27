@@ -1562,6 +1562,21 @@ Geavanceerde Windows-hulpmiddelen</translation></message>
 Add required runtimes</source><translation>Onderdelen
 Vereiste runtimes toevoegen</translation></message>
     <message><source>Install optional components such as Visual C++, .NET or classic-game support.</source><translation>Installeer optionele onderdelen zoals Visual C++, .NET of ondersteuning voor klassieke games.</translation></message>
+    <message><source>Program file
+Choose another EXE</source><translation>Programmabestand
+Andere EXE kiezen</translation></message>
+    <message><source>Change which installed executable is started for this app.</source><translation>Kies welk geïnstalleerd uitvoerbaar bestand voor deze app wordt gestart.</translation></message>
+    <message><source>Choose the program file for %1</source><translation>Kies het programmabestand voor %1</translation></message>
+    <message><source>Windows executable (*.exe)</source><translation>Windows-programma (*.exe)</translation></message>
+    <message><source>Change program file</source><translation>Programmabestand wijzigen</translation></message>
+    <message><source>Start ‘%1’ with this executable from now on?
+
+%2</source><translation>‘%1’ voortaan met dit uitvoerbare bestand starten?
+
+%2</translation></message>
+    <message><source>Saving the selected program file…</source><translation>Gekozen programmabestand opslaan…</translation></message>
+    <message><source>The selected program file could not be saved.</source><translation>Het gekozen programmabestand kon niet worden opgeslagen.</translation></message>
+    <message><source>Program file not changed</source><translation>Programmabestand niet gewijzigd</translation></message>
     <message><source>Run setup again
 Use the saved installer</source><translation>Setup opnieuw uitvoeren
 Opgeslagen installer gebruiken</translation></message>

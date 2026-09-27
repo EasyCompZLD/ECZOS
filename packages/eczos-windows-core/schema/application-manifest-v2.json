@@ -85,6 +85,15 @@
         "lastFinished": {"type": "string"}
       }
     },
+    "entrypointSelection": {
+      "type": "object",
+      "required": ["source", "updatedAt"],
+      "properties": {
+        "source": {"enum": ["automatic", "manual"]},
+        "updatedAt": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
     "prefix": {"type": "string", "pattern": "^/"},
     "status": {"type": "string"},
     "drives": {

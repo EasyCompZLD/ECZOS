@@ -1151,6 +1151,21 @@ Erweiterte Windows-Werkzeuge</translation></message>
 Add required runtimes</source><translation>Komponenten
 Benötigte Laufzeiten hinzufügen</translation></message>
     <message><source>Install optional components such as Visual C++, .NET or classic-game support.</source><translation>Optionale Komponenten wie Visual C++, .NET oder Unterstützung für klassische Spiele installieren.</translation></message>
+    <message><source>Program file
+Choose another EXE</source><translation>Programmdatei
+Andere EXE auswählen</translation></message>
+    <message><source>Change which installed executable is started for this app.</source><translation>Ändern, welche installierte Programmdatei für diese App gestartet wird.</translation></message>
+    <message><source>Choose the program file for %1</source><translation>Programmdatei für %1 auswählen</translation></message>
+    <message><source>Windows executable (*.exe)</source><translation>Windows-Programm (*.exe)</translation></message>
+    <message><source>Change program file</source><translation>Programmdatei ändern</translation></message>
+    <message><source>Start ‘%1’ with this executable from now on?
+
+%2</source><translation>‘%1’ künftig mit dieser Programmdatei starten?
+
+%2</translation></message>
+    <message><source>Saving the selected program file…</source><translation>Ausgewählte Programmdatei wird gespeichert…</translation></message>
+    <message><source>The selected program file could not be saved.</source><translation>Die ausgewählte Programmdatei konnte nicht gespeichert werden.</translation></message>
+    <message><source>Program file not changed</source><translation>Programmdatei nicht geändert</translation></message>
     <message><source>Run setup again
 Use the saved installer</source><translation>Setup erneut ausführen
 Gespeicherten Installer verwenden</translation></message>

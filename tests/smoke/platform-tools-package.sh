@@ -3,6 +3,12 @@ set -Eeuo pipefail
 
 [[ $(id -u) -eq 0 ]] || { printf 'Run as root on the test host.\n' >&2; exit 2; }
 dpkg-query -W -f='${Status}\n' eczos-platform-tools | grep -Fx 'install ok installed'
+for component in eczos-boot-tools eczos-hardware-tools eczos-network-shares; do
+    dpkg-query -W -f='${Status}\n' "$component" | grep -Fx 'install ok installed'
+done
+dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-boot-tools)" ge 0.1.0~dev1
+dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-hardware-tools)" ge 0.1.0~dev3
+dpkg --compare-versions "$(dpkg-query -W -f='${Version}' eczos-network-shares)" ge 0.1.0~dev2
 for command in eczos-control-center eczos-doctor eczos-migrate eczos-support-report eczos-remote-input eczos-time; do
     test -x "/usr/bin/$command"
     bash -n "/usr/bin/$command"
@@ -35,8 +41,10 @@ for label in 'ECZOS appearance' 'Automatic' 'Applying %1 appearance'; do
     strings -a /usr/bin/eczos-system-settings | grep -F "$label" >/dev/null
 done
 for label in 'Start app' 'Check and repair' 'Fix this app automatically' 'Compatibility engine' 'Advanced mode' \
-    'obsolete SafeDisc disc protection'; do
-    strings -a -el /usr/bin/eczos-system-settings | grep -F "$label" >/dev/null
+    'obsolete SafeDisc disc protection' 'Program file' 'Choose another EXE'; do
+    if ! strings -a /usr/bin/eczos-system-settings | grep -F "$label" >/dev/null; then
+        strings -a -el /usr/bin/eczos-system-settings | grep -F "$label" >/dev/null
+    fi
 done
 dpkg-query -W -f='${Status}\n' eczos-desktop-defaults | grep -Fx 'install ok installed'
 test -x /usr/bin/systemsettings

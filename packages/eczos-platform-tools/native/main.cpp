@@ -774,6 +774,7 @@ private:
                 {tr("Start app\nOpen the program"), tr("Start this Windows application."), QStringLiteral("media-playback-start"), QStringLiteral("run")},
                 {tr("App settings\nAdvanced Windows tools"), tr("Open Wine settings and Windows maintenance tools for only this app."), QStringLiteral("configure"), QStringLiteral("configure")},
                 {tr("Components\nAdd required runtimes"), tr("Install optional components such as Visual C++, .NET or classic-game support."), QStringLiteral("package-x-generic"), QStringLiteral("dependencies")},
+                {tr("Program file\nChoose another EXE"), tr("Change which installed executable is started for this app."), QStringLiteral("application-x-executable"), QStringLiteral("set-entrypoint")},
                 {tr("Run setup again\nUse the saved installer"), tr("Run the original installer again without deleting this app."), QStringLiteral("system-software-install"), QStringLiteral("retry-installer")},
                 {tr("Find program again\nRepair a missing launcher"), tr("Search the managed Windows environment for the correct program file."), QStringLiteral("edit-find"), QStringLiteral("rescan")},
                 {tr("Check and repair\nFix this app automatically"), tr("Check the isolated Windows environment and automatically repair known problems."), QStringLiteral("tools-wizard"), QStringLiteral("repair")},
@@ -798,7 +799,10 @@ private:
                 } else if (action == QStringLiteral("configure")) {
                     button->setVisible(m_advancedMode);
                 }
-                connect(button, &QPushButton::clicked, this, [this, id, action, name = displayName, status] {
+                const QString currentEntrypoint = record.value(QStringLiteral("entrypoint")).toString();
+                const QString managedPrefix = record.value(QStringLiteral("prefix")).toString();
+                connect(button, &QPushButton::clicked, this,
+                        [this, id, action, name = displayName, status, currentEntrypoint, managedPrefix] {
                     if (action == QStringLiteral("run")) {
                         status->setText(tr("Starting %1…").arg(name));
                         auto *launch = new QProcess(this);
@@ -905,6 +909,43 @@ private:
                                                                                             : tr("Installing the component failed."))
                                                                         : message.section('\n', -1));
                                                 });
+                                  });
+                        return;
+                    }
+                    if (action == QStringLiteral("set-entrypoint")) {
+                        QString startLocation = currentEntrypoint;
+                        if (!QFileInfo::exists(startLocation)) {
+                            startLocation = managedPrefix + QStringLiteral("/drive_c");
+                        }
+                        const QString executable = QFileDialog::getOpenFileName(
+                            this, tr("Choose the program file for %1").arg(name), startLocation,
+                            tr("Windows executable (*.exe)"));
+                        if (executable.isEmpty()) {
+                            status->setText(tr("No changes made."));
+                            return;
+                        }
+                        if (QMessageBox::question(
+                                this, tr("Change program file"),
+                                tr("Start ‘%1’ with this executable from now on?\n\n%2").arg(name, executable))
+                            != QMessageBox::Yes) {
+                            status->setText(tr("No changes made."));
+                            return;
+                        }
+                        setTaskFeedback(status);
+                        startTask(QStringLiteral("windows-entrypoint"), QStringLiteral("/usr/bin/eczos-windows"),
+                                  {QStringLiteral("set-entrypoint"), id, executable},
+                                  tr("Saving the selected program file…"),
+                                  [this, status](int code, const QByteArray &output, const QByteArray &errors) {
+                                      const QString message = QString::fromUtf8(code == 0 ? output : errors).trimmed();
+                                      if (code == 0) {
+                                          showWindowsPage();
+                                      } else {
+                                          const QString detail = message.isEmpty()
+                                              ? tr("The selected program file could not be saved.")
+                                              : message.section('\n', -1);
+                                          status->setText(detail);
+                                          QMessageBox::warning(this, tr("Program file not changed"), detail);
+                                      }
                                   });
                         return;
                     }

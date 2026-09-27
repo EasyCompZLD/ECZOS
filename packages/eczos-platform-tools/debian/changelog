@@ -1,3 +1,14 @@
+eczos-platform-tools (0.1.2~dev24) UNRELEASED; urgency=medium
+
+  * Install every ECZOS component used by the integrated hardware, network
+    share and boot settings pages as a required dependency during upgrades.
+  * Accept the currently published development versions of those components
+    while remaining compatible with their later stable releases.
+  * Let users select and persist a different safe executable for an existing
+    managed ECZ Windows application directly from System Settings.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 13:05:00 +0200
+
 eczos-platform-tools (0.1.2~dev23) UNRELEASED; urgency=medium
 
   * Add USB Devices, Desktop Session and Device Actions to the reviewed

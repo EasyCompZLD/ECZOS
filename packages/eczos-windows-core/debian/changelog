@@ -1,3 +1,12 @@
+eczos-windows-core (0.1.1~dev21) UNRELEASED; urgency=medium
+
+  * Add a validated per-application executable override that only accepts an
+    existing EXE inside the app's isolated Windows environment.
+  * Regenerate the application launcher and icon after a manual executable
+    selection and retain the choice in the application manifest.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 13:05:00 +0200
+
 eczos-windows-core (0.1.1~dev20) UNRELEASED; urgency=medium
 
   * Run legacy 32-bit InstallShield 10 installers in a real win32 prefix.

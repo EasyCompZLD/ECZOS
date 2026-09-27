@@ -25,6 +25,7 @@ usage() {
     printf '%s\n' '  eczos-windows info APP-ID'
     printf '%s\n' '  eczos-windows run APP-ID [ARG ...]'
     printf '%s\n' '  eczos-windows rescan APP-ID'
+    printf '%s\n' '  eczos-windows set-entrypoint APP-ID EXECUTABLE.exe'
     printf '%s\n' '  eczos-windows repair APP-ID'
     printf '%s\n' '  eczos-windows retry-installer [--check|--yes] APP-ID'
     printf '%s\n' '  eczos-windows configure APP-ID TOOL'
@@ -1743,6 +1744,51 @@ rescan_app() {
     printf 'Registered installed application: %s\n' "$DISCOVERED_NAME"
 }
 
+set_entrypoint() {
+    require_unprivileged
+    [[ $# -eq 2 ]] || { usage >&2; exit 2; }
+    local app_id=$1 selected=$2 app_dir manifest prefix canonical_drive canonical_selected
+    local display_name launcher_icon launcher_group temp_manifest
+    app_dir=$(app_dir_for "$app_id")
+    manifest=$(read_manifest "$app_id")
+    prefix=$(jq -er '.prefix' "$manifest")
+    canonical_drive=$(realpath -e -- "$prefix/drive_c" 2>/dev/null || true)
+    canonical_selected=$(realpath -e -- "$selected" 2>/dev/null || true)
+    [[ "$prefix" = "$app_dir/prefix" && -n "$canonical_drive" && -d "$canonical_drive" ]] || {
+        printf 'Unsafe Windows application environment.\n' >&2
+        exit 1
+    }
+    [[ -f "$canonical_selected" && "${canonical_selected,,}" = *.exe && \
+       "$canonical_selected" = "$canonical_drive/"* ]] || {
+        printf 'Choose an executable inside this app’s managed Windows environment.\n' >&2
+        exit 2
+    }
+    mkdir -p "$LOCKS_ROOT"
+    exec {entrypoint_lock_fd}>"$LOCKS_ROOT/$app_id.lock"
+    flock -n "$entrypoint_lock_fd" || { printf 'This Windows app is currently busy.\n' >&2; exit 1; }
+    display_name=$(jq -r '.name // empty' "$manifest")
+    [[ -n "${display_name//[[:space:]]/}" ]] || \
+        display_name=$(safe_display_name "$(basename "${canonical_selected%.*}")")
+    launcher_group=$(launcher_category "$canonical_selected")
+    extract_launcher_icon "$app_dir" "$canonical_selected"
+    launcher_icon=$EXTRACTED_ICON
+    temp_manifest="$app_dir/manifest.json.new"
+    jq --arg entrypoint "$canonical_selected" --arg name "$display_name" \
+       --arg icon "$launcher_icon" --arg category "$launcher_group" \
+       --arg at "$(date --iso-8601=seconds)" '
+        .status="installed"
+        | .entrypoint=$entrypoint | .entrypointType="executable" | .name=$name
+        | .icon=$icon | .category=$category
+        | .entrypointSelection={source:"manual",updatedAt:$at}
+    ' "$manifest" >"$temp_manifest"
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$manifest"
+    rm -f "$prefix/.eczos-cnc-ddraw-scope-v1"
+    write_launcher "$app_id" "$display_name" "$launcher_icon" "$launcher_group"
+    logger -t eczos-windows -- "changed executable for $app_id to ${canonical_selected#"$canonical_drive/"}"
+    printf 'The selected program file is now used for %s.\n' "$display_name"
+}
+
 repair_app() {
     require_unprivileged
     local manifest prefix app_dir
@@ -1953,6 +1999,7 @@ case "$command_name" in
     info) require_unprivileged; [[ $# -eq 1 ]] || { usage >&2; exit 2; }; jq . "$(read_manifest "$1")" ;;
     run) [[ $# -ge 1 ]] || { usage >&2; exit 2; }; app_id=$1; shift; run_app "$app_id" "$@" ;;
     rescan) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; rescan_app "$1" ;;
+    set-entrypoint) set_entrypoint "$@" ;;
     repair) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; repair_app "$1" ;;
     retry-installer) retry_installer "$@" ;;
     configure) configure_app "$@" ;;

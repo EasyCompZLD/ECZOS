@@ -49,6 +49,11 @@ grep -F 'execute-link' /usr/lib/eczos/windows/runtime-wine-system
 grep -F 'windows_shortcut="C:\\' /usr/lib/eczos/windows/runtime-wine-system
 grep -F "grep -aoP '(?i)[a-z]:" /usr/bin/eczos-windows
 grep -F 'rescan_app' /usr/bin/eczos-windows
+grep -F 'set-entrypoint APP-ID EXECUTABLE.exe' /usr/bin/eczos-windows
+grep -F 'set_entrypoint()' /usr/bin/eczos-windows
+grep -F '.entrypointSelection={source:"manual",updatedAt:$at}' /usr/bin/eczos-windows
+grep -F '"$canonical_selected" = "$canonical_drive/"*' /usr/bin/eczos-windows
+grep -F 'set-entrypoint) set_entrypoint "$@"' /usr/bin/eczos-windows
 grep -F '{app_lock_fd}>&-' /usr/bin/eczos-windows
 grep -F 'apply_drive_mappings "$manifest" "$prefix"' /usr/bin/eczos-windows
 grep -F 'extract_launcher_icon' /usr/bin/eczos-windows
@@ -119,6 +124,8 @@ jq -e '.id == "wine-system-v1" and .family == "wine"' \
 jq -e '.properties.schema.const == 2' \
     /usr/share/eczos/windows/schema/application-manifest-v2.json >/dev/null
 jq -e '.properties.launch.properties.requiredSession.enum == ["any", "x11", "wayland"]' \
+    /usr/share/eczos/windows/schema/application-manifest-v2.json >/dev/null
+jq -e '.properties.entrypointSelection.properties.source.enum == ["automatic", "manual"]' \
     /usr/share/eczos/windows/schema/application-manifest-v2.json >/dev/null
 for definition in /usr/share/eczos/windows/dependencies/*.json; do
     jq -e '.schema == 1 and .provider == "winetricks" and (.verb | type == "string")' \

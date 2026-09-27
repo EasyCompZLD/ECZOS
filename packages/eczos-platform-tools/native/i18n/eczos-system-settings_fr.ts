@@ -1151,6 +1151,21 @@ Outils Windows avancés</translation></message>
 Add required runtimes</source><translation>Composants
 Ajouter les environnements requis</translation></message>
     <message><source>Install optional components such as Visual C++, .NET or classic-game support.</source><translation>Installer des composants facultatifs comme Visual C++, .NET ou la prise en charge des jeux classiques.</translation></message>
+    <message><source>Program file
+Choose another EXE</source><translation>Fichier programme
+Choisir un autre EXE</translation></message>
+    <message><source>Change which installed executable is started for this app.</source><translation>Modifier le fichier exécutable installé qui démarre pour cette application.</translation></message>
+    <message><source>Choose the program file for %1</source><translation>Choisir le fichier programme pour %1</translation></message>
+    <message><source>Windows executable (*.exe)</source><translation>Programme Windows (*.exe)</translation></message>
+    <message><source>Change program file</source><translation>Modifier le fichier programme</translation></message>
+    <message><source>Start ‘%1’ with this executable from now on?
+
+%2</source><translation>Démarrer désormais « %1 » avec ce fichier exécutable ?
+
+%2</translation></message>
+    <message><source>Saving the selected program file…</source><translation>Enregistrement du fichier programme sélectionné…</translation></message>
+    <message><source>The selected program file could not be saved.</source><translation>Le fichier programme sélectionné n’a pas pu être enregistré.</translation></message>
+    <message><source>Program file not changed</source><translation>Fichier programme non modifié</translation></message>
     <message><source>Run setup again
 Use the saved installer</source><translation>Relancer l’installation
 Utiliser l’installateur enregistré</translation></message>
