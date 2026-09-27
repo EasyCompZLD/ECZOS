@@ -1,3 +1,9 @@
+eczos-network-optical (0.1.2) trixie; urgency=medium
+
+  * Open the dedicated firewall service only while an optical drive is shared.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 20:15:00 +0200
+
 eczos-network-optical (0.1.1) trixie; urgency=medium
 
   * Disable unconfigured target-level CHAP authentication for the documented

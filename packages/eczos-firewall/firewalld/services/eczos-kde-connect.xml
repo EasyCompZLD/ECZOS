@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>ECZOS KDE Connect</short>
+  <description>Connect phones and other trusted local devices to ECZOS through KDE Connect.</description>
+  <port protocol="tcp" port="1714-1764"/>
+  <port protocol="udp" port="1714-1764"/>
+</service>

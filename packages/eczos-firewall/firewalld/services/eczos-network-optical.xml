@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>ECZOS Network Optical Drive</short>
+  <description>Share an explicitly selected physical optical drive with another ECZOS computer on the local network.</description>
+  <port protocol="tcp" port="3260"/>
+</service>

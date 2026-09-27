@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+if [ "$1" = configure ]; then
+    offline=/usr/bin/firewall-offline-cmd
+    if [ -x "$offline" ]; then
+        "$offline" --set-default-zone=eczos-public >/dev/null
+
+        # Keep deliberately enabled remote administration reachable when this
+        # update is installed on an existing managed ECZOS machine. Fresh
+        # installations do not expose SSH unless its service was enabled.
+        if systemctl is-enabled --quiet ssh.service 2>/dev/null || \
+           systemctl is-enabled --quiet ssh.socket 2>/dev/null; then
+            "$offline" --zone=eczos-public --add-service=ssh >/dev/null 2>&1 || true
+        fi
+
+        # Do not interrupt an optical drive that was already being shared when
+        # the firewall update arrived. New shares manage this rule dynamically.
+        if [ -s /var/lib/eczos/network-optical/state.json ] && \
+           python3 -c 'import json,sys; sys.exit(not bool(json.load(open(sys.argv[1])).get("shares")))' \
+               /var/lib/eczos/network-optical/state.json 2>/dev/null; then
+            "$offline" --zone=eczos-public --add-service=eczos-network-optical \
+                >/dev/null 2>&1 || true
+        fi
+    fi
+
+    systemctl --system enable firewalld.service >/dev/null 2>&1 || true
+    if [ -d /run/systemd/system ]; then
+        systemctl --system restart firewalld.service >/dev/null 2>&1 || true
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

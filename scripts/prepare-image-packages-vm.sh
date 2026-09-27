@@ -26,6 +26,7 @@ PACKAGES=(
     eczos-desktop-defaults
     eczos-release
     eczos-platform-core
+    eczos-firewall
     eczos-windows-core
     eczos-gaming-core
     eczos-boot-tools
@@ -65,7 +66,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config keyrings lookandfeel polkit product qml release runtime-definitions schema systemd theme xdg; do
+    for data_dir in applications assets branding config firewalld keyrings lookandfeel polkit product qml release runtime-definitions schema systemd theme xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi

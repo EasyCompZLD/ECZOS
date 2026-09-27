@@ -1,0 +1,20 @@
+Source: eczos-firewall
+Section: net
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-firewall
+Architecture: all
+Depends:
+ ${misc:Depends},
+ firewalld,
+ nftables,
+ plasma-firewall
+Description: secure default firewall integration for ECZOS
+ Enables the firewalld nftables backend with an ECZOS workstation zone,
+ integrates with the Plasma firewall settings page and keeps supported local
+ discovery services available without exposing unrelated listening services.

@@ -1,0 +1,10 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ECZOS Firewall Integration
+Source: internal EasyComp Zeeland project configuration
+
+Files: *
+Copyright: 2026 EasyComp Zeeland
+License: ECZOS-Proprietary-Redistributable
+ All rights are reserved by EasyComp Zeeland. Permission is granted to copy and
+ redistribute these files, unmodified, as part of official ECZOS packages,
+ installation images and recovery media published by EasyComp Zeeland.

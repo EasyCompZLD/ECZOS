@@ -11,6 +11,7 @@ for package in \
     eczos-release \
     eczos-branding \
     eczos-desktop-defaults \
+    eczos-firewall \
     eczos-plymouth-theme \
     eczos-sddm-theme \
     eczos-windows-core \

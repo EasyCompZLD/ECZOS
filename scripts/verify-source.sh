@@ -75,6 +75,12 @@ for required in \
     packages/eczos-gaming-core/lib/runtime-umu \
     packages/eczos-gaming-core/lib/repair-runtime \
     packages/eczos-gaming-core/polkit/org.eczos.gaming.policy \
+    packages/eczos-firewall/debian/control \
+    packages/eczos-firewall/debian/postinst \
+    packages/eczos-firewall/debian/prerm \
+    packages/eczos-firewall/firewalld/zones/eczos-public.xml \
+    packages/eczos-firewall/firewalld/services/eczos-kde-connect.xml \
+    packages/eczos-firewall/firewalld/services/eczos-network-optical.xml \
     packages/eczos-gaming-core/po/nl.po \
     packages/eczos-gaming-core/po/de.po \
     packages/eczos-gaming-core/po/fr.po \
@@ -189,6 +195,9 @@ for required in \
     scripts/verify-staged-package-versions-vm.sh \
     scripts/stage-prebuild-experience-vm.sh \
     scripts/stage-installer-branding-vm.sh \
+    scripts/stage-firewall-update-vm.sh \
+    scripts/publish-stable-firewall-update-vm.sh \
+    tests/smoke/firewall-package.sh \
     scripts/stage-ux-batch-vm.sh \
     scripts/stage-settings-gaming-batch-vm.sh \
     scripts/stage-network-optical-vm.sh \

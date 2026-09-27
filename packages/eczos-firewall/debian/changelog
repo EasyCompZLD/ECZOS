@@ -1,0 +1,7 @@
+eczos-firewall (0.1.0) trixie; urgency=medium
+
+  * Enable a deny-by-default inbound firewall for ECZOS installations.
+  * Keep KDE Connect and local mDNS discovery working by default.
+  * Preserve SSH access when an administrator had already enabled SSH.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 20:15:00 +0200

@@ -107,6 +107,12 @@ PACKAGE_DESCRIPTIONS = {
         "de": "Hardware- und Proton-Basis für ECZ Gaming",
         "fr": "Base matérielle et Proton pour ECZ Gaming",
     },
+    "eczos-firewall": {
+        "nl": "Standaard ingeschakelde firewall en Plasma-integratie",
+        "en": "Default-on firewall and Plasma integration",
+        "de": "Standardmäßig aktive Firewall und Plasma-Integration",
+        "fr": "Pare-feu activé par défaut et intégration Plasma",
+    },
     "eczos-installer": {
         "nl": "Presentatie en instellingen van het ECZOS-installatieprogramma",
         "en": "ECZOS installer presentation and settings",

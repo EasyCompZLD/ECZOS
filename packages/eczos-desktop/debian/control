@@ -13,6 +13,7 @@ Depends:
  ${misc:Depends},
  eczos-branding (>= 0.1.0),
  eczos-desktop-defaults (>= 0.1.0),
+ eczos-firewall (>= 0.1.0),
  eczos-platform-tools (>= 0.1.0),
  eczos-plymouth-theme (>= 0.1.0),
  eczos-release (>= 0.1.0),

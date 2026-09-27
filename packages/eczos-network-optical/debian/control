@@ -14,6 +14,7 @@ Depends:
  avahi-daemon,
  avahi-utils,
  eject,
+ eczos-firewall (>= 0.1.0),
  iproute2,
  lsscsi,
  open-iscsi,

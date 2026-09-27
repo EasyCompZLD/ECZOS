@@ -1,5 +1,20 @@
 # Security architecture
 
+## Host firewall
+
+ECZOS installs and enables `firewalld` with its nftables backend. The default
+`eczos-public` workstation zone blocks unsolicited inbound connections while
+allowing DHCPv6, link-local mDNS discovery and KDE Connect. Administrators can
+review and change zones and services through the Firewall page embedded in
+ECZOS Settings.
+
+An update to an existing machine preserves SSH only when the SSH service was
+already explicitly enabled. Fresh installations do not expose SSH by default.
+The network-optical-drive service opens TCP 3260 only while a user has an
+active exported drive and closes it when the final share is removed. Remote
+support remains an outbound client workflow and does not receive a blanket
+inbound firewall exception.
+
 ## Remote support
 
 Remote support must use per-device enrollment and revocable credentials. It is

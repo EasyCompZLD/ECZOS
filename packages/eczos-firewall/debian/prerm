@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+
+if [ "$1" = remove ] || [ "$1" = deconfigure ]; then
+    offline=/usr/bin/firewall-offline-cmd
+    if [ -x "$offline" ] && \
+       [ "$("$offline" --get-default-zone 2>/dev/null || true)" = eczos-public ]; then
+        "$offline" --set-default-zone=public >/dev/null 2>&1 || true
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

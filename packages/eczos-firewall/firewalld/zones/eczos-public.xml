@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone target="default">
+  <short>ECZOS Public</short>
+  <description>Safe ECZOS workstation defaults. Unsolicited incoming connections are blocked except supported local discovery and device integration.</description>
+  <service name="dhcpv6-client"/>
+  <service name="mdns"/>
+  <service name="eczos-kde-connect"/>
+</zone>

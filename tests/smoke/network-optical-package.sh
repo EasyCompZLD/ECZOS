@@ -5,6 +5,8 @@ set -Eeuo pipefail
 dpkg-query -W -f='${Status}\n' eczos-network-optical | grep -Fx 'install ok installed'
 test -x /usr/bin/eczos-network-optical
 test -x /usr/lib/eczos-network-optical/helper
+grep -Fq 'eczos-network-optical' /usr/lib/eczos-network-optical/helper
+grep -Fq 'firewall-offline-cmd' /usr/lib/eczos-network-optical/helper
 test -x /usr/lib/eczos-network-optical/guard
 test -s /usr/share/polkit-1/actions/org.eczos.networkoptical.policy
 test -s /usr/lib/systemd/system/eczos-network-optical-guard.service

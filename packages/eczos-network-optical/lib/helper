@@ -59,6 +59,43 @@ def run(argv, timeout=30, check=True):
     return result
 
 
+def set_optical_firewall_service(enabled):
+    """Keep TCP 3260 open only while this computer exports a drive."""
+    service = "eczos-network-optical"
+    zone = "eczos-public"
+    firewall_cmd = Path("/usr/bin/firewall-cmd")
+    offline_cmd = Path("/usr/bin/firewall-offline-cmd")
+    if not firewall_cmd.exists() and not offline_cmd.exists():
+        return True
+
+    action = "--add-service" if enabled else "--remove-service"
+    commands = []
+    running = False
+    if firewall_cmd.exists():
+        state = subprocess.run(
+            [str(firewall_cmd), "--state"], text=True, capture_output=True,
+            timeout=10, check=False)
+        running = state.returncode == 0
+    if running:
+        commands.extend([
+            [str(firewall_cmd), f"--zone={zone}", f"{action}={service}"],
+            [str(firewall_cmd), "--permanent", f"--zone={zone}", f"{action}={service}"],
+        ])
+    elif offline_cmd.exists():
+        commands.append([str(offline_cmd), f"--zone={zone}", f"{action}={service}"])
+    else:
+        return False
+
+    for command in commands:
+        result = subprocess.run(command, text=True, capture_output=True, timeout=15, check=False)
+        detail = f"{result.stdout}\n{result.stderr}".lower()
+        if result.returncode != 0 and not any(
+                marker in detail for marker in ("already_enabled", "already disabled", "not_enabled")):
+            LOG.error("firewall update failed: %s", (result.stderr or result.stdout).strip())
+            return False
+    return True
+
+
 def config():
     values = {"PortalAddress": "", "Port": "3260", "ReleaseTimeoutSec": "30"}
     try:
@@ -268,6 +305,8 @@ def share(args):
         NetworkPortal(tpg, address, 3260)
         tpg.enable = True
         targetctl_save()
+        if not set_optical_firewall_service(True):
+            raise RuntimeError("the ECZOS firewall rule could not be enabled")
     except Exception as error:
         try:
             if target is not None:
@@ -277,6 +316,8 @@ def share(args):
             targetctl_save()
         except Exception as cleanup_error:
             LOG.error("share rollback failed for %s: %s", device_id, cleanup_error)
+        if not state["shares"]:
+            set_optical_firewall_service(False)
         release_state(lock)
         LOG.error("share failed for %s: %s", device_id, error)
         fail(f"The optical drive could not be shared: {error}")
@@ -328,6 +369,8 @@ def unshare(args):
     set_local_use_blocked(args.id, record["device"], False)
     del state["shares"][args.id]
     save_state(lock, state)
+    if not state["shares"] and not set_optical_firewall_service(False):
+        LOG.warning("the optical-drive firewall rule could not be removed")
     LOG.info("stopped share %s", record["iqn"])
     print(json.dumps({"ok": True}))
 

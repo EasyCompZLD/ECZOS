@@ -1,0 +1,2 @@
+firewalld/services/*.xml usr/lib/firewalld/services/
+firewalld/zones/*.xml usr/lib/firewalld/zones/
