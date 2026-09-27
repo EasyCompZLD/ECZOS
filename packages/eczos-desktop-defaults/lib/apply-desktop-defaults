@@ -37,6 +37,6 @@ if [[ -z ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then
     exit 1
 fi
 
-eczos-theme-switch default
+eczos-theme-switch nightlight
 mkdir -p "$STATE_DIR"
 printf 'applied=%s\n' "$(date --iso-8601=seconds)" > "$MARKER"

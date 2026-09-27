@@ -23,7 +23,7 @@ shift 2
 
 export WINEPREFIX="$prefix"
 export WINEDEBUG=-all
-export WINEDLLOVERRIDES='winemenubuilder.exe=d'
+export WINEDLLOVERRIDES="${WINEDLLOVERRIDES:+$WINEDLLOVERRIDES;}winemenubuilder.exe=d"
 
 case "$operation" in
     initialize|repair)
@@ -66,6 +66,29 @@ case "$operation" in
         [[ $# -eq 1 ]] || exit 2
         cd "$prefix/drive_c"
         exec wine msiexec /i "$1"
+        ;;
+    set-version)
+        [[ $# -eq 1 ]] || exit 2
+        case "$1" in
+            winxp|win7|win8|win81|win10|win11) ;;
+            *) printf 'Unsupported Windows compatibility version.\n' >&2; exit 2 ;;
+        esac
+        cd "$prefix/drive_c"
+        exec winecfg -v "$1"
+        ;;
+    tool)
+        [[ $# -eq 1 ]] || exit 2
+        cd "$prefix/drive_c"
+        case "$1" in
+            winecfg) exec winecfg ;;
+            control) exec wine control ;;
+            regedit) exec wine regedit ;;
+            taskmgr) exec wine taskmgr ;;
+            uninstaller) exec wine uninstaller ;;
+            explorer) exec wine explorer ;;
+            cmd) exec wine cmd ;;
+            *) printf 'Unknown Windows configuration tool.\n' >&2; exit 2 ;;
+        esac
         ;;
     *)
         printf 'Unknown ECZ Windows runtime operation.\n' >&2

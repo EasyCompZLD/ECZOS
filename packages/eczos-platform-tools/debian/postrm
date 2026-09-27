@@ -3,6 +3,7 @@ set -e
 
 case "$1" in
     remove|abort-install)
+        systemctl --system disable --now eczos-remote-support-guard.service >/dev/null 2>&1 || true
         for target in /usr/bin/systemsettings /usr/bin/kcmshell6; do
             if [ "$(dpkg-divert --listpackage "$target")" = eczos-platform-tools ]; then
                 rm -f "$target"

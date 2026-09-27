@@ -19,6 +19,7 @@ SMOKE_TESTS=(
     release-package.sh
     branding-package.sh
     desktop-defaults-package.sh
+    platform-core-package.sh
     platform-tools-package.sh
     windows-core-package.sh
     gaming-core-package.sh
@@ -59,6 +60,7 @@ PACKAGES=(
     eczos-release
     eczos-branding
     eczos-desktop-defaults
+    eczos-platform-core
     eczos-platform-tools
     eczos-windows-core
     eczos-gaming-core
@@ -87,7 +89,7 @@ for package in "${PACKAGES[@]}"; do
             find "$package_dir/$executable_dir" -type f -exec chmod 0755 {} +
         fi
     done
-    for data_dir in applications assets branding config keyrings polkit product qml xdg; do
+    for data_dir in applications assets branding config keyrings polkit product qml runtime-definitions schema systemd xdg; do
         if [[ -d "$package_dir/$data_dir" ]]; then
             find "$package_dir/$data_dir" -type f -exec chmod 0644 {} +
         fi

@@ -1,3 +1,9 @@
+eczos-release (0.1.1~dev1) UNRELEASED; urgency=medium
+
+  * Identify the next post-0.1 qualification image and package set uniquely.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 07:30:00 +0200
+
 eczos-release (0.1.0) trixie; urgency=medium
 
   * Publish stable ECZOS 0.1 release identity and repository configuration.

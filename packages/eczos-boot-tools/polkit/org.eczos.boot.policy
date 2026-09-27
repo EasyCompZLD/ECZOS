@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN" "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig><vendor>EasyComp Zeeland</vendor><vendor_url>https://easycompzeeland.nl/</vendor_url>
+<action id="org.eczos.boot.manage"><description>Scan or safely update the ECZOS boot menu</description><description xml:lang="nl">Het ECZOS-opstartmenu scannen of veilig bijwerken</description><description xml:lang="de">Das ECZOS-Startmenü prüfen oder sicher aktualisieren</description><description xml:lang="fr">Analyser ou mettre à jour en toute sécurité le menu de démarrage ECZOS</description><message>Authentication is required to inspect boot files or update the boot menu.</message><message xml:lang="nl">Authenticatie is nodig om opstartbestanden te controleren of het opstartmenu bij te werken.</message><defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin_keep</allow_active></defaults><annotate key="org.freedesktop.policykit.exec.path">/usr/lib/eczos/boot/helper</annotate></action>
+</policyconfig>

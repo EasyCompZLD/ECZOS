@@ -71,6 +71,7 @@ fi
 
 "$ROOT_DIR/scripts/configure-freeoffice-repository-vm.sh"
 "$ROOT_DIR/scripts/prepare-image-packages-vm.sh"
+"$ROOT_DIR/scripts/verify-staged-package-versions-vm.sh" "$ROOT_DIR/image/config/packages.chroot"
 rsync -a "$ROOT_DIR/image/config/packages.chroot" "$WORK_DIR/config/"
 
 # Reuse only package payloads. APT authenticates them against freshly fetched

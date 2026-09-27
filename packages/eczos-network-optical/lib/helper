@@ -253,19 +253,30 @@ def share(args):
     month = datetime.now(timezone.utc).strftime("%Y-%m")
     iqn = f"iqn.{month}.nl.easycomp.eczos:{token}.optical.{device_id[:12]}"
     backstore = f"eczos_{device_id[:12]}"
+    storage = None
+    target = None
     try:
         from rtslib_fb import FabricModule, LUN, NetworkPortal, PSCSIStorageObject, TPG, Target
         storage = PSCSIStorageObject(backstore, dev=device)
         target = Target(FabricModule("iscsi"), iqn, mode="create")
         tpg = TPG(target, 1, mode="create")
         LUN(tpg, 0, storage_object=storage)
-        NetworkPortal(tpg, address, 3260)
+        tpg.set_attribute("authentication", "0")
         tpg.set_attribute("generate_node_acls", "1")
         tpg.set_attribute("cache_dynamic_acls", "1")
         tpg.set_attribute("demo_mode_write_protect", "0")
+        NetworkPortal(tpg, address, 3260)
         tpg.enable = True
         targetctl_save()
     except Exception as error:
+        try:
+            if target is not None:
+                target.delete()
+            if storage is not None:
+                storage.delete()
+            targetctl_save()
+        except Exception as cleanup_error:
+            LOG.error("share rollback failed for %s: %s", device_id, cleanup_error)
         release_state(lock)
         LOG.error("share failed for %s: %s", device_id, error)
         fail(f"The optical drive could not be shared: {error}")

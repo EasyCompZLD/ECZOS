@@ -1,0 +1,19 @@
+[Unit]
+Description=ECZOS managed keyboard and mouse sharing
+Documentation=https://easycompzeeland.nl/
+After=graphical-session.target network-online.target
+Wants=network-online.target
+PartOf=graphical-session.target
+StartLimitIntervalSec=120
+StartLimitBurst=6
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/eczos-remote-input supervise
+ExecStopPost=/usr/bin/eczos-remote-input cleanup
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=8
+
+[Install]
+WantedBy=graphical-session.target

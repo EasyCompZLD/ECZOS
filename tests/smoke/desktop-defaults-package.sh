@@ -14,6 +14,13 @@ for file in \
     test -x "$file"
     bash -n "$file"
 done
+test -x /usr/lib/eczos/eczos-theme-nightlight-sync
+python3 -c 'compile(open("/usr/lib/eczos/eczos-theme-nightlight-sync", encoding="utf-8").read(), "eczos-theme-nightlight-sync", "exec")'
+test -s /usr/lib/systemd/user/eczos-theme-nightlight.service
+test -L /usr/lib/systemd/user/graphical-session.target.wants/eczos-theme-nightlight.service
+grep -F 'org.kde.KWin.NightLight' /usr/lib/eczos/eczos-theme-nightlight-sync
+grep -F 'ExecStart=/usr/lib/eczos/eczos-theme-nightlight-sync' \
+    /usr/lib/systemd/user/eczos-theme-nightlight.service
 test -s /etc/xdg/autostart/eczos-desktop-first-run.desktop
 test -s /etc/xdg/ksplashrc
 test -s /etc/skel/.config/ksplashrc
@@ -23,11 +30,13 @@ grep -Fx 'OnlyShowIn=KDE;' /etc/xdg/autostart/eczos-desktop-first-run.desktop
 grep -F 'START_ICON=file:///usr/share/eczos/branding/logo/logo-dark.png' /usr/bin/eczos-theme-switch
 grep -F 'START_ICON=file:///usr/share/eczos/branding/logo/logo.png' /usr/bin/eczos-theme-switch
 grep -F 'desktop-defaults-v5' /usr/lib/eczos/apply-desktop-defaults
+grep -F 'eczos-theme-switch nightlight' /usr/lib/eczos/apply-desktop-defaults
 grep -F 'calamares-install-debian.desktop' /usr/lib/eczos/apply-desktop-defaults
 grep -F 'timeout 12s plasma-apply-wallpaperimage' /usr/bin/eczos-theme-switch
 grep -F 'kscreenlockerrc' /usr/bin/eczos-theme-switch
 grep -F 'org.eczos.desktop' /usr/bin/eczos-theme-switch
 grep -F 'LookAndFeelPackage' /usr/bin/eczos-theme-switch
+grep -F -- '--nightlight-state' /usr/bin/eczos-theme-switch
 grep -F 'org.kde.KGlobalSettings.notifyChange' /usr/bin/eczos-theme-switch
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/metadata.json
 test -s /usr/share/plasma/look-and-feel/org.eczos.desktop/contents/splash/Splash.qml

@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+"""Keep the ECZOS automatic appearance aligned with KDE Night Light."""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+import gi
+
+gi.require_version("Gio", "2.0")
+from gi.repository import Gio, GLib  # noqa: E402
+
+
+SERVICE = "org.kde.KWin.NightLight"
+PATH = "/org/kde/KWin/NightLight"
+INTERFACE = "org.kde.KWin.NightLight"
+MODE_FILE = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "eczos/theme-mode"
+
+
+def property_value(proxy: Gio.DBusProxy, name: str):
+    value = proxy.get_cached_property(name)
+    return None if value is None else value.unpack()
+
+
+def requested_mode() -> str:
+    try:
+        mode = MODE_FILE.read_text(encoding="utf-8").strip()
+    except OSError:
+        return "nightlight"
+    return "nightlight" if mode == "auto" else mode
+
+
+def nightlight_state(proxy: Gio.DBusProxy) -> str | None:
+    if not proxy.get_name_owner():
+        return None
+    enabled = property_value(proxy, "enabled")
+    running = property_value(proxy, "running")
+    daylight = property_value(proxy, "daylight")
+    mode = property_value(proxy, "mode")
+    if None in (enabled, running, daylight, mode):
+        return None
+
+    # Scheduled/location modes are dark during KWin's night period. Constant
+    # mode is dark whenever Night Light is actually running. Inhibition and the
+    # global Night Light switch both immediately return ECZOS to the light theme.
+    dark = bool(enabled and running and (int(mode) == 3 or not daylight))
+    return "dark" if dark else "light"
+
+
+def create_proxy() -> Gio.DBusProxy:
+    return Gio.DBusProxy.new_for_bus_sync(
+        Gio.BusType.SESSION,
+        Gio.DBusProxyFlags.NONE,
+        None,
+        SERVICE,
+        PATH,
+        INTERFACE,
+        None,
+    )
+
+
+def main() -> int:
+    proxy = create_proxy()
+    if sys.argv[1:] == ["--print-state"]:
+        state = nightlight_state(proxy)
+        if state is None:
+            return 1
+        print(state)
+        return 0
+    if sys.argv[1:]:
+        print("Usage: eczos-theme-nightlight-sync [--print-state]", file=sys.stderr)
+        return 2
+
+    last_applied: str | None = None
+
+    def synchronize(*_args) -> None:
+        nonlocal last_applied
+        if requested_mode() != "nightlight":
+            last_applied = None
+            return
+        state = nightlight_state(proxy)
+        if state is None or state == last_applied:
+            return
+        result = subprocess.run(
+            ["/usr/bin/eczos-theme-switch", "--nightlight-state", state],
+            check=False,
+        )
+        if result.returncode == 0:
+            last_applied = state
+
+    proxy.connect("g-properties-changed", synchronize)
+    proxy.connect("notify::g-name-owner", synchronize)
+
+    try:
+        monitor = Gio.File.new_for_path(str(MODE_FILE)).monitor_file(Gio.FileMonitorFlags.NONE, None)
+        monitor.connect("changed", synchronize)
+    except GLib.Error:
+        monitor = None
+
+    GLib.idle_add(lambda: (synchronize(), False)[1])
+    GLib.MainLoop().run()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+case "$1" in
+    configure)
+        systemctl daemon-reload >/dev/null 2>&1 || true
+        systemctl enable eczos-boot-scan.service >/dev/null 2>&1 || true
+        /usr/lib/eczos/boot/helper scan >/dev/null 2>&1 || true
+        ;;
+esac
+#DEBHELPER#
+exit 0

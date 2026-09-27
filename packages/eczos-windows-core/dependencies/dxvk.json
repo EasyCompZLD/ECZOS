@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "dxvk",
+  "name": "DXVK",
+  "description": "Vulkan-based Direct3D 8, 9, 10 and 11 support for games.",
+  "provider": "winetricks",
+  "verb": "dxvk"
+}

@@ -14,7 +14,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-archive-keyring eczos-release eczos-branding eczos-plymouth-theme eczos-desktop-defaults eczos-installer eczos-oobe eczos-desktop)
+PACKAGES=(eczos-archive-keyring eczos-release eczos-branding eczos-plymouth-theme eczos-desktop-defaults eczos-platform-core eczos-platform-tools eczos-installer eczos-oobe eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
 "$ROOT_DIR/scripts/normalize-image-source-permissions-vm.sh"
@@ -57,6 +57,8 @@ update-grub
 "$ROOT_DIR/tests/smoke/branding-package.sh"
 "$ROOT_DIR/tests/smoke/plymouth-theme-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-defaults-package.sh"
+"$ROOT_DIR/tests/smoke/platform-core-package.sh"
+"$ROOT_DIR/tests/smoke/platform-tools-package.sh"
 "$ROOT_DIR/tests/smoke/installer-package.sh"
 "$ROOT_DIR/tests/smoke/oobe-package.sh"
 dpkg-query -W -f='${Status}\n' eczos-desktop | grep -Fx 'install ok installed'

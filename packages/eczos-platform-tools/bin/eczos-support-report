@@ -26,6 +26,8 @@ documents=$(xdg-user-dir DOCUMENTS 2>/dev/null || true)
 mkdir -p "$documents"
 output="$documents/ECZOS-supportrapport-$(date +%Y%m%d-%H%M%S).txt"
 umask 077
+raw=$(mktemp "${TMPDIR:-/tmp}/eczos-support.XXXXXX")
+trap 'rm -f "$raw"' EXIT
 {
     printf "$(_ 'ECZOS support report\nCreated: %s\n\n')" "$(date --iso-8601=seconds)"
     printf '%s\n' "$(_ '--- System ---')"
@@ -41,10 +43,14 @@ umask 077
     eczos-doctor
     printf '\n%s\n' "$(_ '--- Failed services ---')"
     systemctl --failed --no-pager 2>&1 || true
+    printf '\n%s\n' '--- ECZOS activity (privacy filtered) ---'
+    /usr/bin/eczos-logs text --days 7 2>&1 || true
     printf '\n%s\n' "$(_ 'This report is not sent automatically. Check it before sharing.')"
-} > "$output"
+} > "$raw"
+/usr/bin/eczos-logs sanitize < "$raw" > "$output"
 
 printf "$(_ 'Support report saved: %s')\n" "$output"
+printf 'ECZOS_REPORT_PATH=%s\n' "$output"
 if [[ $gui == true && -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
     kdialog --title "$(_ 'ECZOS Support')" --msgbox "$(printf "$(_ 'The report was saved as:\n%s\n\nIt was not sent automatically.')" "$output")"
 fi

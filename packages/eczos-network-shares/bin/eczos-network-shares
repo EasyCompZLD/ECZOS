@@ -1,0 +1,349 @@
+#!/usr/bin/python3
+"""Manage ECZOS user network locations without storing credentials."""
+
+from __future__ import annotations
+
+import argparse
+import concurrent.futures
+import fcntl
+import ipaddress
+import json
+import os
+import pathlib
+import shutil
+import subprocess
+import sys
+import tempfile
+import urllib.parse
+import uuid
+
+
+SCHEMES = {"smb": "SMB", "nfs": "NFS", "webdav": "WebDAV", "webdavs": "Secure WebDAV", "sftp": "SFTP"}
+CONFIG_HOME = pathlib.Path(os.environ.get("XDG_CONFIG_HOME", pathlib.Path.home() / ".config"))
+DATA_HOME = pathlib.Path(os.environ.get("XDG_DATA_HOME", pathlib.Path.home() / ".local/share"))
+CONFIG_DIR = CONFIG_HOME / "eczos"
+REGISTRY = CONFIG_DIR / "network-shares.json"
+LOCK = CONFIG_DIR / "network-shares.lock"
+REMOTE_VIEW = DATA_HOME / "remoteview"
+
+
+def fail(message: str, code: int = 1) -> "None":
+    print(message, file=sys.stderr)
+    raise SystemExit(code)
+
+
+def ensure_user() -> None:
+    if os.geteuid() == 0:
+        fail("Network locations belong to a desktop user and cannot be managed as root.", 77)
+    CONFIG_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(CONFIG_DIR, 0o700)
+
+
+def locked():
+    ensure_user()
+    descriptor = os.open(LOCK, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    os.fchmod(descriptor, 0o600)
+    fcntl.flock(descriptor, fcntl.LOCK_EX)
+    return descriptor
+
+
+def load_registry() -> dict:
+    if not REGISTRY.exists():
+        return {"schemaVersion": 1, "shares": []}
+    if REGISTRY.is_symlink() or not REGISTRY.is_file():
+        fail("The network-location registry is not a safe regular file.", 78)
+    try:
+        data = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        fail("The network-location registry is damaged.", 65)
+    if data.get("schemaVersion") != 1 or not isinstance(data.get("shares"), list):
+        fail("The network-location registry has an unsupported format.", 65)
+    return data
+
+
+def write_registry(data: dict) -> None:
+    descriptor, name = tempfile.mkstemp(prefix="network-shares.", dir=CONFIG_DIR)
+    temporary = pathlib.Path(name)
+    try:
+        os.fchmod(descriptor, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(data, stream, indent=2, ensure_ascii=False)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, REGISTRY)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def validate_name(value: str) -> str:
+    name = " ".join(value.split())
+    if not name or len(name) > 80 or any(character in name for character in "\r\n"):
+        fail("Enter a name between 1 and 80 characters.", 64)
+    return name
+
+
+def validate_url(value: str) -> tuple[str, str]:
+    try:
+        parsed = urllib.parse.urlsplit(value.strip())
+    except ValueError:
+        fail("The network address is invalid.", 64)
+    scheme = parsed.scheme.lower()
+    if scheme not in SCHEMES:
+        fail("Use an smb://, nfs://, webdav://, webdavs:// or sftp:// address.", 64)
+    if not parsed.hostname:
+        fail("The network address must contain a server name or address.", 64)
+    if parsed.password is not None:
+        fail("Do not put a password in the address. KDE Wallet will store it securely.", 64)
+    if parsed.query or parsed.fragment or "\n" in value or "\r" in value:
+        fail("Query parameters and fragments are not allowed in a network address.", 64)
+    hostname = parsed.hostname
+    if ":" in hostname and not hostname.startswith("["):
+        hostname = f"[{hostname}]"
+    user = f"{urllib.parse.quote(urllib.parse.unquote(parsed.username), safe='')}@" if parsed.username else ""
+    try:
+        parsed_port = parsed.port
+    except ValueError:
+        fail("The network address contains an invalid port.", 64)
+    port = f":{parsed_port}" if parsed_port else ""
+    path = urllib.parse.quote(urllib.parse.unquote(parsed.path or "/"), safe="/%:@!$&'()*+,;=-._~")
+    return urllib.parse.urlunsplit((scheme, f"{user}{hostname}{port}", path, "", "")), SCHEMES[scheme]
+
+
+def desktop_path(identifier: str) -> pathlib.Path:
+    return REMOTE_VIEW / f"eczos-{identifier}.desktop"
+
+
+def write_desktop(entry: dict) -> None:
+    REMOTE_VIEW.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(REMOTE_VIEW, 0o700)
+    target = desktop_path(entry["id"])
+    if target.is_symlink():
+        fail("The file-manager shortcut is an unsafe symbolic link.", 78)
+    content = "\n".join((
+        "[Desktop Entry]",
+        "Type=Link",
+        "Icon=folder-remote",
+        f"Name={entry['name'].replace(chr(92), chr(92) * 2)}",
+        f"URL={entry['url']}",
+        "X-ECZOS-Managed=true",
+        "",
+    ))
+    descriptor, name = tempfile.mkstemp(prefix=".eczos-network-", dir=REMOTE_VIEW)
+    temporary = pathlib.Path(name)
+    try:
+        os.fchmod(descriptor, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def mounted_locations() -> list[dict]:
+    try:
+        result = subprocess.run(
+            ["findmnt", "--json", "-rn", "-t", "cifs,nfs,nfs4,fuse.sshfs,davfs", "-o", "TARGET,SOURCE,FSTYPE"],
+            check=False, capture_output=True, text=True, timeout=8,
+        )
+        items = json.loads(result.stdout or "{}").get("filesystems", [])
+    except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError):
+        return []
+    return [{"target": item.get("target", ""), "source": item.get("source", ""), "type": item.get("fstype", ""), "managed": False}
+            for item in items if item.get("target")]
+
+
+def existing_kde_locations(managed_urls: set[str]) -> list[dict]:
+    locations: dict[str, dict] = {}
+    places = DATA_HOME / "user-places.xbel"
+    if places.is_file() and not places.is_symlink():
+        try:
+            import xml.etree.ElementTree as etree
+            root = etree.parse(places).getroot()
+            for bookmark in root.findall(".//{*}bookmark"):
+                raw_url = bookmark.get("href", "")
+                if urllib.parse.urlsplit(raw_url).scheme.lower() not in SCHEMES:
+                    continue
+                try:
+                    url, protocol = validate_url(raw_url)
+                except SystemExit:
+                    continue
+                if url in managed_urls:
+                    continue
+                title = next((child.text or "" for child in bookmark if child.tag.endswith("title")), "")
+                locations[url] = {"name": title or urllib.parse.urlsplit(url).hostname or url, "url": url,
+                                  "protocol": protocol, "source": "kde-places", "managed": False}
+        except (OSError, etree.ParseError):
+            pass
+    if REMOTE_VIEW.is_dir():
+        for desktop in REMOTE_VIEW.glob("*.desktop"):
+            if desktop.is_symlink():
+                continue
+            try:
+                values = {}
+                for line in desktop.read_text(encoding="utf-8", errors="replace").splitlines():
+                    key, separator, value = line.partition("=")
+                    if separator and key in {"Name", "URL", "X-ECZOS-Managed"}:
+                        values[key] = value
+                if values.get("X-ECZOS-Managed") == "true":
+                    continue
+                if urllib.parse.urlsplit(values.get("URL", "")).scheme.lower() not in SCHEMES:
+                    continue
+                url, protocol = validate_url(values.get("URL", ""))
+                if url not in managed_urls:
+                    locations[url] = {"name": values.get("Name") or urllib.parse.urlsplit(url).hostname or url,
+                                      "url": url, "protocol": protocol, "source": "remoteview", "managed": False}
+            except (OSError, SystemExit):
+                continue
+    return sorted(locations.values(), key=lambda item: item["name"].lower())
+
+
+def find_entry(data: dict, identifier: str) -> dict:
+    for entry in data["shares"]:
+        if entry.get("id") == identifier:
+            return entry
+    fail("The selected network location no longer exists.", 66)
+
+
+def kio_client() -> str:
+    client = shutil.which("kioclient") or shutil.which("kioclient6") or shutil.which("kioclient5")
+    if not client:
+        fail("KDE network support is not installed.", 69)
+    return client
+
+
+def discover_avahi() -> list[dict]:
+    browser = shutil.which("avahi-browse")
+    if not browser:
+        return []
+    try:
+        result = subprocess.run([browser, "-artp"], check=False, capture_output=True, text=True, timeout=8)
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    mapping = {
+        "_smb._tcp": ("smb", None), "_sftp-ssh._tcp": ("sftp", None), "_ssh._tcp": ("sftp", None),
+        "_webdav._tcp": ("webdav", None), "_webdavs._tcp": ("webdavs", None), "_nfs._tcp": ("nfs", None),
+    }
+    found: dict[str, dict] = {}
+    for line in result.stdout.splitlines():
+        if not line.startswith("="):
+            continue
+        parts = line.split(";")
+        if len(parts) < 9 or parts[4] not in mapping:
+            continue
+        scheme, _ = mapping[parts[4]]
+        host = parts[6].rstrip(".") or parts[7]
+        try:
+            port = int(parts[8])
+        except ValueError:
+            continue
+        default_port = {"smb": 445, "sftp": 22, "webdav": 80, "webdavs": 443, "nfs": 2049}[scheme]
+        address = f"{scheme}://{host}{f':{port}' if port != default_port else ''}/"
+        found[address] = {"name": parts[3], "url": address, "protocol": SCHEMES[scheme]}
+    return list(found.values())
+
+
+def discover_smb_kio() -> list[dict]:
+    client = shutil.which("kioclient") or shutil.which("kioclient6") or shutil.which("kioclient5")
+    if not client:
+        return []
+    try:
+        result = subprocess.run([client, "ls", "smb://"], check=False, capture_output=True, text=True, timeout=15)
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    if result.returncode != 0:
+        return []
+    found = []
+    for line in result.stdout.splitlines():
+        name = line.strip().rstrip("/")
+        if not name or name == "." or any(character in name for character in "\r\n/\\"):
+            continue
+        if ":" in name:
+            try:
+                address = ipaddress.ip_address(name.split("%", 1)[0])
+            except ValueError:
+                continue
+            if address.is_link_local and "%" not in name:
+                continue
+            host = "[" + urllib.parse.quote(name, safe=":%") + "]"
+        else:
+            host = urllib.parse.quote(name, safe="-._~")
+        url = "smb://" + host + "/"
+        found.append({"name": name, "url": url, "protocol": "SMB"})
+    return found
+
+
+def discover() -> list[dict]:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda operation: operation(), (discover_avahi, discover_smb_kio)))
+    found: dict[str, dict] = {}
+    for group in results:
+        for item in group:
+            found[item["url"]] = item
+    return sorted(found.values(), key=lambda item: (item["protocol"], item["name"].lower()))
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(prog="eczos-network-shares")
+    commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("list").add_argument("--json", action="store_true")
+    add = commands.add_parser("add"); add.add_argument("--name", required=True); add.add_argument("--url", required=True)
+    remove = commands.add_parser("remove"); remove.add_argument("id")
+    test = commands.add_parser("test"); test.add_argument("id")
+    test_url = commands.add_parser("test-url"); test_url.add_argument("--url", required=True)
+    open_parser = commands.add_parser("open"); open_parser.add_argument("id")
+    open_url = commands.add_parser("open-url"); open_url.add_argument("--url", required=True)
+    commands.add_parser("discover").add_argument("--json", action="store_true")
+    arguments = parser.parse_args()
+    lock_descriptor = locked()
+    try:
+        data = load_registry()
+        if arguments.command == "list":
+            managed_urls = {item.get("url", "") for item in data["shares"]}
+            payload = {"schemaVersion": 1, "shares": data["shares"],
+                       "existing": existing_kde_locations(managed_urls), "mounted": mounted_locations()}
+            print(json.dumps(payload, ensure_ascii=False) if arguments.json else "\n".join(f"{item['name']}: {item['url']}" for item in data["shares"]))
+        elif arguments.command == "discover":
+            result = discover()
+            print(json.dumps({"schemaVersion": 1, "services": result}, ensure_ascii=False) if arguments.json else "\n".join(item["url"] for item in result))
+        elif arguments.command == "add":
+            name = validate_name(arguments.name)
+            url, protocol = validate_url(arguments.url)
+            if any(item.get("url") == url for item in data["shares"]):
+                fail("This network location has already been added.", 73)
+            entry = {"id": str(uuid.uuid4()), "name": name, "url": url, "protocol": protocol}
+            write_desktop(entry)
+            try:
+                data["shares"].append(entry)
+                write_registry(data)
+            except BaseException:
+                desktop_path(entry["id"]).unlink(missing_ok=True)
+                raise
+            print(json.dumps(entry, ensure_ascii=False))
+        elif arguments.command == "remove":
+            entry = find_entry(data, arguments.id)
+            shortcut = desktop_path(entry["id"])
+            data["shares"] = [item for item in data["shares"] if item.get("id") != arguments.id]
+            write_registry(data)
+            if shortcut.exists() and not shortcut.is_symlink():
+                shortcut.unlink()
+            print("Network location removed.")
+        elif arguments.command in {"test", "test-url"}:
+            url = find_entry(data, arguments.id)["url"] if arguments.command == "test" else validate_url(arguments.url)[0]
+            result = subprocess.run([kio_client(), "stat", url], check=False, capture_output=True, text=True, timeout=30)
+            if result.returncode != 0:
+                fail((result.stderr or result.stdout or "The network location could not be reached.").strip(), 75)
+            print("Connection successful.")
+        elif arguments.command in {"open", "open-url"}:
+            url = find_entry(data, arguments.id)["url"] if arguments.command == "open" else validate_url(arguments.url)[0]
+            subprocess.Popen([kio_client(), "exec", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            print("Network location opened.")
+    finally:
+        os.close(lock_descriptor)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://repo.easycomp.cloud/eczos/schema/capability-result-v1.json",
+  "title": "ECZOS capability result version 1",
+  "type": "object",
+  "required": ["schema", "component", "capability", "status", "reason", "summary", "checkedAt", "details"],
+  "properties": {
+    "schema": {"const": 1},
+    "component": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$"},
+    "capability": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$"},
+    "status": {"enum": ["ready", "degraded", "unavailable", "blocked", "unsupported", "error", "unknown"]},
+    "reason": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$"},
+    "summary": {"type": "string"},
+    "checkedAt": {"type": "string", "format": "date-time"},
+    "details": {"type": "object"}
+  },
+  "additionalProperties": false
+}

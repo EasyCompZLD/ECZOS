@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "vkd3d",
+  "name": "VKD3D",
+  "description": "Vulkan-based Direct3D 12 support for compatible applications and games.",
+  "provider": "winetricks",
+  "verb": "vkd3d"
+}

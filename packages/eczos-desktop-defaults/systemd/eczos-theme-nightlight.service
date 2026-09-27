@@ -1,0 +1,13 @@
+[Unit]
+Description=Synchronize the ECZOS appearance with KDE Night Light
+After=graphical-session-pre.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/eczos/eczos-theme-nightlight-sync
+Restart=on-failure
+RestartSec=3s
+
+[Install]
+WantedBy=graphical-session.target

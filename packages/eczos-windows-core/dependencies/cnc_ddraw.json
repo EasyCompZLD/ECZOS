@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "cnc_ddraw",
+  "name": "Classic DirectDraw scaling",
+  "description": "Fullscreen upscaling and corrected mouse coordinates for classic 2D DirectDraw games.",
+  "provider": "winetricks",
+  "verb": "cnc_ddraw"
+}

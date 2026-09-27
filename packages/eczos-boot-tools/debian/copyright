@@ -1,0 +1,14 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: eczos-boot-tools
+Source: https://github.com/EasyCompZLD/ECZOS
+
+Files: *
+Copyright: 2026 EasyComp Zeeland
+License: GPL-2+
+
+License: GPL-2+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License version 2 or later.
+ .
+ On Debian systems, the complete text is available in
+ /usr/share/common-licenses/GPL-2.

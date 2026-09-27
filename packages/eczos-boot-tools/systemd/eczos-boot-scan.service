@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh the read-only ECZOS boot inventory
+After=local-fs.target
+ConditionPathExists=/boot/grub
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/eczos/boot/helper scan
+
+[Install]
+WantedBy=multi-user.target

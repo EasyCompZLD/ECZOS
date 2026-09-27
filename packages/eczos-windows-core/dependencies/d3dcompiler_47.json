@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "d3dcompiler_47",
+  "name": "Direct3D Compiler 47",
+  "description": "Shader compiler used by many modern Windows applications.",
+  "provider": "winetricks",
+  "verb": "d3dcompiler_47"
+}

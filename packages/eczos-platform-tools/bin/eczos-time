@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+bool_property() {
+    [[ $(timedatectl show -p "$1" --value 2>/dev/null || true) == yes ]] && printf true || printf false
+}
+
+status_json() {
+    local timezone ntp synchronized can_ntp local_rtc provider=none provider_active=false server='' health reason summary
+    timezone=$(timedatectl show -p Timezone --value 2>/dev/null || true)
+    ntp=$(bool_property NTP)
+    synchronized=$(bool_property NTPSynchronized)
+    can_ntp=$(bool_property CanNTP)
+    local_rtc=$(bool_property LocalRTC)
+    for candidate in systemd-timesyncd.service chrony.service chronyd.service ntpsec.service ntp.service; do
+        if systemctl is-active --quiet "$candidate" 2>/dev/null; then
+            provider=${candidate%.service}
+            provider_active=true
+            break
+        fi
+        if [[ "$provider" = none ]] && systemctl cat "$candidate" >/dev/null 2>&1; then
+            provider=${candidate%.service}
+        fi
+    done
+    if [[ "$provider" = systemd-timesyncd ]]; then
+        server=$(timedatectl timesync-status --property=ServerName --value 2>/dev/null || true)
+    fi
+    if [[ "$can_ntp" != true ]]; then
+        health=unavailable; reason=no-provider; summary='No supported network time service is available.'
+    elif [[ "$ntp" != true ]]; then
+        health=degraded; reason=ntp-disabled; summary='Automatic time synchronization is disabled.'
+    elif [[ "$provider_active" != true ]]; then
+        health=degraded; reason=service-inactive; summary='The network time service is not running.'
+    elif [[ "$synchronized" != true ]]; then
+        health=degraded; reason=awaiting-sync; summary='The clock is waiting for network synchronization.'
+    else
+        health=ready; reason=synchronized; summary='The clock is synchronized automatically.'
+    fi
+    jq -n --arg timezone "$timezone" --arg provider "$provider" --arg server "$server" \
+        --arg health "$health" --arg reason "$reason" --arg summary "$summary" \
+        --argjson ntp "$ntp" --argjson synchronized "$synchronized" --argjson canNtp "$can_ntp" \
+        --argjson providerActive "$provider_active" --argjson localRtc "$local_rtc" \
+        '{schemaVersion:1,health:$health,reason:$reason,summary:$summary,timezone:$timezone,
+          ntpEnabled:$ntp,synchronized:$synchronized,canNtp:$canNtp,provider:$provider,
+          providerActive:$providerActive,server:$server,localRtc:$localRtc,
+          hardwareClock:(if $localRtc then "local" else "utc" end)}'
+}
+
+case ${1:-status} in
+    status)
+        [[ ${2:-} == --json ]] && status_json || status_json | jq -r '
+            "Status: \(.health)\nTimezone: \(.timezone)\nAutomatic time: \(.ntpEnabled)\nSynchronized: \(.synchronized)\nService: \(.provider)\nHardware clock: \(.hardwareClock)"'
+        ;;
+    repair)
+        if [[ $(id -u) -eq 0 ]]; then
+            exec /usr/lib/eczos-platform-tools/time-helper repair
+        fi
+        exec pkexec /usr/lib/eczos-platform-tools/time-helper repair
+        ;;
+    *) printf 'Usage: eczos-time status [--json] | repair\n' >&2; exit 2 ;;
+esac

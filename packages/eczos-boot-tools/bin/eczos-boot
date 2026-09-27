@@ -1,0 +1,26 @@
+#!/usr/bin/python3
+import argparse, json, os, pathlib
+
+STATE = pathlib.Path("/var/lib/eczos/boot/inventory.json")
+
+parser = argparse.ArgumentParser(prog="eczos-boot")
+commands = parser.add_subparsers(dest="command", required=True)
+status = commands.add_parser("status"); status.add_argument("--json", action="store_true")
+commands.add_parser("scan")
+commands.add_parser("update-menu")
+args = parser.parse_args()
+
+if args.command in {"scan", "update-menu"}:
+    os.execvp("pkexec", ["pkexec", "/usr/lib/eczos/boot/helper", args.command])
+
+try:
+    data = json.loads(STATE.read_text(encoding="utf-8"))
+except (OSError, json.JSONDecodeError):
+    data = {"schemaVersion": 1, "available": False, "stale": True, "mode": "unknown",
+            "bootloader": "unknown", "osProberEnabled": False, "operatingSystems": [], "firmwareEntries": []}
+if args.json:
+    print(json.dumps(data, ensure_ascii=False))
+else:
+    print(f"Boot mode: {data.get('mode', 'unknown')}")
+    for item in data.get("operatingSystems", []):
+        print(f"{item.get('label', 'Unknown')}: {item.get('device', '')} ({item.get('status', 'unknown')})")

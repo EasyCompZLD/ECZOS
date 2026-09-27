@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://repo.easycomp.cloud/eczos/schema/windows-application-manifest-v2.json",
+  "title": "ECZ Windows application manifest version 2",
+  "type": "object",
+  "required": [
+    "schema", "id", "name", "runner", "windows", "dependencies",
+    "environment", "dllOverrides", "graphics", "audio", "midi", "launch",
+    "prefix", "status", "drives"
+  ],
+  "properties": {
+    "schema": {"const": 2},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,79}$"},
+    "name": {"type": "string", "minLength": 1},
+    "runner": {
+      "type": "object",
+      "required": ["id", "family", "managedBy"],
+      "properties": {
+        "id": {"type": "string"},
+        "family": {"enum": ["wine", "proton"]},
+        "version": {"type": ["string", "null"]},
+        "managedBy": {"enum": ["system", "eczos", "user"]}
+      }
+    },
+    "windows": {
+      "type": "object",
+      "required": ["version", "architecture"],
+      "properties": {
+        "version": {"type": "string"},
+        "architecture": {"enum": ["win32", "win64"]}
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "properties": {
+        "profile": {"type": "string"},
+        "installerEngine": {"type": "string"},
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "severity", "message"],
+            "properties": {
+              "id": {"type": "string"},
+              "severity": {"enum": ["warning", "blocked"]},
+              "message": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "provider", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "provider": {"enum": ["winetricks", "eczos"]},
+          "verb": {"type": "string"},
+          "status": {"enum": ["installed", "missing", "failed"]},
+          "installedAt": {"type": "string"}
+        }
+      }
+    },
+    "environment": {"type": "object"},
+    "dllOverrides": {"type": "object"},
+    "graphics": {"type": "object"},
+    "audio": {"type": "object"},
+    "midi": {"type": "object"},
+    "launch": {
+      "type": "object",
+      "properties": {
+        "arguments": {"type": "array", "items": {"type": "string"}},
+        "requiredSession": {"enum": ["any", "x11", "wayland"]}
+      }
+    },
+    "installer": {
+      "type": "object",
+      "properties": {
+        "path": {"type": "string", "pattern": "^/"},
+        "workingDirectory": {"type": "string", "pattern": "^/"},
+        "type": {"enum": ["exe-installer", "msi-installer", "portable-executable"]},
+        "lastStarted": {"type": "string"},
+        "lastFinished": {"type": "string"}
+      }
+    },
+    "prefix": {"type": "string", "pattern": "^/"},
+    "status": {"type": "string"},
+    "drives": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "string"},
+          {
+            "type": "object",
+            "required": ["type", "directory", "device"],
+            "properties": {
+              "type": {"const": "optical"},
+              "directory": {"type": "string", "pattern": "^/"},
+              "device": {"type": "string", "pattern": "^/dev/sr[0-9]+$"}
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  }
+}

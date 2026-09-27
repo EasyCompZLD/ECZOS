@@ -1,0 +1,16 @@
+eczos-network-shares (0.1.0~dev2) UNRELEASED; urgency=medium
+
+  * Discover SMB servers through the same KIO browser used by Dolphin in
+    addition to DNS-SD/Avahi discovery.
+  * Import existing KDE Places and remoteview locations as read-only entries.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 03:05:00 +0200
+
+eczos-network-shares (0.1.0~dev1) UNRELEASED; urgency=medium
+
+  * Add managed SMB, NFS, WebDAV and SFTP locations backed by KDE KIO.
+  * Delegate credentials to KDE Wallet and reject passwords embedded in URLs.
+  * Show existing native network mounts without modifying their configuration.
+  * Discover supported local-network services through Avahi.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 02:25:00 +0200

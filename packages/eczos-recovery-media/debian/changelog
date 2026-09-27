@@ -1,3 +1,9 @@
+eczos-recovery-media (0.1.2~dev1) UNRELEASED; urgency=medium
+
+  * Start the next recovery-media qualification series with a unique build.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 07:30:00 +0200
+
 eczos-recovery-media (0.1.1) trixie; urgency=medium
 
   * Enable the public, checksummed ECZOS release-image catalogue.

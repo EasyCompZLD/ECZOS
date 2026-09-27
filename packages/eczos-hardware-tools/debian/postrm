@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = purge ]; then
+    rm -f /etc/eczos/hardware-profile.json
+    rm -f /etc/systemd/zram-generator.conf.d/50-eczos.conf
+    rm -f /etc/sysctl.d/60-eczos-memory.conf
+fi
+
+#DEBHELPER#
+
+exit 0

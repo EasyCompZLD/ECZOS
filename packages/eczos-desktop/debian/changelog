@@ -1,3 +1,28 @@
+eczos-desktop (0.1.1~dev4) UNRELEASED; urgency=medium
+
+  * Recommend removable safe multiboot detection and GRUB menu tooling.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 04:05:00 +0200
+
+eczos-desktop (0.1.1~dev3) UNRELEASED; urgency=medium
+
+  * Recommend the removable ECZOS network-share integration.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 02:40:00 +0200
+
+eczos-desktop (0.1.1~dev2) UNRELEASED; urgency=medium
+
+  * Recommend the removable ECZOS hardware-profile and memory module.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 23:25:00 +0200
+
+eczos-desktop (0.1.1~dev1) UNRELEASED; urgency=medium
+
+  * Keep optional applications, gaming, Windows, recovery and remote optical
+    support removable without breaking the ECZOS desktop metapackage.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Fri, 25 Sep 2026 18:00:00 +0200
+
 eczos-desktop (0.1.0) trixie; urgency=medium
 
   * Release the complete ECZOS 0.1 desktop product layer.

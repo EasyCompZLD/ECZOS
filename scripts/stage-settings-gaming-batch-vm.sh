@@ -14,7 +14,7 @@ if [[ ${ID:-} != debian || ${VERSION_CODENAME:-} != trixie ]]; then
 fi
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-archive-keyring eczos-release eczos-branding eczos-platform-tools eczos-gaming-core eczos-desktop)
+PACKAGES=(eczos-archive-keyring eczos-release eczos-branding eczos-platform-core eczos-platform-tools eczos-gaming-core eczos-desktop)
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
@@ -65,6 +65,7 @@ apt-get install -y "${debs[@]}"
 "$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
 "$ROOT_DIR/tests/smoke/release-package.sh"
 "$ROOT_DIR/tests/smoke/branding-package.sh"
+"$ROOT_DIR/tests/smoke/platform-core-package.sh"
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
 "$ROOT_DIR/tests/smoke/gaming-core-package.sh"
 "$ROOT_DIR/tests/smoke/desktop-metapackage.sh"

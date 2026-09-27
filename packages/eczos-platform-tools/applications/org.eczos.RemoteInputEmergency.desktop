@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Stop keyboard and mouse sharing
+Name[nl]=Delen van toetsenbord en muis stoppen
+Name[de]=Tastatur- und Mausfreigabe stoppen
+Name[fr]=Arrêter le partage du clavier et de la souris
+Comment=Immediately release local keyboard and mouse input
+Comment[nl]=Geef het lokale toetsenbord en de muis onmiddellijk vrij
+Comment[de]=Lokale Tastatur- und Mauseingabe sofort freigeben
+Comment[fr]=Libérer immédiatement le clavier et la souris locaux
+Exec=eczos-remote-input emergency-stop
+Icon=input-keyboard
+Terminal=false
+Categories=Settings;System;
+Keywords=Deskflow;Synergy;Barrier;emergency;keyboard;mouse;

@@ -7,7 +7,7 @@ source /etc/os-release
 [[ ${ID:-} == debian && ${VERSION_CODENAME:-} == trixie ]] || { printf 'Debian 13 (trixie) is required.\n' >&2; exit 1; }
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PACKAGES=(eczos-archive-keyring eczos-release eczos-platform-tools eczos-windows-core eczos-gaming-core eczos-recovery-media eczos-desktop)
+PACKAGES=(eczos-archive-keyring eczos-release eczos-platform-core eczos-platform-tools eczos-windows-core eczos-gaming-core eczos-recovery-media eczos-desktop)
 export DEBIAN_FRONTEND=noninteractive
 
 "$ROOT_DIR/scripts/verify-source.sh"
@@ -47,6 +47,7 @@ apt-get install -y "${package_debs[@]}"
 
 "$ROOT_DIR/tests/smoke/archive-keyring-package.sh"
 "$ROOT_DIR/tests/smoke/release-package.sh"
+"$ROOT_DIR/tests/smoke/platform-core-package.sh"
 "$ROOT_DIR/tests/smoke/platform-tools-package.sh"
 "$ROOT_DIR/tests/smoke/windows-core-package.sh"
 "$ROOT_DIR/tests/smoke/gaming-core-package.sh"

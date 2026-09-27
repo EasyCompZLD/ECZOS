@@ -1,3 +1,15 @@
+eczos-network-optical (0.1.1~dev2) UNRELEASED; urgency=medium
+
+  * Disable unconfigured target-level CHAP authentication for the documented
+    private-LAN, single-client sharing model.
+  * Roll back partially created LIO targets and pSCSI backstores when sharing
+    fails, so a retry does not collide with stale configfs objects.
+  * Parse Avahi's quoted TXT record list correctly so disconnected shares stay
+    discoverable and connected shares retain their managed status.
+  * Decode UTF-8 octet escapes in discovered drive labels and capabilities.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 12:25:00 +0200
+
 eczos-network-optical (0.1.0) trixie; urgency=medium
 
   * Add LAN discovery, LIO sharing and Open-iSCSI connection management for

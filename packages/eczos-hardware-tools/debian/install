@@ -1,0 +1,3 @@
+bin/* usr/bin/
+lib/* usr/lib/eczos/hardware/
+polkit/*.policy usr/share/polkit-1/actions/

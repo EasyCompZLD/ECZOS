@@ -42,14 +42,64 @@ if package_ok softmaker-freeoffice-2024; then
     office_label=$(_ 'installed')
 fi
 failed_units=$(systemctl --failed --no-legend 2>/dev/null | wc -l | tr -d ' ')
+time_json=$(/usr/bin/eczos-time status --json 2>/dev/null || printf '{"timezone":"","ntpEnabled":false,"synchronized":false,"localRtc":false,"provider":"none","providerActive":false,"health":"unknown"}')
+timezone=$(jq -r '.timezone // ""' <<<"$time_json")
+ntp_enabled=$(jq -r '.ntpEnabled // false' <<<"$time_json")
+ntp_synchronized=$(jq -r '.synchronized // false' <<<"$time_json")
+local_rtc=$(jq -r '.localRtc // false' <<<"$time_json")
+time_provider=$(jq -r '.provider // "none"' <<<"$time_json")
+time_provider_active=$(jq -r '.providerActive // false' <<<"$time_json")
+time_health=$(jq -r '.health // "unknown"' <<<"$time_json")
+memory_kib=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
+swap_kib=$(awk '/^SwapTotal:/ {print $2}' /proc/meminfo)
+zram=false
+compgen -G '/sys/block/zram*' >/dev/null && zram=true
+input_provider=none
+input_processes=0
+input_duplicate=false
+input_managed=false
+input_active=false
+input_legacy=0
+if [[ -x /usr/bin/eczos-remote-input && $(id -u) -ne 0 ]]; then
+    input_json=$(/usr/bin/eczos-remote-input status --json 2>/dev/null || printf '{}')
+    input_provider=$(jq -r '.provider // "none"' <<<"$input_json")
+    input_processes=$(jq -r '.processes // 0' <<<"$input_json")
+    input_duplicate=$(jq -r '.duplicate // false' <<<"$input_json")
+    input_managed=$(jq -r '.managed // false' <<<"$input_json")
+    input_active=$(jq -r '.active // false' <<<"$input_json")
+    input_legacy=$(jq -r '.legacyMechanisms // 0' <<<"$input_json")
+else
+    for candidate in deskflow synergy barrierc barrier; do
+        if command -v "$candidate" >/dev/null 2>&1; then input_provider=$candidate; break; fi
+    done
+    input_processes=$(pgrep -c -f '(^|/)(deskflow|deskflow-core|synergy|synergyc|synergys|barrierc|barriers|barrier)( |$)' 2>/dev/null || true)
+    input_processes=${input_processes:-0}
+fi
+remote_json='{"installed":false,"serviceActive":false,"softwareEncoding":false,"gpuCrashDetectedThisBoot":false}'
+if [[ -x /usr/lib/eczos-platform-tools/remote-support-guard ]]; then
+    remote_json=$(/usr/lib/eczos-platform-tools/remote-support-guard status --json 2>/dev/null || printf '%s' "$remote_json")
+fi
+remote_installed=$(jq -r '.installed // false' <<<"$remote_json")
+remote_active=$(jq -r '.serviceActive // false' <<<"$remote_json")
+remote_software=$(jq -r '.softwareEncoding // false' <<<"$remote_json")
+remote_gpu_crash=$(jq -r '.gpuCrashDetectedThisBoot // false' <<<"$remote_json")
 
 if [[ $json == true ]]; then
     jq -n --argjson windows "$windows" --arg gaming "$gaming_verdict" \
         --argjson apps "$apps" --argjson flatpak "$flatpak" --argjson backup "$backup" \
         --argjson phone "$phone" --argjson firmware "$firmware" \
         --argjson printer "$printer" --argjson scanner "$scanner" --arg office "$office" \
-        --argjson failedUnits "$failed_units" \
-        '{schemaVersion:1, windows:$windows, gaming:$gaming, applications:{discover:$apps,flatpak:$flatpak},backup:$backup,phone:$phone,devices:{firmware:$firmware,printer:$printer,scanner:$scanner},office:$office,failedUnits:$failedUnits}'
+        --argjson failedUnits "$failed_units" --arg timezone "$timezone" \
+        --argjson ntpEnabled "$ntp_enabled" --argjson ntpSynchronized "$ntp_synchronized" \
+        --argjson localRtc "$local_rtc" --argjson memoryKiB "$memory_kib" \
+        --arg timeProvider "$time_provider" --argjson timeProviderActive "$time_provider_active" --arg timeHealth "$time_health" \
+        --argjson swapKiB "$swap_kib" --argjson zram "$zram" \
+        --arg inputProvider "$input_provider" --argjson inputProcesses "$input_processes" \
+        --argjson inputDuplicate "$input_duplicate" --argjson inputManaged "$input_managed" \
+        --argjson inputActive "$input_active" --argjson inputLegacy "$input_legacy" \
+        --argjson remoteInstalled "$remote_installed" --argjson remoteActive "$remote_active" \
+        --argjson remoteSoftware "$remote_software" --argjson remoteGpuCrash "$remote_gpu_crash" \
+        '{schemaVersion:2, windows:$windows, gaming:$gaming, applications:{discover:$apps,flatpak:$flatpak},backup:$backup,phone:$phone,devices:{firmware:$firmware,printer:$printer,scanner:$scanner},office:$office,failedUnits:$failedUnits,time:{timezone:$timezone,ntpEnabled:$ntpEnabled,synchronized:$ntpSynchronized,localRtc:$localRtc,provider:$timeProvider,providerActive:$timeProviderActive,health:$timeHealth},memory:{totalKiB:$memoryKiB,swapKiB:$swapKiB,zram:$zram},inputSharing:{provider:$inputProvider,processes:$inputProcesses,duplicate:$inputDuplicate,managed:$inputManaged,active:$inputActive,legacyMechanisms:$inputLegacy},remoteSupport:{installed:$remoteInstalled,serviceActive:$remoteActive,softwareEncoding:$remoteSoftware,gpuCrashDetectedThisBoot:$remoteGpuCrash}}'
     exit 0
 fi
 
@@ -67,6 +117,15 @@ $(_ 'Printers'): $(yesno "$printer")
 $(_ 'Scanners'): $(yesno "$scanner")
 $(_ 'Office'): $office_label
 $(_ 'Failed system services'): $failed_units
+Timezone: $timezone
+NTP enabled: $(yesno "$ntp_enabled")
+Clock synchronized: $(yesno "$ntp_synchronized")
+Memory: $memory_kib KiB
+Swap: $swap_kib KiB
+Input sharing: $input_provider ($input_processes active process(es))
+Remote support installed: $(yesno "$remote_installed")
+Remote support software encoding: $(yesno "$remote_software")
+Remote support GPU crash detected this boot: $(yesno "$remote_gpu_crash")
 EOF
 )
 

@@ -13,17 +13,21 @@ Depends:
  ${misc:Depends},
  eczos-branding (>= 0.1.0),
  eczos-desktop-defaults (>= 0.1.0),
- eczos-desktop-apps (>= 0.1.0),
- eczos-gaming-core (>= 0.1.0),
- eczos-network-optical (>= 0.1.0),
  eczos-platform-tools (>= 0.1.0),
  eczos-plymouth-theme (>= 0.1.0),
- eczos-recovery-media (>= 0.1.0),
  eczos-release (>= 0.1.0),
  eczos-sddm-theme (>= 0.1.0),
- eczos-oobe (>= 0.1.0),
+ eczos-oobe (>= 0.1.0)
+Recommends:
+ eczos-boot-tools (>= 0.1.0),
+ eczos-desktop-apps (>= 0.1.0),
+ eczos-gaming-core (>= 0.1.0),
+ eczos-hardware-tools (>= 0.1.0),
+ eczos-network-shares (>= 0.1.0),
+ eczos-network-optical (>= 0.1.0),
+ eczos-recovery-media (>= 0.1.0),
  eczos-windows-core (>= 0.1.0)
 Description: complete ECZOS desktop product layer
  Keeps the ECZOS release identity, branding, login theme, boot theme and Plasma
- defaults installed as one supported desktop set, including managed Windows
- application compatibility, consumer tools and the supported native app set.
+ defaults installed as one supported desktop. Recommended feature sets remain
+ individually removable without uninstalling the ECZOS desktop identity.

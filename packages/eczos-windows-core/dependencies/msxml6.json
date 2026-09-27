@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "msxml6",
+  "name": "Microsoft XML 6",
+  "description": "XML services used by various installers and business applications.",
+  "provider": "winetricks",
+  "verb": "msxml6"
+}

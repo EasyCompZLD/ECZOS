@@ -6,8 +6,14 @@ STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
 APPS_ROOT="$DATA_HOME/eczos/windows/apps"
 LAUNCHERS_DIR="$DATA_HOME/applications"
 REGISTER_MARKER="$STATE_HOME/eczos/windows-associations-v1"
-RUNTIME_ADAPTER=/usr/lib/eczos/windows/runtime-wine-system
+RUNTIMES_ROOT=/usr/lib/eczos/windows
+RUNTIME_DEFINITIONS_ROOT=/usr/share/eczos/windows/runtimes
+DEPENDENCY_DEFINITIONS_ROOT=/usr/share/eczos/windows/dependencies
+DEFAULT_RUNTIME_ID=wine-system-v1
 LOCKS_ROOT="$STATE_HOME/eczos/windows-locks"
+MANAGED_WINETRICKS_VERSION=20260125
+MANAGED_WINETRICKS_SHA256=431f82fc74000e6c864409f1d8fb495d696c03928808e3e8acffc45179312a7b
+MANAGED_WINETRICKS_URL="https://raw.githubusercontent.com/Winetricks/winetricks/$MANAGED_WINETRICKS_VERSION/src/winetricks"
 
 usage() {
     printf '%s\n' 'Usage:'
@@ -20,8 +26,14 @@ usage() {
     printf '%s\n' '  eczos-windows run APP-ID [ARG ...]'
     printf '%s\n' '  eczos-windows rescan APP-ID'
     printf '%s\n' '  eczos-windows repair APP-ID'
+    printf '%s\n' '  eczos-windows retry-installer [--check|--yes] APP-ID'
+    printf '%s\n' '  eczos-windows configure APP-ID TOOL'
+    printf '%s\n' '  eczos-windows dependencies [--json] APP-ID'
+    printf '%s\n' '  eczos-windows install-dependency [--yes] APP-ID DEPENDENCY-ID'
+    printf '%s\n' '  eczos-windows migrate'
     printf '%s\n' '  eczos-windows drives APP-ID'
     printf '%s\n' '  eczos-windows map-drive [--yes] APP-ID LETTER DIRECTORY'
+    printf '%s\n' '  eczos-windows map-optical [--yes] APP-ID LETTER DEVICE MOUNT-DIRECTORY'
     printf '%s\n' '  eczos-windows unmap-drive APP-ID LETTER'
     printf '%s\n' '  eczos-windows remove [--yes] APP-ID'
 }
@@ -58,6 +70,74 @@ confirm_action() {
     kdialog --title 'ECZ Windows' --warningcontinuecancel "$message"
 }
 
+current_session_type() {
+    local session_type=${XDG_SESSION_TYPE:-}
+    if [[ -z "$session_type" && -n ${XDG_SESSION_ID:-} ]]; then
+        session_type=$(loginctl show-session "$XDG_SESSION_ID" -p Type --value 2>/dev/null || true)
+    fi
+    printf '%s\n' "${session_type,,}"
+}
+
+required_session_for_manifest() {
+    local manifest=$1 required
+    required=$(jq -r '.launch.requiredSession // "any"' "$manifest")
+    if [[ "$required" = any ]] && jq -e '
+        any(.dependencies[]?; .id == "cnc_ddraw" and .status == "installed")
+    ' "$manifest" >/dev/null; then
+        required=x11
+    fi
+    printf '%s\n' "$required"
+}
+
+ensure_compatible_session() {
+    local manifest=$1 required current app_name message
+    required=$(required_session_for_manifest "$manifest")
+    [[ "$required" = any ]] && return 0
+    current=$(current_session_type)
+    [[ "$current" = "$required" ]] && return 0
+    app_name=$(jq -r '.name' "$manifest")
+    if [[ "$required" = x11 && "$current" = wayland ]]; then
+        message="$app_name is een klassieke Windows-app die Plasma (X11) nodig heeft voor betrouwbare muis- en scherminvoer. Meld je af, kies op het aanmeldscherm Plasma (X11) en start de app daarna opnieuw. De app wordt nu niet gestart om vastlopen te voorkomen."
+    else
+        message="$app_name vereist een $required-sessie, maar de huidige sessie is ${current:-onbekend}. Start de juiste desktopsessie en probeer het opnieuw."
+    fi
+    if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] && command -v kdialog >/dev/null 2>&1; then
+        kdialog --title 'ECZ Windows — andere desktopsessie nodig' --error "$message" || true
+    fi
+    printf '%s\n' "$message" >&2
+    return 78
+}
+
+configure_cnc_ddraw_scope() {
+    local manifest=$1 prefix entrypoint executable marker
+    jq -e 'any(.dependencies[]?; .id == "cnc_ddraw" and .status == "installed")' \
+        "$manifest" >/dev/null || return 0
+    marker="$prefix/.eczos-cnc-ddraw-scope-v1"
+    [[ -e "$marker" ]] && return 0
+    entrypoint=$(jq -r '.entrypoint // empty' "$manifest")
+    executable=${entrypoint##*/}
+    [[ "${executable,,}" =~ ^[a-z0-9_.+-]+\.exe$ ]] || return 0
+
+    # Winetricks installs cnc-ddraw as a prefix-wide override. Scope it to the
+    # actual game so launchers, configuration tools and uninstallers retain
+    # Wine's normal DirectDraw implementation.
+    WINEPREFIX="$prefix" WINEDEBUG=-all wine reg delete \
+        'HKCU\Software\Wine\DllOverrides' /v '*ddraw' /f >/dev/null 2>&1 || true
+    WINEPREFIX="$prefix" WINEDEBUG=-all wine reg add \
+        "HKCU\Software\Wine\AppDefaults\\$executable\DllOverrides" \
+        /v ddraw /t REG_SZ /d 'native,builtin' /f >/dev/null
+
+    if [[ -f "$prefix/drive_c/Team17/Worms2/worms2.exe" ]]; then
+        WINEPREFIX="$prefix" WINEDEBUG=-all wine reg add \
+            'HKCU\Software\Wine\AppDefaults\worms2.exe\DllOverrides' \
+            /v ddraw /t REG_SZ /d 'native,builtin' /f >/dev/null
+        WINEPREFIX="$prefix" WINEDEBUG=-all wine reg add \
+            'HKCU\Software\Wine\AppDefaults\frontend.exe\DllOverrides' \
+            /v ddraw /t REG_SZ /d builtin /f >/dev/null
+    fi
+    : >"$marker"
+}
+
 register_handler() {
     require_unprivileged
     if [[ -s "$REGISTER_MARKER" ]]; then
@@ -87,20 +167,512 @@ restrict_prefix() {
     done < <(find "$prefix" -type l -print0)
 }
 
-apply_drive_mappings() {
-    local manifest=$1 prefix=$2 letter directory
-    while IFS=$'\t' read -r letter directory; do
-        [[ $letter =~ ^[d-y]$ && -d "$directory" ]] || continue
-        ln -sfn "$directory" "$prefix/dosdevices/$letter:"
-    done < <(jq -r '(.drives // {}) | to_entries[] | [.key,.value] | @tsv' "$manifest")
+mounted_directory_for_device() {
+    local device=$1 preferred=${2:-} candidate
+    while IFS= read -r candidate; do
+        [[ -n "$candidate" && -d "$candidate" ]] || continue
+        if [[ -n "$preferred" && "$candidate" = "$preferred" ]]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done < <(findmnt --json --source "$device" --output TARGET 2>/dev/null |
+        jq -r '.filesystems[]?.target // empty')
+
+    candidate=$(findmnt --json --source "$device" --output TARGET 2>/dev/null |
+        jq -r '.filesystems[]?.target // empty' | head -n1)
+    if [[ -z "$candidate" ]]; then
+        udisksctl mount --block-device "$device" >/dev/null 2>&1 || true
+        candidate=$(findmnt --json --source "$device" --output TARGET 2>/dev/null |
+            jq -r '.filesystems[]?.target // empty' | head -n1)
+    fi
+    [[ -n "$candidate" && -d "$candidate" ]] || return 1
+    printf '%s\n' "$candidate"
 }
 
-runtime_call() {
-    [[ -x "$RUNTIME_ADAPTER" ]] || {
+apply_drive_mappings() {
+    local manifest=$1 prefix=$2 letter directory device canonical_device mounted_directory
+    while IFS=$'\t' read -r letter directory device; do
+        [[ $letter =~ ^[d-y]$ ]] || continue
+        if [[ -n "$device" ]]; then
+            canonical_device=$(realpath -e -- "$device" 2>/dev/null || true)
+            [[ "$canonical_device" =~ ^/dev/sr[0-9]+$ && -b "$canonical_device" ]] || continue
+            mounted_directory=$(mounted_directory_for_device "$canonical_device" "$directory" || true)
+            [[ -n "$mounted_directory" ]] || continue
+            directory=$mounted_directory
+            device=$canonical_device
+        fi
+        [[ -d "$directory" ]] || continue
+        ln -sfn "$directory" "$prefix/dosdevices/$letter:"
+        if [[ -n "$device" && "$device" =~ ^/dev/sr[0-9]+$ && -b "$device" ]]; then
+            ln -sfn "$device" "$prefix/dosdevices/$letter::"
+        fi
+    done < <(jq -r '(.drives // {}) | to_entries[] |
+        if (.value | type) == "string" then [.key,.value,""]
+        else [.key,.value.directory,(.value.device // "")] end | @tsv' "$manifest")
+}
+
+apply_known_compatibility_fixes() {
+    local prefix=$1 legacy_root installed_data cached_levels source name current_target cnc_ini
+    installed_data="$prefix/drive_c/Team17/Worms2/Data"
+    cached_levels="$prefix/drive_c/ECZOS-Install/media/DATA/LEVEL"
+    [[ -f "$prefix/drive_c/Team17/Worms2/worms2.exe" && \
+       -d "$installed_data/Water" && -d "$cached_levels" ]] || return 0
+
+    legacy_root="$prefix/drive_c/nw2"
+    if [[ -L "$legacy_root" ]]; then
+        current_target=$(readlink -- "$legacy_root")
+        [[ "$current_target" = 'ECZOS-Install/media' ]] || return 0
+        rm -- "$legacy_root"
+    fi
+    [[ ! -e "$legacy_root" || -d "$legacy_root" ]] || return 0
+    mkdir -p "$legacy_root/data"
+    for source in "$installed_data"/*; do
+        [[ -e "$source" ]] || continue
+        name=${source##*/}
+        [[ "$name" != Level && ! -e "$legacy_root/data/$name" ]] || continue
+        ln -s "../../Team17/Worms2/Data/$name" "$legacy_root/data/$name"
+    done
+    if [[ ! -e "$legacy_root/data/Level" ]]; then
+        ln -s '../../ECZOS-Install/media/DATA/LEVEL' "$legacy_root/data/Level"
+    fi
+
+    cnc_ini="$prefix/drive_c/windows/syswow64/ddraw.ini"
+    if [[ -f "$cnc_ini" ]]; then
+        sed -i \
+            -e '0,/^fullscreen=false/{s//fullscreen=true/}' \
+            -e '0,/^maintas=false/{s//maintas=true/}' \
+            -e '0,/^adjmouse=false/{s//adjmouse=true/}' \
+            "$cnc_ini"
+    fi
+}
+
+runtime_adapter_for() {
+    local runtime_id=$1 definition adapter canonical
+    [[ "$runtime_id" =~ ^[a-z0-9][a-z0-9._-]{0,79}$ ]] || {
+        printf 'Invalid ECZ Windows runner ID.\n' >&2
+        return 1
+    }
+    definition="$RUNTIME_DEFINITIONS_ROOT/$runtime_id.json"
+    [[ -r "$definition" ]] || {
+        printf 'Unsupported ECZ Windows runner: %s\n' "$runtime_id" >&2
+        return 1
+    }
+    adapter=$(jq -er --arg id "$runtime_id" 'select(.schema == 1 and .id == $id) | .adapter' "$definition") || {
+        printf 'Invalid ECZ Windows runner definition: %s\n' "$runtime_id" >&2
+        return 1
+    }
+    canonical=$(realpath -e -- "$adapter" 2>/dev/null || true)
+    [[ -x "$canonical" && "$canonical" = "$RUNTIMES_ROOT/"* ]] || {
+        printf 'Unsafe ECZ Windows runner adapter: %s\n' "$runtime_id" >&2
+        return 1
+    }
+    printf '%s\n' "$canonical"
+}
+
+runtime_call_id() {
+    local runtime_id=$1 adapter
+    shift
+    adapter=$(runtime_adapter_for "$runtime_id") || exit 1
+    [[ -x "$adapter" ]] || {
         printf 'The ECZ Windows runtime is unavailable.\n' >&2
         exit 1
     }
-    "$RUNTIME_ADAPTER" "$@"
+    "$adapter" "$@"
+}
+
+runtime_call() {
+    runtime_call_id "$DEFAULT_RUNTIME_ID" "$@"
+}
+
+runtime_id_from_manifest() {
+    jq -er '.runner.id // .runtime // "wine-system-v1"' "$1"
+}
+
+runtime_call_manifest() {
+    local manifest=$1 runtime_id key value dll_overrides architecture
+    shift
+    runtime_id=$(runtime_id_from_manifest "$manifest")
+
+    while IFS=$'\t' read -r key value; do
+        [[ "$key" =~ ^[A-Z_][A-Z0-9_]*$ ]] || continue
+        case "$key" in
+            HOME|PATH|LD_*|DBUS_SESSION_BUS_ADDRESS|XDG_RUNTIME_DIR) continue ;;
+        esac
+        export "$key=$value"
+    done < <(jq -r '(.environment // {}) | to_entries[] | [.key, (.value | tostring)] | @tsv' "$manifest")
+
+    dll_overrides=$(jq -r '(.dllOverrides // {}) | to_entries | map(.key + "=" + .value) | join(";")' "$manifest")
+    [[ -z "$dll_overrides" ]] || export WINEDLLOVERRIDES="$dll_overrides"
+    architecture=$(jq -r '.windows.architecture // "win64"' "$manifest")
+    case "$architecture" in
+        win32) export WINEARCH=win32 ;;
+        win64) export WINEARCH=win64 ;;
+        *) printf 'Unsupported Windows prefix architecture: %s\n' "$architecture" >&2; return 2 ;;
+    esac
+    runtime_call_id "$runtime_id" "$@"
+}
+
+apply_windows_version() {
+    local manifest=$1 prefix=$2 version marker current
+    version=$(jq -r '.windows.version // "win10"' "$manifest")
+    case "$version" in
+        winxp|win7|win8|win81|win10|win11) ;;
+        *) printf 'Unsupported Windows compatibility version: %s\n' "$version" >&2; return 2 ;;
+    esac
+    marker="$prefix/.eczos-windows-version"
+    current=$(cat "$marker" 2>/dev/null || true)
+    [[ "$current" = "$version" ]] && return 0
+    runtime_call_manifest "$manifest" set-version "$prefix" "$version"
+    printf '%s\n' "$version" >"$marker"
+}
+
+refresh_compatibility_profile() {
+    local manifest=$1 prefix media setup_ini engine_version temp_manifest has_safedisc=false
+    prefix=$(jq -r '.prefix // empty' "$manifest")
+    [[ -n "$prefix" && -d "$prefix/drive_c" ]] || return 0
+    media="$prefix/drive_c/ECZOS-Install/media"
+    [[ -d "$media" ]] || return 0
+    temp_manifest="${manifest}.compatibility"
+
+    setup_ini=$(find "$media" -maxdepth 2 -type f -iname setup.ini -print -quit 2>/dev/null || true)
+    engine_version=
+    if [[ -n "$setup_ini" ]]; then
+        engine_version=$(tr -d '\r' <"$setup_ini" |
+            sed -n 's/^[[:space:]]*[Ee]ngine[Vv]ersion[[:space:]]*=[[:space:]]*//p' | head -n1)
+    fi
+    if [[ "$engine_version" =~ ^10\. ]]; then
+        jq --arg engine "$engine_version" '
+            .windows.version = "winxp"
+            | if .status != "installed" or (((.entrypoint // "") | length) == 0)
+              then .windows.architecture = "win32" else . end
+            | .compatibility = (.compatibility // {})
+            | .compatibility.profile = "installshield-10-legacy"
+            | .compatibility.installerEngine = $engine
+        ' "$manifest" >"$temp_manifest"
+        chmod 0600 "$temp_manifest"
+        mv -f "$temp_manifest" "$manifest"
+    fi
+
+    if find "$media" -maxdepth 2 -type f -iname secdrv.sys -print -quit 2>/dev/null | grep -q . &&
+       find "$media" -maxdepth 3 -type f -iname '*.icd' -print -quit 2>/dev/null | grep -q .; then
+        has_safedisc=true
+    fi
+    if [[ "$has_safedisc" = true ]]; then
+        jq '
+            .compatibility = (.compatibility // {})
+            | .compatibility.blockers = ([.compatibility.blockers[]?
+                | select(.id != "safedisc-driver")]
+                + [{id:"safedisc-driver",severity:"blocked",
+                    message:"This original disc uses the obsolete SafeDisc kernel driver. Wine cannot run this protected executable. Use a legitimate publisher-updated executable or a DRM-free release."}])
+        ' "$manifest" >"$temp_manifest"
+        chmod 0600 "$temp_manifest"
+        mv -f "$temp_manifest" "$manifest"
+    fi
+}
+
+prefix_architecture() {
+    local prefix=$1 architecture
+    architecture=$(sed -n 's/^#arch=//p' "$prefix/system.reg" 2>/dev/null | head -n1)
+    case "$architecture" in
+        win32|win64) printf '%s\n' "$architecture" ;;
+        *) return 1 ;;
+    esac
+}
+
+rebuild_empty_prefix_architecture() {
+    local manifest=$1 prefix=$2 desired actual app_dir replacement backup media
+    desired=$(jq -r '.windows.architecture // "win64"' "$manifest")
+    actual=$(prefix_architecture "$prefix" 2>/dev/null || true)
+    [[ -z "$actual" || "$actual" = "$desired" ]] && return 0
+
+    # Never rebuild an environment that ECZOS has already registered as an
+    # installed application. Architecture conversion is only safe while setup
+    # has not produced a launchable program.
+    if jq -e '.status == "installed" and (((.entrypoint // "") | length) > 0)' "$manifest" >/dev/null; then
+        printf 'The installed application uses a %s prefix and cannot be converted automatically to %s.\n' \
+            "$actual" "$desired" >&2
+        return 1
+    fi
+    app_dir=$(dirname "$manifest")
+    [[ "$prefix" = "$app_dir/prefix" ]] || {
+        printf 'Unsafe prefix path for architecture migration.\n' >&2
+        return 1
+    }
+    replacement="$app_dir/prefix-architecture-new"
+    backup="$app_dir/failed-attempts/$(date +%Y%m%d-%H%M%S)-$actual-prefix"
+    [[ ! -e "$replacement" ]] || rm -rf -- "$replacement"
+    mkdir -p "$replacement"
+    chmod 0700 "$replacement"
+    if ! runtime_call_manifest "$manifest" initialize "$replacement" >/dev/null 2>&1; then
+        rm -rf -- "$replacement"
+        printf 'ECZ Windows could not create the required %s environment.\n' "$desired" >&2
+        return 1
+    fi
+    apply_windows_version "$manifest" "$replacement"
+
+    media="$prefix/drive_c/ECZOS-Install"
+    if [[ -d "$media" ]]; then
+        rm -rf -- "$replacement/drive_c/ECZOS-Install"
+        mv -- "$media" "$replacement/drive_c/ECZOS-Install"
+    fi
+    mkdir -p "$(dirname "$backup")"
+    mv -- "$prefix" "$backup"
+    mv -- "$replacement" "$prefix"
+    jq --arg from "$actual" --arg to "$desired" --arg at "$(date --iso-8601=seconds)" \
+       --arg backup "$backup" '
+        .compatibility = (.compatibility // {})
+        | .compatibility.architectureMigration = {from:$from,to:$to,at:$at,backup:$backup}
+    ' "$manifest" >"$manifest.architecture"
+    chmod 0600 "$manifest.architecture"
+    mv -f "$manifest.architecture" "$manifest"
+    restrict_prefix "$prefix"
+    apply_drive_mappings "$manifest" "$prefix"
+}
+
+prepare_installer_compatibility() {
+    local manifest=$1 prefix=$2 profile directory
+    refresh_compatibility_profile "$manifest"
+    rebuild_empty_prefix_architecture "$manifest" "$prefix"
+    apply_windows_version "$manifest" "$prefix"
+    profile=$(jq -r '.compatibility.profile // empty' "$manifest")
+    [[ "$profile" = installshield-10-legacy ]] || return 0
+
+    # InstallShield 10 can leave a half-extracted engine after error -5006.
+    # Remove only that redistributable cache inside this application's prefix;
+    # setup recreates it from the saved original media on the next attempt.
+    for directory in \
+        "$prefix/drive_c/Program Files/Common Files/InstallShield/Professional/RunTime/10/50" \
+        "$prefix/drive_c/Program Files (x86)/Common Files/InstallShield/Professional/RunTime/10/50"; do
+        [[ ! -d "$directory" ]] || rm -rf -- "$directory"
+    done
+}
+
+ensure_no_compatibility_blocker() {
+    local manifest=$1 app_name blocker message
+    blocker=$(jq -r '.compatibility.blockers[]? | select(.severity == "blocked") | .id' "$manifest" | head -n1)
+    [[ -z "$blocker" ]] && return 0
+    app_name=$(jq -r '.name // .id' "$manifest")
+    case "$blocker" in
+        safedisc-driver)
+            message="$app_name gebruikt de verouderde SafeDisc-stuurprogramma-beveiliging van de originele cd. Wine kan dit beschermde programma niet uitvoeren. Gebruik een legitieme, door de uitgever bijgewerkte executable of een DRM-vrije uitgave; ECZOS kan en zal de kopieerbeveiliging niet omzeilen."
+            ;;
+        *) message="$app_name kan niet veilig met deze compatibiliteitslaag worden gestart." ;;
+    esac
+    if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] && command -v kdialog >/dev/null 2>&1; then
+        kdialog --title 'ECZ Windows — niet-ondersteunde beveiliging' --error "$message" || true
+    fi
+    printf '%s\n' "$message" >&2
+    return 79
+}
+
+dependency_definition() {
+    local dependency_id=$1 definition
+    [[ "$dependency_id" =~ ^[a-z0-9][a-z0-9._-]{0,63}$ ]] || {
+        printf 'Invalid Windows component ID.\n' >&2
+        return 2
+    }
+    definition="$DEPENDENCY_DEFINITIONS_ROOT/$dependency_id.json"
+    [[ -r "$definition" ]] || {
+        printf 'Unknown Windows component: %s\n' "$dependency_id" >&2
+        return 2
+    }
+    jq -e --arg id "$dependency_id" '
+        .schema == 1 and .id == $id and .provider == "winetricks"
+        and (.verb | test("^[a-z0-9][a-z0-9._-]{0,63}$"))
+        and (.name | type == "string") and (.description | type == "string")
+    ' "$definition" >/dev/null || {
+        printf 'Invalid Windows component definition: %s\n' "$dependency_id" >&2
+        return 1
+    }
+    printf '%s\n' "$definition"
+}
+
+installed_winetricks_verbs() {
+    local manifest=$1 prefix
+    prefix=$(jq -er '.prefix' "$manifest")
+    command -v winetricks >/dev/null 2>&1 || return 69
+    WINEPREFIX="$prefix" WINEDEBUG=-all winetricks list-installed 2>/dev/null |
+        sed -n 's/^[[:space:]]*\([a-z0-9][a-z0-9._-]*\)[[:space:]]*$/\1/p' |
+        LC_ALL=C sort -u
+}
+
+managed_winetricks() {
+    local tools_dir target temporary checksum
+    tools_dir="$STATE_HOME/eczos/windows-tools"
+    target="$tools_dir/winetricks-$MANAGED_WINETRICKS_VERSION"
+    if [[ -x "$target" ]]; then
+        checksum=$(sha256sum "$target" | awk '{print $1}')
+        if [[ "$checksum" = "$MANAGED_WINETRICKS_SHA256" ]]; then
+            printf '%s\n' "$target"
+            return 0
+        fi
+    fi
+    command -v wget >/dev/null 2>&1 || {
+        printf 'The verified Windows component downloader is unavailable.\n' >&2
+        return 69
+    }
+    mkdir -p "$tools_dir"
+    chmod 0700 "$tools_dir"
+    temporary=$(mktemp "$tools_dir/winetricks.download.XXXXXX")
+    if ! wget -q --https-only --timeout=30 -O "$temporary" "$MANAGED_WINETRICKS_URL"; then
+        rm -f "$temporary"
+        printf 'Downloading the verified Windows component helper failed.\n' >&2
+        return 1
+    fi
+    checksum=$(sha256sum "$temporary" | awk '{print $1}')
+    if [[ "$checksum" != "$MANAGED_WINETRICKS_SHA256" ]]; then
+        rm -f "$temporary"
+        printf 'The Windows component helper failed its integrity check.\n' >&2
+        return 1
+    fi
+    chmod 0700 "$temporary"
+    mv -f "$temporary" "$target"
+    printf '%s\n' "$target"
+}
+
+list_dependencies() {
+    require_unprivileged
+    local json=false
+    if [[ ${1:-} == --json ]]; then json=true; shift; fi
+    [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+    local manifest definition dependency_id verb installed=false installed_verbs
+    manifest=$(read_manifest "$1")
+    installed_verbs=$(installed_winetricks_verbs "$manifest" || true)
+    if [[ "$json" = true ]]; then printf '['; fi
+    local separator=
+    while IFS= read -r -d '' definition; do
+        dependency_id=$(jq -r '.id' "$definition")
+        verb=$(jq -r '.verb' "$definition")
+        installed=false
+        if grep -Fxq "$verb" <<<"$installed_verbs" ||
+            jq -e --arg id "$dependency_id" 'any(.dependencies[]?; .id == $id and .status == "installed")' "$manifest" >/dev/null; then
+            installed=true
+        fi
+        if [[ "$json" = true ]]; then
+            printf '%s' "$separator"
+            jq -c --argjson installed "$installed" '. + {installed:$installed}' "$definition"
+            separator=,
+        else
+            printf '%s\t%s\t%s\n' "$dependency_id" "$installed" "$(jq -r '.name' "$definition")"
+        fi
+    done < <(find "$DEPENDENCY_DEFINITIONS_ROOT" -maxdepth 1 -type f -name '*.json' -print0 | LC_ALL=C sort -z)
+    if [[ "$json" = true ]]; then printf ']\n'; fi
+}
+
+install_dependency() {
+    require_unprivileged
+    local assume_yes=false
+    if [[ ${1:-} == --yes ]]; then assume_yes=true; shift; fi
+    [[ $# -eq 2 ]] || { usage >&2; exit 2; }
+    local app_id=$1 dependency_id=$2 manifest definition prefix app_dir verb name temp_manifest log_file result winetricks_bin
+    manifest=$(read_manifest "$app_id")
+    definition=$(dependency_definition "$dependency_id")
+    prefix=$(jq -er '.prefix' "$manifest")
+    app_dir=$(app_dir_for "$app_id")
+    [[ "$prefix" = "$app_dir/prefix" && -d "$prefix" ]] || {
+        printf 'Unsafe Windows application environment.\n' >&2
+        exit 1
+    }
+    winetricks_bin=$(managed_winetricks) || exit $?
+    verb=$(jq -r '.verb' "$definition")
+    name=$(jq -r '.name' "$definition")
+    if installed_winetricks_verbs "$manifest" | grep -Fxq "$verb"; then
+        printf '%s is already installed for %s.\n' "$name" "$app_id"
+        return 0
+    fi
+    confirm_action "Install '$name' only in the managed environment for '$app_id'?" "$assume_yes"
+    mkdir -p "$LOCKS_ROOT"
+    exec {dependency_lock_fd}>"$LOCKS_ROOT/$app_id.lock"
+    flock -n "$dependency_lock_fd" || { printf 'This Windows app is currently busy.\n' >&2; exit 1; }
+    log_file="$app_dir/dependency-$dependency_id.log"
+    set +e
+    WINEPREFIX="$prefix" WINEDEBUG=-all "$winetricks_bin" -q "$verb" {dependency_lock_fd}>&- 2>&1 | tee "$log_file"
+    result=${PIPESTATUS[0]}
+    set -e
+    chmod 0600 "$log_file"
+    ((result == 0)) || { printf 'Installing %s failed. See %s\n' "$name" "$log_file" >&2; exit "$result"; }
+    restrict_prefix "$prefix"
+    temp_manifest="$app_dir/manifest.json.new"
+    jq --arg id "$dependency_id" --arg provider winetricks --arg verb "$verb" \
+       --arg at "$(date --iso-8601=seconds)" '
+        .dependencies = ([.dependencies[]? | select(.id != $id)]
+          + [{id:$id,provider:$provider,verb:$verb,status:"installed",installedAt:$at}])
+        | if $id == "cnc_ddraw" then
+            .launch = (.launch // {arguments:[]})
+            | .launch.requiredSession = "x11"
+          else . end
+    ' "$manifest" >"$temp_manifest"
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$manifest"
+    configure_cnc_ddraw_scope "$manifest" "$prefix"
+    logger -t eczos-windows -- "installed dependency $dependency_id for $app_id"
+    printf 'Installed %s for %s.\n' "$name" "$app_id"
+}
+
+migrate_manifest_path() {
+    local manifest=$1 schema app_dir temp_manifest backup
+    schema=$(jq -er '.schema // 1' "$manifest") || {
+        printf 'Invalid ECZ Windows application record: %s\n' "$manifest" >&2
+        return 1
+    }
+    [[ "$schema" =~ ^[0-9]+$ ]] || return 1
+    if ((schema != 1 && schema != 2)); then
+        printf 'This application record needs a newer ECZ Windows version: %s\n' "$manifest" >&2
+        return 1
+    fi
+    app_dir=$(dirname "$manifest")
+    temp_manifest="$app_dir/manifest.json.new"
+    if ((schema == 2)); then
+        if jq -e '
+            ((.name // "") | length) == 0
+            or (.status == "installed" and (((.entrypoint // "") | length) == 0))
+            or ((.launch.requiredSession // "any") == "any"
+                and any(.dependencies[]?; .id == "cnc_ddraw" and .status == "installed"))
+        ' "$manifest" >/dev/null; then
+            jq '
+                if ((.name // "") | length) == 0
+                then .name = (.id | sub("-[0-9a-f]{8}$"; "") | gsub("[-_]"; " "))
+                else . end
+                | if .status == "installed" and (((.entrypoint // "") | length) == 0)
+                  then .status = "installed-needs-entrypoint" else . end
+                | if (.launch.requiredSession // "any") == "any"
+                     and any(.dependencies[]?; .id == "cnc_ddraw" and .status == "installed")
+                  then .launch.requiredSession = "x11" else . end
+            ' "$manifest" >"$temp_manifest"
+            chmod 0600 "$temp_manifest"
+            mv -f "$temp_manifest" "$manifest"
+        fi
+        refresh_compatibility_profile "$manifest"
+        return 0
+    fi
+
+    backup="$app_dir/manifest.schema1.json"
+    [[ -e "$backup" ]] || install -m 0600 "$manifest" "$backup"
+    jq --arg migrated "$(date --iso-8601=seconds)" '
+        .schema = 2
+        | .runtime = (.runtime // "wine-system-v1")
+        | .runner = (.runner // {id:.runtime, family:"wine", version:null, managedBy:"system"})
+        | .windows = (.windows // {version:"win10", architecture:"win64"})
+        | .dependencies = (.dependencies // [])
+        | .environment = (.environment // {})
+        | .dllOverrides = (.dllOverrides // {})
+        | .graphics = (.graphics // {dxvk:false, vkd3d:false})
+        | .audio = (.audio // {driver:"default"})
+        | .midi = (.midi // {driver:"default"})
+        | .launch = (.launch // {arguments:[]})
+        | .migrations = ((.migrations // []) + [{from:1,to:2,at:$migrated}])
+    ' "$manifest" >"$temp_manifest"
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$manifest"
+    refresh_compatibility_profile "$manifest"
+}
+
+migrate_all_manifests() {
+    local manifest
+    [[ -d "$APPS_ROOT" ]] || return 0
+    while IFS= read -r -d '' manifest; do
+        migrate_manifest_path "$manifest"
+    done < <(find "$APPS_ROOT" -mindepth 2 -maxdepth 2 -name manifest.json -print0)
 }
 
 inspect_file() {
@@ -196,7 +768,7 @@ safe_display_name() {
 
 detect_installation_media() {
     local selected=$1 mount_json mount_root filesystem options autorun_file autorun_command
-    local relative candidate
+    local relative candidate preferred
     INSTALL_MEDIA_ROOT=
     INSTALL_MEDIA_ENTRY=
 
@@ -226,8 +798,30 @@ detect_installation_media() {
     relative=${relative#/}
     candidate=$(realpath -e -- "$mount_root/$relative" 2>/dev/null || true)
     [[ -f "$candidate" && "$candidate" == "$mount_root/"* ]] || return 0
+    preferred=$(preferred_media_installer "$mount_root" 2>/dev/null || true)
+    [[ -z "$preferred" ]] || candidate=$preferred
     INSTALL_MEDIA_ROOT=$mount_root
     INSTALL_MEDIA_ENTRY=$candidate
+}
+
+preferred_media_installer() {
+    local media_root=$1 instruction_file configured relative candidate
+    instruction_file=$(find "$media_root" -maxdepth 1 -type f -iname 'now.ini' -print -quit 2>/dev/null)
+    [[ -n "$instruction_file" ]] || return 1
+    configured=$(tr -d '\r' <"$instruction_file" |
+        awk 'BEGIN {section=""}
+             /^\[[^]]+\]$/ {section=tolower($0); next}
+             section=="[setup]" && tolower($0) ~ /^[[:space:]]*exe[[:space:]]*=/ {
+                 sub(/^[^=]*=[[:space:]]*/, ""); print; exit
+             }')
+    configured=${configured#\"}
+    configured=${configured%\"}
+    [[ -n "$configured" && "$configured" != *' '* && "${configured,,}" == *.exe ]] || return 1
+    relative=${configured//\\//}
+    relative=${relative#/}
+    candidate=$(realpath -e -- "$media_root/$relative" 2>/dev/null || true)
+    [[ -f "$candidate" && "$candidate" == "$media_root/"* ]] || return 1
+    printf '%s\n' "$candidate"
 }
 
 copy_installation_media() {
@@ -260,11 +854,145 @@ copy_installation_media() {
     fi
 }
 
+registry_windows_path() {
+    local prefix=$1 encoded=$2 decoded relative candidate canonical_drive segment entry entry_name matched
+    local -a segments=()
+    decoded=${encoded//\\\\/\\}
+    decoded=${decoded//\\\"/\"}
+    [[ "$decoded" =~ ^[Cc]:\\ ]] || return 1
+    relative=${decoded:3}
+    relative=${relative//\\//}
+    canonical_drive=$(realpath -e -- "$prefix/drive_c" 2>/dev/null || true)
+    [[ -n "$canonical_drive" ]] || return 1
+    candidate=$canonical_drive
+    IFS=/ read -r -a segments <<<"$relative"
+    for segment in "${segments[@]}"; do
+        [[ -n "$segment" && "$segment" != . && "$segment" != .. ]] || return 1
+        matched=
+        while IFS= read -r -d '' entry; do
+            entry_name=${entry##*/}
+            if [[ "$entry_name" = "$segment" ]]; then
+                matched=$entry
+                break
+            fi
+            if [[ -z "$matched" && "${entry_name,,}" = "${segment,,}" ]]; then
+                matched=$entry
+            fi
+        done < <(find "$candidate" -mindepth 1 -maxdepth 1 -print0 2>/dev/null)
+        if [[ -z "$matched" && "${segment,,}" != *.exe ]]; then
+            while IFS= read -r -d '' entry; do
+                entry_name=${entry##*/}
+                if [[ "${entry_name,,}" = "${segment,,}.exe" ]]; then
+                    matched=$entry
+                    break
+                fi
+            done < <(find "$candidate" -mindepth 1 -maxdepth 1 -type f -print0 2>/dev/null)
+        fi
+        [[ -n "$matched" ]] || return 1
+        candidate=$matched
+    done
+    candidate=$(realpath -e -- "$candidate" 2>/dev/null || true)
+    [[ -n "$canonical_drive" && -f "$candidate" && "${candidate,,}" = *.exe && \
+        "$candidate" = "$canonical_drive/"* ]] || return 1
+    printf '%s\n' "$candidate"
+}
+
+registered_entrypoints() {
+    local prefix=$1 registry encoded candidate
+    for registry in "$prefix/system.reg" "$prefix/user.reg"; do
+        [[ -r "$registry" ]] || continue
+        while IFS= read -r encoded; do
+            candidate=$(registry_windows_path "$prefix" "$encoded" 2>/dev/null || true)
+            [[ -z "$candidate" ]] || printf '%s\0' "$candidate"
+        done < <(awk '
+            /^\[/ {
+                in_app_paths = index($0, "\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\App Paths\\\\") > 0
+                next
+            }
+            in_app_paths && /^@="/ {
+                value=$0
+                sub(/^@="/, "", value)
+                sub(/"$/, "", value)
+                print value
+            }
+        ' "$registry")
+    done
+}
+
+record_entrypoint_choice() {
+    local fallback_name=$1 candidate=$2 detected_name detected_key
+    detected_name=$(basename "${candidate%.*}")
+    detected_key=${detected_name,,}
+    detected_key=${detected_key//[^a-z0-9]/}
+    DISCOVERED_ENTRYPOINT=$candidate
+    DISCOVERED_ENTRYPOINT_TYPE=executable
+    case "$detected_key" in
+        frontend|launcher|start|play|game|client) DISCOVERED_NAME=$fallback_name ;;
+        *) DISCOVERED_NAME=$(safe_display_name "$detected_name") ;;
+    esac
+}
+
+choose_entrypoint() {
+    local fallback_name=$1 source_label=$2 candidate selected index label relative
+    shift 2
+    local -a choices=("$@") dialog_args=()
+    [[ ${#choices[@]} -gt 0 ]] || return 1
+    if [[ -n ${ECZOS_ENTRYPOINT_CHOICE:-} ]]; then
+        for candidate in "${choices[@]}"; do
+            if [[ "${candidate##*/}" = "$ECZOS_ENTRYPOINT_CHOICE" ]]; then
+                record_entrypoint_choice "$fallback_name" "$candidate"
+                return 0
+            fi
+        done
+        printf 'The requested start program is not one of the detected candidates.\n' >&2
+        return 1
+    fi
+    if [[ ${#choices[@]} -eq 1 ]]; then
+        record_entrypoint_choice "$fallback_name" "${choices[0]}"
+        return 0
+    fi
+
+    if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} && -x /usr/bin/kdialog ]]; then
+        index=0
+        for candidate in "${choices[@]}"; do
+            ((index += 1))
+            relative=${candidate#*/drive_c/}
+            label="$(basename "$candidate") — C:\\${relative//\//\\}"
+            dialog_args+=("$index" "$label")
+        done
+        selected=$(kdialog --title 'ECZ Windows' --menu \
+            "Meerdere startprogramma's zijn gevonden voor $fallback_name. Kies het juiste programma:" \
+            "${dialog_args[@]}" 2>/dev/null || true)
+        [[ "$selected" =~ ^[0-9]+$ && "$selected" -ge 1 && \
+            "$selected" -le ${#choices[@]} ]] || return 1
+        candidate=${choices[selected-1]}
+    elif [[ -t 0 && -t 2 ]]; then
+        printf 'Multiple possible programs were found for %s (%s):\n' "$fallback_name" "$source_label" >&2
+        index=0
+        for candidate in "${choices[@]}"; do
+            ((index += 1))
+            printf '  %d) %s\n' "$index" "$candidate" >&2
+        done
+        printf 'Choose the program to start [1-%d]: ' "${#choices[@]}" >&2
+        IFS= read -r selected
+        [[ "$selected" =~ ^[0-9]+$ && "$selected" -ge 1 && \
+            "$selected" -le ${#choices[@]} ]] || return 1
+        candidate=${choices[selected-1]}
+    else
+        printf 'Multiple possible programs were found for %s; choose one from ECZOS Settings.\n' \
+            "$fallback_name" >&2
+        return 1
+    fi
+
+    record_entrypoint_choice "$fallback_name" "$candidate"
+}
+
 discover_entrypoint() {
     local prefix=$1 kind=$2 portable_payload=$3 fallback_name=$4
     local runtime_user shortcut_root shortcut candidate_root windows_target relative target canonical_target
-    local candidate executable_key ancestor ancestor_key depth
+    local candidate executable_key ancestor ancestor_key depth root_name fallback_key candidate_dir entry
     local -a shortcut_roots=() shortcuts=() candidate_roots=() candidates=() product_matches=()
+    local -a registry_candidates=() registry_choices=() unique_candidates=()
     DISCOVERED_ENTRYPOINT=null
     DISCOVERED_ENTRYPOINT_TYPE=null
     DISCOVERED_NAME=$fallback_name
@@ -272,6 +1000,35 @@ discover_entrypoint() {
     if [[ "$kind" = portable-executable && -f "$portable_payload" ]]; then
         DISCOVERED_ENTRYPOINT=$portable_payload
         DISCOVERED_ENTRYPOINT_TYPE=executable
+        return 0
+    fi
+
+    mapfile -d '' registry_candidates < <(registered_entrypoints "$prefix")
+    if [[ ${#registry_candidates[@]} -gt 0 ]]; then
+        mapfile -t registry_candidates < <(printf '%s\n' "${registry_candidates[@]}" | awk '!seen[$0]++')
+        unique_candidates=()
+        for candidate in "${registry_candidates[@]}"; do
+            case "${candidate,,}" in
+                */drive_c/windows/*|*/internet\ explorer/*|*/windows\ media\ player/*) continue ;;
+            esac
+            unique_candidates+=("$candidate")
+        done
+        registry_candidates=("${unique_candidates[@]}")
+        registry_choices=("${registry_candidates[@]}")
+        for candidate in "${registry_candidates[@]}"; do
+            candidate_dir=$(dirname "$candidate")
+            while IFS= read -r -d '' entry; do
+                executable_key=$(basename "${entry%.*}")
+                executable_key=${executable_key,,}
+                executable_key=${executable_key//[^a-z0-9]/}
+                case "$executable_key" in
+                    frontend|launcher|start|play|game|client) registry_choices+=("$entry") ;;
+                esac
+            done < <(find "$candidate_dir" -mindepth 1 -maxdepth 1 -type f -iname '*.exe' \
+                ! -iname 'setup*.exe' ! -iname 'update*.exe' ! -iname 'unins*.exe' -print0 2>/dev/null)
+        done
+        mapfile -t registry_choices < <(printf '%s\n' "${registry_choices[@]}" | awk '!seen[$0]++')
+        choose_entrypoint "$fallback_name" registry "${registry_choices[@]}" || true
         return 0
     fi
 
@@ -309,6 +1066,13 @@ discover_entrypoint() {
         "$prefix/drive_c/users/$runtime_user/AppData/Local/Programs"; do
         [[ ! -d "$candidate_root" ]] || candidate_roots+=("$candidate_root")
     done
+    while IFS= read -r -d '' candidate_root; do
+        root_name=${candidate_root##*/}
+        case "${root_name,,}" in
+            windows|users|'program files'|'program files (x86)'|programdata|eczos-install) continue ;;
+        esac
+        candidate_roots+=("$candidate_root")
+    done < <(find "$prefix/drive_c" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null)
     if [[ ${#candidate_roots[@]} -gt 0 ]]; then
         mapfile -d '' candidates < <(find "${candidate_roots[@]}" -type f -iname '*.exe' \
             ! -iname 'unins*.exe' ! -iname 'uninstall*.exe' \
@@ -316,6 +1080,10 @@ discover_entrypoint() {
             ! -path '*/Common Files/*' ! -path '*/Internet Explorer/*' \
             ! -path '*/Windows Media Player/*' ! -path '*/Windows NT/*' \
             -print0 2>/dev/null)
+    fi
+    if [[ ${#candidates[@]} -gt 0 ]]; then
+        mapfile -t unique_candidates < <(printf '%s\n' "${candidates[@]}" | awk '!seen[$0]++')
+        candidates=("${unique_candidates[@]}")
     fi
     if [[ ${#candidates[@]} -eq 1 ]]; then
         DISCOVERED_ENTRYPOINT=${candidates[0]}
@@ -326,13 +1094,13 @@ discover_entrypoint() {
     # Installers often leave a game executable beside helper tools. Prefer an
     # executable whose normalized name exactly matches one of its product
     # directories, for example Tactical Ops/System/TacticalOps.exe over UCC.exe.
+    product_matches=()
     for candidate in "${candidates[@]}"; do
         executable_key=$(basename "${candidate%.*}")
         executable_key=${executable_key,,}
         executable_key=${executable_key//[^a-z0-9]/}
         ancestor=$(dirname "$candidate")
         for depth in 1 2 3 4; do
-            ancestor=$(dirname "$ancestor")
             ancestor_key=$(basename "$ancestor")
             ancestor_key=${ancestor_key,,}
             ancestor_key=${ancestor_key//[^a-z0-9]/}
@@ -340,21 +1108,49 @@ discover_entrypoint() {
                 product_matches+=("$candidate")
                 break
             fi
+            ancestor=$(dirname "$ancestor")
         done
     done
     if [[ ${#product_matches[@]} -eq 1 ]]; then
         DISCOVERED_ENTRYPOINT=${product_matches[0]}
         DISCOVERED_ENTRYPOINT_TYPE=executable
+        DISCOVERED_NAME=$(safe_display_name "$(basename "${product_matches[0]%.*}")")
+        return 0
+    fi
+    if [[ ${#product_matches[@]} -gt 1 ]]; then
+        choose_entrypoint "$fallback_name" product "${product_matches[@]}" || true
+    elif [[ ${#candidates[@]} -gt 1 ]]; then
+        choose_entrypoint "$fallback_name" scan "${candidates[@]}" || true
+    fi
+}
+
+discovered_entrypoint_is_valid() {
+    local prefix=$1 canonical_drive canonical_entrypoint
+    [[ "$DISCOVERED_ENTRYPOINT_TYPE" = executable && \
+       -n "$DISCOVERED_ENTRYPOINT" && "$DISCOVERED_ENTRYPOINT" != null ]] || return 1
+    canonical_drive=$(realpath -e -- "$prefix/drive_c" 2>/dev/null || true)
+    canonical_entrypoint=$(realpath -e -- "$DISCOVERED_ENTRYPOINT" 2>/dev/null || true)
+    [[ -n "$canonical_drive" && -f "$canonical_entrypoint" && \
+       "${canonical_entrypoint,,}" = *.exe && "$canonical_entrypoint" = "$canonical_drive/"* ]] || return 1
+    DISCOVERED_ENTRYPOINT=$canonical_entrypoint
+    if [[ -z "${DISCOVERED_NAME//[[:space:]]/}" ]]; then
+        DISCOVERED_NAME=$(safe_display_name "$(basename "${canonical_entrypoint%.*}")")
     fi
 }
 
 launcher_category() {
-    local executable=${1,,}
+    local executable=${1,,} prefix registry
     if [[ "$executable" =~ (game|games|steam|tactical|unreal|gog) ]]; then
         printf 'Game\n'
-    else
-        printf 'Utility\n'
+        return 0
     fi
+    prefix=${executable%%/drive_c/*}
+    registry="$prefix/system.reg"
+    if [[ -r "$registry" ]] && grep -Fq -- '\\DirectPlay\\Applications\\' "$registry"; then
+        printf 'Game\n'
+        return 0
+    fi
+    printf 'Utility\n'
 }
 
 install_file() {
@@ -466,7 +1262,7 @@ install_file() {
         --arg prefix "$prefix" \
         --argjson installationMedia "$install_media" \
         --arg created "$(date --iso-8601=seconds)" \
-        '{schema:1,id:$id,name:$name,kind:$kind,source:$source,sha256:$sha256,runtime:"wine-system-v1",prefix:$prefix,installationMedia:$installationMedia,status:"initializing",created:$created,entrypoint:null,entrypointType:null,drives:{}}' \
+        '{schema:2,id:$id,name:$name,kind:$kind,source:$source,sha256:$sha256,runtime:"wine-system-v1",runner:{id:"wine-system-v1",family:"wine",version:null,managedBy:"system"},windows:{version:"win10",architecture:"win64"},dependencies:[],environment:{},dllOverrides:{},graphics:{dxvk:false,vkd3d:false},audio:{driver:"default"},midi:{driver:"default"},launch:{arguments:[]},prefix:$prefix,installationMedia:$installationMedia,status:"initializing",created:$created,entrypoint:null,entrypointType:null,drives:{},migrations:[]}' \
         > "$app_dir/manifest.json"
     chmod 0600 "$app_dir/manifest.json"
 
@@ -529,13 +1325,23 @@ install_file() {
         install -m 0600 "$copied" "$runtime_payload"
     fi
 
+    temp_manifest="$app_dir/manifest.json.new"
+    jq --arg path "$runtime_payload" --arg workingDirectory "$runtime_working_dir" \
+       --arg type "$kind" '
+        .installer = {path:$path,workingDirectory:$workingDirectory,type:$type}
+    ' "$app_dir/manifest.json" >"$temp_manifest"
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$app_dir/manifest.json"
+
+    refresh_compatibility_profile "$app_dir/manifest.json"
+    prepare_installer_compatibility "$app_dir/manifest.json" "$prefix"
     install_log="$app_dir/install.log"
     set +e
     if [[ "$kind" = msi-installer ]]; then
-        runtime_call install-msi "$prefix" "$runtime_windows_path" \
+        runtime_call_manifest "$app_dir/manifest.json" install-msi "$prefix" "$runtime_windows_path" \
             {app_lock_fd}>&- 2>&1 | tee "$install_log"
     else
-        runtime_call execute-from "$prefix" "$runtime_working_dir" "$runtime_windows_path" \
+        runtime_call_manifest "$app_dir/manifest.json" execute-from "$prefix" "$runtime_working_dir" "$runtime_windows_path" \
             {app_lock_fd}>&- 2>&1 | tee "$install_log"
     fi
     result=${PIPESTATUS[0]}
@@ -544,9 +1350,15 @@ install_file() {
     restrict_prefix "$prefix"
 
     discover_entrypoint "$prefix" "$kind" "$runtime_payload" "$display_name"
-    entrypoint=$DISCOVERED_ENTRYPOINT
-    entrypoint_type=$DISCOVERED_ENTRYPOINT_TYPE
-    detected_name=$DISCOVERED_NAME
+    if discovered_entrypoint_is_valid "$prefix"; then
+        entrypoint=$DISCOVERED_ENTRYPOINT
+        entrypoint_type=$DISCOVERED_ENTRYPOINT_TYPE
+        detected_name=$DISCOVERED_NAME
+    else
+        entrypoint=null
+        entrypoint_type=null
+        detected_name=$display_name
+    fi
 
     temp_manifest="$app_dir/manifest.json.new"
     if [[ "$entrypoint" != null ]]; then
@@ -588,7 +1400,45 @@ list_drives() {
         printf 'Geen extra stations gekoppeld.\n'
         return 0
     fi
-    jq -r '(.drives // {}) | to_entries[] | "\(.key | ascii_upcase):\t\(.value)"' "$manifest"
+    jq -r '(.drives // {}) | to_entries[] |
+        if (.value | type) == "string" then "\(.key | ascii_upcase):\t\(.value)"
+        else "\(.key | ascii_upcase):\t\(.value.directory) [optical: \(.value.device)]" end' "$manifest"
+}
+
+map_optical() {
+    require_unprivileged
+    local assume_yes=false
+    if [[ ${1:-} == --yes ]]; then assume_yes=true; shift; fi
+    [[ $# -eq 4 ]] || { usage >&2; exit 2; }
+    local app_id=$1 letter=${2,,} device=$3 directory=$4 manifest app_dir prefix temp_manifest
+    local canonical_device canonical_directory id_cdrom
+    [[ $letter =~ ^[d-y]$ ]] || { printf 'Kies één stationsletter van D tot en met Y.\n' >&2; exit 2; }
+    canonical_device=$(realpath -e -- "$device" 2>/dev/null || true)
+    [[ "$canonical_device" =~ ^/dev/sr[0-9]+$ && -b "$canonical_device" ]] || {
+        printf 'Kies een aangesloten fysiek of netwerk-optisch station.\n' >&2
+        exit 2
+    }
+    id_cdrom=$(udevadm info --query=property --name "$canonical_device" 2>/dev/null |
+        sed -n 's/^ID_CDROM=//p' | head -n1)
+    [[ "$id_cdrom" = 1 ]] || { printf 'Het geselecteerde apparaat is geen optisch station.\n' >&2; exit 2; }
+    canonical_directory=$(realpath -e -- "$directory" 2>/dev/null || true)
+    [[ -n "$canonical_directory" && -d "$canonical_directory" && \
+        $(findmnt -rn -S "$canonical_device" -o TARGET | grep -Fxc -- "$canonical_directory") -gt 0 ]] || {
+        printf 'Koppel de cd eerst aan voordat je hem aan een Windows-app geeft.\n' >&2
+        exit 2
+    }
+    manifest=$(read_manifest "$app_id")
+    app_dir=$(app_dir_for "$app_id")
+    prefix=$(jq -er '.prefix' "$manifest")
+    [[ "$prefix" = "$app_dir/prefix" ]] || { printf 'Onveilige applicatieomgeving.\n' >&2; exit 1; }
+    confirm_action "Geef '$app_id' toegang tot '$canonical_device' als ${letter^^}:?" "$assume_yes"
+    temp_manifest="$app_dir/manifest.json.new"
+    jq --arg letter "$letter" --arg directory "$canonical_directory" --arg device "$canonical_device" \
+        '.drives = (.drives // {}) | .drives[$letter]={type:"optical",directory:$directory,device:$device}' \
+        "$manifest" >"$temp_manifest"
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$manifest"
+    printf '%s: gekoppeld aan optisch station %s voor %s.\n' "${letter^^}" "$canonical_device" "$app_id"
 }
 
 map_drive() {
@@ -628,7 +1478,7 @@ unmap_drive() {
     jq --arg letter "$letter" 'del(.drives[$letter])' "$manifest" > "$temp_manifest"
     chmod 0600 "$temp_manifest"
     mv -f "$temp_manifest" "$manifest"
-    rm -f "$prefix/dosdevices/$letter:"
+    rm -f "$prefix/dosdevices/$letter:" "$prefix/dosdevices/$letter::"
     printf '%s: losgekoppeld van %s.\n' "${letter^^}" "$app_id"
 }
 
@@ -710,6 +1560,7 @@ manage_apps() {
 
 list_apps() {
     require_unprivileged
+    migrate_all_manifests
     if [[ ! -d "$APPS_ROOT" ]]; then
         printf 'No managed Windows applications.\n'
         return 0
@@ -726,7 +1577,59 @@ read_manifest() {
     app_dir=$(app_dir_for "$app_id")
     manifest="$app_dir/manifest.json"
     [[ -f "$manifest" ]] || { printf 'Unknown application: %s\n' "$app_id" >&2; exit 2; }
+    migrate_manifest_path "$manifest"
     printf '%s\n' "$manifest"
+}
+
+show_launch_failure() {
+    local manifest=$1 log_file=$2 app_name message
+    app_name=$(jq -r 'if ((.name // "") | length) > 0 then .name else (.id // "Windows-app") end' "$manifest")
+    if grep -Eqi 'msvcp[0-9]+|vcruntime[0-9]+|Microsoft Visual C\+\+' "$log_file"; then
+        message="$app_name mist waarschijnlijk een Microsoft Visual C++-onderdeel. Open ECZOS Instellingen > Windows-apps > Onderdelen voor deze app."
+    elif grep -Eqi 'mscoree|\.NET Framework|CLR runtime|0xe0434352' "$log_file"; then
+        message="$app_name mist waarschijnlijk een .NET-onderdeel. Open ECZOS Instellingen > Windows-apps > Onderdelen voor deze app."
+    else
+        message="$app_name kon niet goed worden gestart. ECZ Windows heeft bekende problemen gecontroleerd. Open ECZOS Instellingen > Windows-apps en kies ‘Controleren en herstellen’."
+    fi
+    if [[ -n ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] && command -v kdialog >/dev/null 2>&1; then
+        kdialog --title 'ECZ Windows — app kon niet starten' --error "$message" || true
+    fi
+    printf '%s\n' "$message" >&2
+}
+
+run_with_automatic_recovery() {
+    local manifest=$1 prefix=$2 app_id=$3
+    shift 3
+    local app_dir log_file result
+    app_dir=$(app_dir_for "$app_id")
+    log_file="$app_dir/last-run.log"
+    set +e
+    runtime_call_manifest "$manifest" "$@" >"$log_file" 2>&1
+    result=$?
+    set -e
+    chmod 0600 "$log_file"
+    ((result == 0)) && return 0
+
+    # Retry once only for signatures that indicate damaged Wine plumbing.
+    # Application crashes and missing licensed runtimes are never guessed at.
+    if grep -Eqi 'could not load kernel32|wine client error|wineserver.*(failed|error)|registry.*(corrupt|invalid)|failed to initialize the wine' \
+        "$log_file"; then
+        runtime_call_manifest "$manifest" repair "$prefix" >>"$log_file" 2>&1 || true
+        restrict_prefix "$prefix"
+        apply_drive_mappings "$manifest" "$prefix"
+        apply_known_compatibility_fixes "$prefix"
+        configure_cnc_ddraw_scope "$manifest" "$prefix"
+        set +e
+        runtime_call_manifest "$manifest" "$@" >>"$log_file" 2>&1
+        result=$?
+        set -e
+        ((result == 0)) && {
+            logger -t eczos-windows -- "recovered Wine infrastructure and relaunched $app_id"
+            return 0
+        }
+    fi
+    show_launch_failure "$manifest" "$log_file"
+    return "$result"
 }
 
 run_app() {
@@ -734,23 +1637,66 @@ run_app() {
     local app_id=$1
     shift
     local manifest prefix entrypoint entrypoint_type app_dir canonical_app_dir canonical_entrypoint
+    local canonical_working_directory automatic_repair=false
+    local -a profile_arguments=()
     manifest=$(read_manifest "$app_id")
     app_dir=$(app_dir_for "$app_id")
     prefix=$(jq -er '.prefix' "$manifest")
-    entrypoint=$(jq -er '.entrypoint' "$manifest")
+    [[ "$prefix" = "$app_dir/prefix" && -d "$prefix/drive_c" ]] || {
+        printf 'The managed Windows environment for %s is missing or unsafe.\n' "$app_id" >&2
+        exit 1
+    }
+    entrypoint=$(jq -r '.entrypoint // empty' "$manifest")
     entrypoint_type=$(jq -r '.entrypointType // "executable"' "$manifest")
     canonical_app_dir=$(realpath "$app_dir")
     canonical_entrypoint=$(realpath "$entrypoint" 2>/dev/null || true)
-    [[ "$prefix" = "$app_dir/prefix" && -f "$canonical_entrypoint" && \
-        "$canonical_entrypoint" = "$canonical_app_dir/"* ]] || {
-        printf 'No safe entry point is configured for %s.\n' "$app_id" >&2
+
+    # A moved/deleted executable or incomplete installer record is a common
+    # recoverable failure. Search the existing isolated prefix once before
+    # asking the user to repair or reinstall anything.
+    if [[ ! -f "$canonical_entrypoint" || "$canonical_entrypoint" != "$canonical_app_dir/"* ]]; then
+        if rescan_app "$app_id"; then
+            automatic_repair=true
+            manifest=$(read_manifest "$app_id")
+            entrypoint=$(jq -r '.entrypoint // empty' "$manifest")
+            entrypoint_type=$(jq -r '.entrypointType // "executable"' "$manifest")
+            canonical_entrypoint=$(realpath "$entrypoint" 2>/dev/null || true)
+        fi
+    fi
+    [[ -f "$canonical_entrypoint" && "$canonical_entrypoint" = "$canonical_app_dir/"* ]] || {
+        printf 'ECZ Windows could not find a safe program file for %s after automatic repair.\n' "$app_id" >&2
         exit 1
     }
+
+    # Repair only incomplete Wine infrastructure automatically. A healthy
+    # prefix is never reset, and user files or application settings are kept.
+    if [[ ! -s "$prefix/system.reg" || ! -s "$prefix/user.reg" || ! -d "$prefix/dosdevices" ]]; then
+        runtime_call_manifest "$manifest" repair "$prefix"
+        automatic_repair=true
+    fi
     restrict_prefix "$prefix"
     apply_drive_mappings "$manifest" "$prefix"
+    refresh_compatibility_profile "$manifest"
+    apply_windows_version "$manifest" "$prefix"
+    ensure_no_compatibility_blocker "$manifest"
+    apply_known_compatibility_fixes "$prefix"
+    configure_cnc_ddraw_scope "$manifest" "$prefix"
+    ensure_compatible_session "$manifest"
+    if [[ "$automatic_repair" = true ]]; then
+        logger -t eczos-windows -- "automatically repaired $app_id before launch"
+    fi
+    mapfile -t profile_arguments < <(jq -r '(.launch.arguments // [])[]' "$manifest")
     case "$entrypoint_type" in
-        executable) exec "$RUNTIME_ADAPTER" execute "$prefix" "$canonical_entrypoint" "$@" ;;
-        windows-shortcut) exec "$RUNTIME_ADAPTER" execute-link "$prefix" "$canonical_entrypoint" ;;
+        executable)
+            canonical_working_directory=$(dirname -- "$canonical_entrypoint")
+            run_with_automatic_recovery "$manifest" "$prefix" "$app_id" \
+                execute-from "$prefix" "$canonical_working_directory" \
+                "$canonical_entrypoint" "${profile_arguments[@]}" "$@"
+            ;;
+        windows-shortcut)
+            run_with_automatic_recovery "$manifest" "$prefix" "$app_id" \
+                execute-link "$prefix" "$canonical_entrypoint"
+            ;;
         *) printf 'Unknown application entry-point type.\n' >&2; exit 1 ;;
     esac
 }
@@ -762,7 +1708,8 @@ rescan_app() {
     manifest=$(read_manifest "$app_id")
     prefix=$(jq -er '.prefix' "$manifest")
     kind=$(jq -er '.kind' "$manifest")
-    name=$(jq -er '.name' "$manifest")
+    name=$(jq -r '.name // empty' "$manifest")
+    [[ -n "${name//[[:space:]]/}" ]] || name=$app_id
     [[ "$prefix" = "$app_dir/prefix" && -d "$prefix" ]] || {
         printf 'Unsafe application environment.\n' >&2
         exit 1
@@ -775,7 +1722,7 @@ rescan_app() {
     fi
     payload="$prefix/drive_c/ECZOS-Install/payload.exe"
     discover_entrypoint "$prefix" "$kind" "$payload" "$name"
-    [[ "$DISCOVERED_ENTRYPOINT" != null ]] || {
+    discovered_entrypoint_is_valid "$prefix" || {
         printf 'No unambiguous installed application was found.\n' >&2
         exit 1
     }
@@ -806,9 +1753,176 @@ repair_app() {
         printf 'Unsafe Wine prefix in application record.\n' >&2
         exit 1
     }
-    runtime_call repair "$prefix"
+    runtime_call_manifest "$manifest" repair "$prefix"
     restrict_prefix "$prefix"
+    apply_drive_mappings "$manifest" "$prefix"
+    refresh_compatibility_profile "$manifest"
+    apply_windows_version "$manifest" "$prefix"
+    apply_known_compatibility_fixes "$prefix"
+    configure_cnc_ddraw_scope "$manifest" "$prefix"
     printf 'Repaired %s.\n' "$1"
+}
+
+retry_installer() {
+    require_unprivileged
+    local assume_yes=false
+    local check_only=false
+    case ${1:-} in
+        --yes) assume_yes=true; shift ;;
+        --check) check_only=true; shift ;;
+    esac
+    [[ $# -eq 1 ]] || { usage >&2; exit 2; }
+    local app_id=$1 manifest app_dir prefix status kind name installer working_directory
+    local canonical_installer canonical_working relative windows_path log_file result temp_manifest
+    local entrypoint entrypoint_type detected_name launcher_icon launcher_group source_name preferred
+    local -a matches=()
+    app_dir=$(app_dir_for "$app_id")
+    manifest=$(read_manifest "$app_id")
+    prefix=$(jq -er '.prefix' "$manifest")
+    status=$(jq -er '.status' "$manifest")
+    kind=$(jq -er '.kind' "$manifest")
+    name=$(jq -er '.name' "$manifest")
+    [[ "$status" =~ ^(installer-failed|installed-needs-entrypoint|rerunning-installer)$ ]] || {
+        printf 'The installer can only be rerun after a failed installation or when no application was found.\n' >&2
+        exit 2
+    }
+    [[ "$prefix" = "$app_dir/prefix" && -d "$prefix/drive_c" ]] || {
+        printf 'Unsafe Windows application environment.\n' >&2
+        exit 1
+    }
+
+    installer=$(jq -r '.installer.path // empty' "$manifest")
+    working_directory=$(jq -r '.installer.workingDirectory // empty' "$manifest")
+    if jq -e '.installationMedia == true' "$manifest" >/dev/null; then
+        preferred=$(preferred_media_installer "$prefix/drive_c/ECZOS-Install/media" 2>/dev/null || true)
+        if [[ -n "$preferred" && ( -z "$installer" || "${installer,,}" == */setup.now.exe ) ]]; then
+            installer=$preferred
+            working_directory=$(dirname "$installer")
+        fi
+    fi
+    if [[ -z "$installer" ]]; then
+        if jq -e '.installationMedia == true' "$manifest" >/dev/null; then
+            if [[ -z "$installer" ]]; then
+                source_name=$(basename "$(jq -r '.source' "$manifest")")
+                mapfile -d '' matches < <(find "$prefix/drive_c/ECZOS-Install/media" -type f \
+                    -iname "$source_name" -print0 2>/dev/null)
+                [[ ${#matches[@]} -eq 1 ]] || {
+                    printf 'The cached setup program could not be identified unambiguously. Insert the original medium and retry the installation.\n' >&2
+                    exit 1
+                }
+                installer=${matches[0]}
+            fi
+        else
+            case "$kind" in
+                msi-installer) installer="$prefix/drive_c/ECZOS-Install/payload.msi" ;;
+                *) installer="$prefix/drive_c/ECZOS-Install/payload.exe" ;;
+            esac
+        fi
+        working_directory=$(dirname "$installer")
+    fi
+    canonical_installer=$(realpath -e -- "$installer" 2>/dev/null || true)
+    canonical_working=$(realpath -e -- "$working_directory" 2>/dev/null || true)
+    [[ -f "$canonical_installer" && "$canonical_installer" = "$prefix/drive_c/"* &&
+       -d "$canonical_working" && "$canonical_working" = "$prefix/drive_c/"* ]] || {
+        printf 'The cached setup program is missing or unsafe.\n' >&2
+        exit 1
+    }
+    relative=${canonical_installer#"$prefix/drive_c/"}
+    windows_path="C:\\${relative//\//\\}"
+    if [[ "$check_only" = true ]]; then
+        jq -n --arg appId "$app_id" --arg installer "$canonical_installer" \
+            --arg workingDirectory "$canonical_working" --arg windowsPath "$windows_path" \
+            '{ready:true,appId:$appId,installer:$installer,workingDirectory:$workingDirectory,windowsPath:$windowsPath}'
+        return 0
+    fi
+    confirm_action "Run the cached setup for '$name' again in the same Windows environment?" "$assume_yes"
+    mkdir -p "$LOCKS_ROOT"
+    exec {retry_lock_fd}>"$LOCKS_ROOT/$app_id.lock"
+    flock -n "$retry_lock_fd" || { printf 'This Windows app is currently busy.\n' >&2; exit 1; }
+
+    prepare_installer_compatibility "$manifest" "$prefix"
+
+    temp_manifest="$app_dir/manifest.json.new"
+    jq --arg at "$(date --iso-8601=seconds)" '.status="rerunning-installer" | .installer.lastStarted=$at' \
+        "$manifest" >"$temp_manifest"
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$manifest"
+    log_file="$app_dir/install-retry-$(date +%Y%m%d-%H%M%S).log"
+    set +e
+    if [[ "$kind" = msi-installer ]]; then
+        runtime_call_manifest "$manifest" install-msi "$prefix" "$windows_path" \
+            {retry_lock_fd}>&- 2>&1 | tee "$log_file"
+    else
+        runtime_call_manifest "$manifest" execute-from "$prefix" "$canonical_working" "$windows_path" \
+            {retry_lock_fd}>&- 2>&1 | tee "$log_file"
+    fi
+    result=${PIPESTATUS[0]}
+    set -e
+    chmod 0600 "$log_file"
+    restrict_prefix "$prefix"
+
+    discover_entrypoint "$prefix" "$kind" "$canonical_installer" "$name"
+    if discovered_entrypoint_is_valid "$prefix"; then
+        entrypoint=$DISCOVERED_ENTRYPOINT
+        entrypoint_type=$DISCOVERED_ENTRYPOINT_TYPE
+        detected_name=$DISCOVERED_NAME
+    else
+        entrypoint=null
+        entrypoint_type=null
+        detected_name=$name
+    fi
+    temp_manifest="$app_dir/manifest.json.new"
+    if [[ "$entrypoint" != null ]]; then
+        launcher_group=$(launcher_category "$entrypoint")
+        extract_launcher_icon "$app_dir" "$entrypoint"
+        launcher_icon=$EXTRACTED_ICON
+        jq --argjson result "$result" --arg entrypoint "$entrypoint" \
+           --arg entrypointType "$entrypoint_type" --arg name "$detected_name" \
+           --arg icon "$launcher_icon" --arg category "$launcher_group" \
+           --arg at "$(date --iso-8601=seconds)" '
+            .status="installed" | .installerExit=$result | .installerWarning=($result != 0)
+            | .entrypoint=$entrypoint | .entrypointType=$entrypointType | .name=$name
+            | .icon=$icon | .category=$category | .installer.lastFinished=$at
+        ' "$manifest" >"$temp_manifest"
+        write_launcher "$app_id" "$detected_name" "$launcher_icon" "$launcher_group"
+    else
+        jq --argjson result "$result" --arg at "$(date --iso-8601=seconds)" '
+            .status=(if $result == 0 then "installed-needs-entrypoint" else "installer-failed" end)
+            | .installerExit=$result | .installer.lastFinished=$at
+        ' "$manifest" >"$temp_manifest"
+    fi
+    chmod 0600 "$temp_manifest"
+    mv -f "$temp_manifest" "$manifest"
+    logger -t eczos-windows -- "reran installer for $app_id with exit status $result"
+    if [[ "$entrypoint" = null ]]; then
+        printf 'Setup finished, but ECZ Windows could not identify one application to launch. Use Search again after checking the installation.\n' >&2
+        ((result == 0)) && exit 3
+        exit "$result"
+    fi
+    printf 'Setup rerun completed and the launcher for %s was restored.\n' "$detected_name"
+}
+
+configure_app() {
+    require_unprivileged
+    [[ $# -eq 2 ]] || { usage >&2; exit 2; }
+    local app_id=$1 tool=$2 manifest app_dir prefix
+    case "$tool" in
+        winecfg|control|regedit|taskmgr|uninstaller|explorer|cmd) ;;
+        *)
+            printf 'Unknown Windows configuration tool.\n' >&2
+            exit 2
+            ;;
+    esac
+    app_dir=$(app_dir_for "$app_id")
+    manifest=$(read_manifest "$app_id")
+    prefix=$(jq -er '.prefix' "$manifest")
+    [[ "$prefix" = "$app_dir/prefix" && -d "$prefix" ]] || {
+        printf 'Unsafe Wine prefix in application record.\n' >&2
+        exit 1
+    }
+    restrict_prefix "$prefix"
+    apply_drive_mappings "$manifest" "$prefix"
+    runtime_call_manifest "$manifest" tool "$prefix" "$tool"
 }
 
 remove_app() {
@@ -840,8 +1954,14 @@ case "$command_name" in
     run) [[ $# -ge 1 ]] || { usage >&2; exit 2; }; app_id=$1; shift; run_app "$app_id" "$@" ;;
     rescan) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; rescan_app "$1" ;;
     repair) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; repair_app "$1" ;;
+    retry-installer) retry_installer "$@" ;;
+    configure) configure_app "$@" ;;
+    dependencies) list_dependencies "$@" ;;
+    install-dependency) install_dependency "$@" ;;
+    migrate) require_unprivileged; [[ $# -eq 0 ]] || { usage >&2; exit 2; }; migrate_all_manifests ;;
     drives) [[ $# -eq 1 ]] || { usage >&2; exit 2; }; list_drives "$1" ;;
     map-drive) map_drive "$@" ;;
+    map-optical) map_optical "$@" ;;
     unmap-drive) unmap_drive "$@" ;;
     remove) remove_app "$@" ;;
     help|-h|--help) usage ;;

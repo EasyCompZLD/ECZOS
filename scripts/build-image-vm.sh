@@ -42,6 +42,7 @@ cd "$IMAGE_DIR"
 ./auto/config
 mkdir -p "$ARTIFACT_DIR" "$LOG_DIR"
 "$ROOT_DIR/scripts/prepare-image-packages-vm.sh"
+"$ROOT_DIR/scripts/verify-staged-package-versions-vm.sh" "$ROOT_DIR/image/config/packages.chroot"
 
 export MKSQUASHFS_OPTIONS="-processors $(nproc)"
 export SOURCE_DATE_EPOCH

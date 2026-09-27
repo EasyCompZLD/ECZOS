@@ -13,8 +13,11 @@ Status date: 2026-09-14.
 | Repair and diagnostics | Unified ECZOS interface with Windows repair plus system, gaming and support diagnostics | Guided automatic system repair actions |
 | One app ecosystem | Plasma Discover with APT, firmware and Flathub plus ECZ Windows launchers | Unified trust labels across all sources |
 | Familiar Linux desktop | Windows-style Plasma defaults, ECZOS boot/login/console branding, unified native tools and a screenshot-rich OOBE | Optional dock layout |
-| Support-aware OS | Local privacy-conscious support report | Vendor-approved remote-support enrollment |
+| Support-aware OS | Local privacy-filtered report, central ECZOS activity view and reviewed email/GitHub hand-off | Vendor-approved remote-support enrollment |
 | Unified settings | ECZOS tools and all 87 discovered KDE modules share one native window; legacy settings launch commands are redirected | Fresh-install BIOS/UEFI qualification |
+| Network locations | SMB, NFS, WebDAV and SFTP locations are managed in ECZOS Settings through KIO, KIO-Fuse and KDE Wallet; native mounts remain visible without being overwritten | Broader physical server and credential-recovery matrix |
+| Predictable upgrades | Package-owned configuration migrations are preflighted, checksummed, logged and safely retryable; optional feature packages remain removable | Multi-version upgrade and rollback qualification |
+| Accessible and powerful | Consumer-first settings with a persistent Advanced mode for technical logs and specialist controls | Broader usability qualification with new users |
 | Mac application experiment | Darling feasibility recorded for a future optional ECZ Mac layer | Complex GUI applications are not yet dependable; not a release blocker |
 
 ## Standard application set

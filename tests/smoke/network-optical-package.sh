@@ -12,6 +12,9 @@ python3 -m py_compile /usr/bin/eczos-network-optical /usr/lib/eczos-network-opti
 /usr/bin/eczos-network-optical status --json | jq -e '.schema == 1 and (.local | type == "array") and (.network | type == "array")' >/dev/null
 grep -Fq 'org.eczos.networkoptical.manage' /usr/share/polkit-1/actions/org.eczos.networkoptical.policy
 grep -Fq 'generate_node_acls' /usr/lib/eczos-network-optical/guard
+grep -Fq 'tpg.set_attribute("authentication", "0")' /usr/lib/eczos-network-optical/helper
+grep -Fq 'share rollback failed' /usr/lib/eczos-network-optical/helper
+grep -Fq 'shlex.split' /usr/bin/eczos-network-optical
 dpkg --audit
 apt-get check
 printf 'eczos-network-optical installed-package smoke test passed\n'

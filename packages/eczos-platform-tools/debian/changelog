@@ -1,3 +1,173 @@
+eczos-platform-tools (0.1.2~dev23) UNRELEASED; urgency=medium
+
+  * Add USB Devices, Desktop Session and Device Actions to the reviewed
+    low-contrast KDE sidebar-icon allowlist.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 07:05:00 +0200
+
+eczos-platform-tools (0.1.2~dev22) UNRELEASED; urgency=medium
+
+  * Apply the light sidebar icon treatment to an explicit reviewed allowlist
+    of ten low-contrast KDE modules while leaving every other KDE icon intact.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 06:55:00 +0200
+
+eczos-platform-tools (0.1.2~dev21) UNRELEASED; urgency=medium
+
+  * Limit the dark-sidebar contrast tint to ECZOS-owned navigation icons and
+    preserve KDE's original theme-aware module icons unchanged.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 06:40:00 +0200
+
+eczos-platform-tools (0.1.2~dev20) UNRELEASED; urgency=medium
+
+  * Merge ECZOS time health and repair into KDE Date & Time and correct the jq
+    conditional that prevented time-status JSON from being generated.
+  * Replace free-form network-location prompts with a protocol-guided form for
+    SMB, SFTP, NFS and WebDAV.
+  * Tint every sidebar icon for reliable contrast on the dark navigation pane.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 06:20:00 +0200
+
+eczos-platform-tools (0.1.2~dev19) UNRELEASED; urgency=medium
+
+  * Add a persistent Advanced mode to ECZOS Settings and keep raw activity,
+    compatibility-engine tools, hardware internals and boot details out of the
+    default consumer view.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 05:25:00 +0200
+
+eczos-platform-tools (0.1.2~dev18) UNRELEASED; urgency=medium
+
+  * Add a central privacy-filtered ECZOS journal reader and embed recent
+    component activity directly in the Support page and local support report.
+  * Open reviewed email drafts with the report attached or GitHub issue forms
+    with the privacy-filtered report copied; reports are never sent silently.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 04:40:00 +0200
+
+eczos-platform-tools (0.1.2~dev17) UNRELEASED; urgency=medium
+
+  * Add validated multiboot detection and transactional GRUB menu management
+    to ECZOS Settings without exposing EFI-order or bootloader-write actions.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 04:00:00 +0200
+
+eczos-platform-tools (0.1.2~dev16) UNRELEASED; urgency=medium
+
+  * Explain supported network-address formats and server/share paths in the
+    manual connection workflow.
+  * Display existing KDE network locations that were created outside ECZOS.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 03:10:00 +0200
+
+eczos-platform-tools (0.1.2~dev15) UNRELEASED; urgency=medium
+
+  * Add integrated management, discovery, testing and opening of SMB, NFS,
+    WebDAV and SFTP locations to ECZOS Settings.
+  * Show native network mounts without silently taking ownership of them.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 02:35:00 +0200
+
+eczos-platform-tools (0.1.2~dev14) UNRELEASED; urgency=medium
+
+  * Offer a visible repair action only for hardware findings with a safe,
+    issue-specific and verified ECZOS repair provider.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 01:55:00 +0200
+
+eczos-platform-tools (0.1.2~dev13) UNRELEASED; urgency=medium
+
+  * Prevent ECZHOA/RustDesk hardware video encoding from crashing affected AMD
+    graphics, while preserving existing device identity and access settings.
+  * Reapply safe software encoding at boot and after RustDesk package changes.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 01:05:00 +0200
+
+eczos-platform-tools (0.1.2~dev12) UNRELEASED; urgency=medium
+
+  * Show cause-oriented hardware diagnostics and detected problems directly
+    below the hardware-profile controls.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 00:05:00 +0200
+
+eczos-platform-tools (0.1.2~dev11) UNRELEASED; urgency=medium
+
+  * Add an integrated hardware-profile page with detected CPU, graphics,
+    storage, memory, swap and verified zram state.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 23:35:00 +0200
+
+eczos-platform-tools (0.1.2~dev10) UNRELEASED; urgency=medium
+
+  * Require the preflighted, failure-reporting configuration migration
+    framework for future ECZOS feature upgrades.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 22:35:00 +0200
+
+eczos-platform-tools (0.1.2~dev9) UNRELEASED; urgency=medium
+
+  * Add provider-aware time, timezone, NTP and hardware-clock diagnostics.
+  * Add an authenticated automatic-time repair with bounded verification.
+  * Never change the RTC local/UTC mode during automatic repair.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 21:30:00 +0200
+
+eczos-platform-tools (0.1.2~dev8) UNRELEASED; urgency=medium
+
+  * Add provider-neutral ECZOS Remote Input management for Deskflow, Synergy
+    and Barrier while preserving their existing user configuration.
+  * Adopt legacy autostarts reversibly and prevent concurrent providers with a
+    runtime lock and one managed user service.
+  * Enable Deskflow's dynamic reconnect interval and add bounded service
+    restart handling.
+  * Add an immediate local-input release action and desktop launcher.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 20:10:00 +0200
+
+eczos-platform-tools (0.1.2~dev7) UNRELEASED; urgency=medium
+
+  * Show detected compatibility blockers directly on Windows application
+    cards and disable Start when an obsolete disc driver cannot be supported.
+  * Explain that SafeDisc cannot be repaired by installing another runtime.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 18:25:00 +0200
+
+eczos-platform-tools (0.1.2~dev6) UNRELEASED; urgency=medium
+
+  * Keep Windows-app launch processes attached to Settings so starting,
+    running, exiting and failing always produce visible feedback.
+  * Disable Start for inconsistent records without an executable instead of
+    launching a silent background failure.
+  * Show explicit completion and failure dialogs for program search and
+    automatic environment repair.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 16:40:00 +0200
+
+eczos-platform-tools (0.1.2~dev5) UNRELEASED; urgency=medium
+
+  * Always show a stable Windows application title with executable and ID
+    fallbacks for incomplete third-party installer metadata.
+  * Replace ambiguous Windows-app action labels with accessible two-line
+    descriptions, icons and explanatory tooltips.
+  * Present human-readable application states and a clear automatic repair
+    action suitable for end users.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 16:00:00 +0200
+
+eczos-platform-tools (0.1.2~dev4) UNRELEASED; urgency=medium
+
+  * Present automatic appearance as the KDE Night Light-linked mode.
+  * Use the shared platform capability and migration foundation.
+  * Add Windows app installation and per-app configuration tools to Settings.
+  * Manage optional Windows components per application from ECZOS Settings.
+  * Diagnose NTP synchronization, memory, swap, zram and duplicate
+    keyboard/mouse-sharing processes in the central diagnostics page.
+  * Offer a visible setup-retry action for failed managed Windows installs.
+  * Keep setup retry available after an interrupted retry operation.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Fri, 25 Sep 2026 22:00:00 +0200
+
 eczos-platform-tools (0.1.1) trixie; urgency=medium
 
   * Load the verified ECZOS release-image catalogue automatically in Recovery

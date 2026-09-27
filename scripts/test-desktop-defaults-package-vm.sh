@@ -25,12 +25,15 @@ chmod 0644 \
     "$PACKAGE_DIR/debian/control" \
     "$PACKAGE_DIR/debian/copyright" \
     "$PACKAGE_DIR/debian/install" \
+    "$PACKAGE_DIR/debian/links" \
     "$PACKAGE_DIR/debian/source/format" \
+    "$PACKAGE_DIR/systemd/eczos-theme-nightlight.service" \
     "$PACKAGE_DIR/xdg/eczos-desktop-first-run.desktop"
 chmod 0755 \
     "$PACKAGE_DIR/debian/rules" \
     "$PACKAGE_DIR/bin/eczos-theme-switch" \
     "$PACKAGE_DIR/bin/eczos-theme-toggle" \
+    "$PACKAGE_DIR/lib/eczos-theme-nightlight-sync" \
     "$PACKAGE_DIR/lib/apply-desktop-defaults"
 
 (cd "$PACKAGE_DIR" && dpkg-buildpackage -us -uc -b)
@@ -51,6 +54,8 @@ apt-get purge -y eczos-desktop-defaults
 test ! -e /etc/xdg/autostart/eczos-desktop-first-run.desktop
 test ! -e /usr/bin/eczos-theme-switch
 test ! -e /usr/bin/eczos-theme-toggle
+test ! -e /usr/lib/eczos/eczos-theme-nightlight-sync
+test ! -e /usr/lib/systemd/user/eczos-theme-nightlight.service
 dpkg --audit
 apt-get check
 

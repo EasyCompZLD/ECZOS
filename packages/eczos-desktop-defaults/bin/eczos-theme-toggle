@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
 MODE_FILE="$CONFIG_HOME/eczos/theme-mode"
-CURRENT_MODE=auto
+CURRENT_MODE=nightlight
 
 if [[ -s "$MODE_FILE" ]]; then
     CURRENT_MODE=$(cat "$MODE_FILE")
@@ -11,10 +11,10 @@ fi
 
 case "$CURRENT_MODE" in
     default) NEXT_MODE=light ;;
-    auto) NEXT_MODE=light ;;
+    auto|nightlight) NEXT_MODE=light ;;
     light) NEXT_MODE=dark ;;
-    dark) NEXT_MODE=auto ;;
-    *) NEXT_MODE=auto ;;
+    dark) NEXT_MODE=nightlight ;;
+    *) NEXT_MODE=nightlight ;;
 esac
 
 exec eczos-theme-switch "$NEXT_MODE"

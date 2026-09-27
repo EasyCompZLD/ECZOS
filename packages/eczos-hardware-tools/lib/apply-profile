@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+[[ $(id -u) -eq 0 ]] || { printf 'This helper must run as root.\n' >&2; exit 1; }
+[[ $# -eq 1 ]] || exit 2
+profile=$1
+case "$profile" in
+    lightweight) size='ram / 2'; swappiness=100; priority=150 ;;
+    standard) size='ram / 4'; swappiness=80; priority=120 ;;
+    performance) size='ram / 8'; swappiness=40; priority=110 ;;
+    gaming) size='ram / 4'; swappiness=60; priority=140 ;;
+    enterprise) size='ram / 4'; swappiness=60; priority=130 ;;
+    *) printf 'Unknown hardware profile.\n' >&2; exit 2 ;;
+esac
+exec 9>/run/lock/eczos-hardware-profile.lock; flock 9
+install -d -m 0755 /etc/eczos /etc/systemd/zram-generator.conf.d /etc/sysctl.d
+backup_dir=$(mktemp -d /run/eczos-hardware-profile.XXXXXX)
+temp=$(mktemp /etc/eczos/hardware-profile.json.XXXXXX)
+old_swappiness=$(sysctl -n vm.swappiness)
+active_before=false
+committed=false
+swapon --noheadings --show=NAME | grep -qx /dev/zram0 && active_before=true
+for file in /etc/eczos/hardware-profile.json /etc/systemd/zram-generator.conf.d/50-eczos.conf /etc/sysctl.d/60-eczos-memory.conf; do
+    [[ ! -f "$file" ]] || cp -a "$file" "$backup_dir/$(basename "$file")"
+done
+rollback() {
+    if [[ "$active_before" != true ]]; then systemctl stop systemd-zram-setup@zram0.service >/dev/null 2>&1 || true; fi
+    for file in /etc/eczos/hardware-profile.json /etc/systemd/zram-generator.conf.d/50-eczos.conf /etc/sysctl.d/60-eczos-memory.conf; do
+        saved="$backup_dir/$(basename "$file")"
+        if [[ -f "$saved" ]]; then cp -a "$saved" "$file"; else rm -f "$file"; fi
+    done
+    sysctl -q -w "vm.swappiness=$old_swappiness" || true
+    systemctl daemon-reload || true
+}
+cleanup() {
+    status=$?
+    if ((status != 0)) && [[ "$committed" != true ]]; then rollback; fi
+    rm -f "$temp"; rm -rf "$backup_dir"
+    exit "$status"
+}
+trap cleanup EXIT
+jq -n --arg profile "$profile" --arg at "$(date -Iseconds)" '{schemaVersion:1,profile:$profile,appliedAt:$at}' >"$temp"
+chmod 0644 "$temp"; mv -f "$temp" /etc/eczos/hardware-profile.json
+cat_config=$(printf '[zram0]\nzram-size = %s\ncompression-algorithm = zstd\nswap-priority = %s\n' "$size" "$priority")
+printf '%s' "$cat_config" >/etc/systemd/zram-generator.conf.d/50-eczos.conf
+printf 'vm.swappiness = %s\n' "$swappiness" >/etc/sysctl.d/60-eczos-memory.conf
+chmod 0644 /etc/systemd/zram-generator.conf.d/50-eczos.conf /etc/sysctl.d/60-eczos-memory.conf
+sysctl -q -p /etc/sysctl.d/60-eczos-memory.conf
+systemctl daemon-reload
+if [[ "$active_before" != true ]]; then
+    if ! systemctl start systemd-zram-setup@zram0.service; then printf 'The zram swap device could not be activated; previous settings were restored.\n' >&2; exit 1; fi
+fi
+swapon --noheadings --show=NAME | grep -qx /dev/zram0 || { printf 'The zram swap device could not be verified; previous settings were restored.\n' >&2; exit 1; }
+logger -t eczos-hardware -- "applied profile=$profile zram-size=$size swappiness=$swappiness"
+committed=true
+if [[ "$active_before" = true ]]; then
+    printf 'Hardware profile %s saved. Existing swap was preserved; the new zram size takes effect after restart.\n' "$profile"
+else
+    printf 'Hardware profile %s applied and zram verified. Existing swap was preserved.\n' "$profile"
+fi

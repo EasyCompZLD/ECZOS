@@ -1,0 +1,9 @@
+eczos-boot-tools (0.1.0~dev1) UNRELEASED; urgency=medium
+
+  * Detect UEFI/BIOS mode, firmware entries and other operating systems.
+  * Validate discovered block devices and EFI boot files before presenting them.
+  * Add an authenticated transactional GRUB menu refresh with backup, syntax
+    validation, verification and rollback.
+  * Never change EFI boot order or reinstall a bootloader.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 03:40:00 +0200

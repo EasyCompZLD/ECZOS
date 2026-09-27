@@ -60,6 +60,14 @@ for required in \
     packages/eczos-windows-core/bin/eczos-windows \
     packages/eczos-windows-core/lib/runtime-wine-system \
     packages/eczos-windows-core/applications/org.eczos.Windows.desktop \
+    packages/eczos-windows-core/schema/application-manifest-v2.json \
+    packages/eczos-windows-core/dependencies/vcrun2022.json \
+    packages/eczos-windows-core/dependencies/dotnet48.json \
+    packages/eczos-windows-core/dependencies/dxvk.json \
+    packages/eczos-platform-core/debian/control \
+    packages/eczos-platform-core/bin/eczos-capability \
+    packages/eczos-platform-core/bin/eczos-config-migrate \
+    packages/eczos-platform-core/schema/capability-result-v1.json \
     packages/eczos-gaming-core/debian/control \
     packages/eczos-gaming-core/bin/eczos-gaming \
     packages/eczos-gaming-core/lib/runtime-umu \
@@ -69,12 +77,24 @@ for required in \
     packages/eczos-gaming-core/po/de.po \
     packages/eczos-gaming-core/po/fr.po \
     packages/eczos-gaming-core/runtime-definitions/umu-launcher-1.4.0.json \
+    packages/eczos-boot-tools/debian/control \
+    packages/eczos-boot-tools/bin/eczos-boot \
+    packages/eczos-boot-tools/lib/helper \
+    packages/eczos-boot-tools/polkit/org.eczos.boot.policy \
+    packages/eczos-boot-tools/systemd/eczos-boot-scan.service \
+    packages/eczos-hardware-tools/debian/control \
+    packages/eczos-hardware-tools/bin/eczos-hardware \
+    packages/eczos-hardware-tools/lib/apply-profile \
+    packages/eczos-hardware-tools/lib/repair-issue \
+    packages/eczos-hardware-tools/polkit/org.eczos.hardware.policy \
     packages/eczos-network-optical/debian/control \
     packages/eczos-network-optical/bin/eczos-network-optical \
     packages/eczos-network-optical/lib/helper \
     packages/eczos-network-optical/lib/guard \
     packages/eczos-network-optical/polkit/org.eczos.networkoptical.policy \
     packages/eczos-network-optical/systemd/eczos-network-optical-guard.service \
+    packages/eczos-network-shares/debian/control \
+    packages/eczos-network-shares/bin/eczos-network-shares \
     packages/eczos-platform-tools/debian/control \
     packages/eczos-platform-tools/bin/eczos-control-center \
     packages/eczos-platform-tools/bin/eczos-ui \
@@ -89,6 +109,11 @@ for required in \
     packages/eczos-platform-tools/bin/eczos-doctor \
     packages/eczos-platform-tools/bin/eczos-migrate \
     packages/eczos-platform-tools/bin/eczos-support-report \
+    packages/eczos-platform-tools/bin/eczos-logs \
+    scripts/stage-central-logging-batch-vm.sh \
+    scripts/stage-advanced-mode-batch-vm.sh \
+    scripts/stage-settings-page-audit-vm.sh \
+    packages/eczos-platform-tools/lib/remote-support-guard \
     packages/eczos-platform-tools/product/default-apps.json \
     packages/eczos-recovery-media/debian/control \
     packages/eczos-recovery-media/bin/eczos-recovery-media \
@@ -125,9 +150,12 @@ for required in \
     image/config/hooks/normal/0110-remove-duplicate-apt-sources.hook.chroot \
     image/config/hooks/normal/0120-remove-debian-installer-shortcuts.hook.chroot \
     scripts/configure-freeoffice-repository-vm.sh \
+    scripts/stage-foundation-windows-theme-batch-vm.sh \
     scripts/init-eczos-repository.sh \
     scripts/import-eczos-repository-packages.sh \
     scripts/publish-eczos-repository.sh \
+    scripts/publish-testing-platform-update-vm.sh \
+    scripts/publish-testing-image-vm.sh \
     scripts/generate-eczos-repository-web.py \
     scripts/prepare-github-upload.sh \
     scripts/prepare-github-source.sh \
@@ -146,6 +174,8 @@ for required in \
     scripts/resume-hardware-qualification-image-vm.sh \
     scripts/build-hardware-qualification-image-vm.sh \
     scripts/build-isolated-hardware-image-vm.sh \
+    scripts/verify-source-package-versions-vm.sh \
+    scripts/verify-staged-package-versions-vm.sh \
     scripts/stage-prebuild-experience-vm.sh \
     scripts/stage-ux-batch-vm.sh \
     scripts/stage-settings-gaming-batch-vm.sh \
@@ -201,6 +231,28 @@ PY
 
 python3 - "$ROOT_DIR/packages/eczos-platform-tools/bin/eczos-ui" <<'PY' || \
     fail 'invalid ECZOS interface Python source'
+import pathlib
+import sys
+compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
+PY
+
+python3 - "$ROOT_DIR/packages/eczos-hardware-tools/bin/eczos-hardware" <<'PY' || \
+    fail 'invalid ECZOS hardware detection Python source'
+import pathlib
+import sys
+compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
+PY
+
+for boot_python in "$ROOT_DIR/packages/eczos-boot-tools/bin/eczos-boot" "$ROOT_DIR/packages/eczos-boot-tools/lib/helper"; do
+    python3 - "$boot_python" <<'PY' || fail "invalid ECZOS boot Python source"
+import pathlib
+import sys
+compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
+PY
+done
+
+python3 - "$ROOT_DIR/packages/eczos-network-shares/bin/eczos-network-shares" <<'PY' || \
+    fail 'invalid ECZOS network-share Python source'
 import pathlib
 import sys
 compile(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"), sys.argv[1], "exec")
@@ -314,6 +366,15 @@ grep -Fq 'eczos-system-settings.sock' \
 grep -Fq 'eczos:network-optical' \
     "$ROOT_DIR/packages/eczos-platform-tools/native/main.cpp" || \
     fail 'ECZOS Settings does not expose network optical drives'
+grep -Fq 'eczos:network-shares' \
+    "$ROOT_DIR/packages/eczos-platform-tools/native/main.cpp" || \
+    fail 'ECZOS Settings does not expose general network shares'
+grep -Fq 'eczos:hardware' \
+    "$ROOT_DIR/packages/eczos-platform-tools/native/main.cpp" || \
+    fail 'ECZOS Settings does not expose hardware profiles'
+grep -Fq 'eczos:boot' \
+    "$ROOT_DIR/packages/eczos-platform-tools/native/main.cpp" || \
+    fail 'ECZOS Settings does not expose safe boot management'
 grep -Fq '_eczos-optical._tcp' \
     "$ROOT_DIR/packages/eczos-network-optical/bin/eczos-network-optical" || \
     fail 'network optical discovery does not use the ECZOS DNS-SD service'
@@ -326,6 +387,9 @@ grep -Fq 'generate_node_acls' \
 grep -Fq 'LookAndFeelPackage' \
     "$ROOT_DIR/packages/eczos-desktop-defaults/bin/eczos-theme-switch" || \
     fail 'ECZOS appearance selection does not persist its global theme'
+grep -Fq 'org.kde.KWin.NightLight' \
+    "$ROOT_DIR/packages/eczos-desktop-defaults/lib/eczos-theme-nightlight-sync" || \
+    fail 'ECZOS automatic appearance does not follow KDE Night Light'
 
 while IFS= read -r script; do
     # Debian package builds leave native ELF binaries below debian/*/usr/bin

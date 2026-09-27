@@ -21,10 +21,22 @@ break distribution detection.
 5. **ECZ Services** — optional backup, device, cloud and support integrations.
 6. **ECZ Distribution** — signed repository, installer, images and releases.
 
+`eczos-platform-core` owns the shared capability-result schema and the
+configuration migration registry. Feature packages keep their own detection
+and repair implementations, but publish stable status and reason codes through
+that contract. Released migrations are immutable, idempotent package-owned
+executables and are recorded with their checksum after successful completion.
+
 Network optical drives follow the same native-settings boundary. The Settings
 page is unprivileged, a read-only JSON backend discovers state, and a narrowly
 scoped Polkit helper controls Linux LIO/pSCSI, Open-iSCSI and Avahi. See
 `docs/network-optical-drives.md` for the data flow and exclusivity model.
+
+General network locations stay user-scoped and use KDE KIO for SMB, NFS,
+WebDAV and SFTP. Authentication is delegated to KDE Wallet; ECZOS never stores
+passwords in its registry or accepts them embedded in URLs. KIO-Fuse provides
+local paths when non-KIO applications need them. Existing native mounts are
+reported read-only and are not silently adopted or rewritten by ECZOS.
 
 ## Ownership boundaries
 

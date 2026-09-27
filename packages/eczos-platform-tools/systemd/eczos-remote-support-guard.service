@@ -1,0 +1,11 @@
+[Unit]
+Description=ECZOS remote support stability guard
+Before=rustdesk.service
+ConditionPathExists=/usr/share/rustdesk/rustdesk
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/eczos-platform-tools/remote-support-guard apply
+
+[Install]
+WantedBy=multi-user.target

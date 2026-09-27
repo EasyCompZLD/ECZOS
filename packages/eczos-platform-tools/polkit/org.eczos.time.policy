@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>EasyComp Zeeland</vendor>
+  <vendor_url>https://easycompzeeland.nl/</vendor_url>
+  <action id="org.eczos.time.repair">
+    <description>Repair automatic ECZOS time synchronization</description>
+    <description xml:lang="nl">Automatische ECZOS-tijdsynchronisatie herstellen</description>
+    <description xml:lang="de">Automatische ECZOS-Zeitsynchronisierung reparieren</description>
+    <description xml:lang="fr">Réparer la synchronisation automatique de l’heure ECZOS</description>
+    <message>Authentication is required to repair automatic time synchronization.</message>
+    <message xml:lang="nl">Authenticatie is nodig om automatische tijdsynchronisatie te herstellen.</message>
+    <message xml:lang="de">Zur Reparatur der automatischen Zeitsynchronisierung ist eine Authentifizierung erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour réparer la synchronisation automatique de l’heure.</message>
+    <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin_keep</allow_active></defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/lib/eczos-platform-tools/time-helper</annotate>
+  </action>
+</policyconfig>

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "vcrun2022",
+  "name": "Microsoft Visual C++ 2015–2022",
+  "description": "Runtime libraries used by many current Windows applications and games.",
+  "provider": "winetricks",
+  "verb": "vcrun2022"
+}

@@ -1,5 +1,9 @@
 applications/*.desktop usr/share/applications/
 bin/* usr/bin/
+lib/* usr/lib/eczos-platform-tools/
+polkit/*.policy usr/share/polkit-1/actions/
 qml/* usr/share/eczos/ui/
 product/default-apps.json usr/share/eczos/product/
+systemd/eczos-remote-input.service usr/lib/systemd/user/
+systemd/eczos-remote-support-guard.service usr/lib/systemd/system/
 debian/build/locale/* usr/share/locale/

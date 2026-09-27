@@ -743,6 +743,22 @@
         <source>Start</source>
         <translation>Starten</translation>
     </message>
+    <message><source>Settings</source><translation>Instellingen</translation></message>
+    <message><source>%1 · Runner: %2</source><translation>%1 · Runner: %2</translation></message>
+    <message><source>Wine configuration</source><translation>Wine-configuratie</translation></message>
+    <message><source>Windows Control Panel</source><translation>Windows-configuratiescherm</translation></message>
+    <message><source>Registry Editor</source><translation>Register-editor</translation></message>
+    <message><source>Task Manager</source><translation>Taakbeheer</translation></message>
+    <message><source>Uninstall a program</source><translation>Een programma verwijderen</translation></message>
+    <message><source>File Explorer</source><translation>Bestandsverkenner</translation></message>
+    <message><source>Command Prompt</source><translation>Opdrachtprompt</translation></message>
+    <message><source>Windows app settings</source><translation>Windows-appinstellingen</translation></message>
+    <message><source>Choose a tool for %1:</source><translation>Kies een hulpmiddel voor %1:</translation></message>
+    <message><source>Install EXE or MSI</source><translation>EXE of MSI installeren</translation></message>
+    <message><source>Install a Windows app</source><translation>Een Windows-app installeren</translation></message>
+    <message><source>Windows programs (*.exe *.msi)</source><translation>Windows-programma&apos;s (*.exe *.msi)</translation></message>
+    <message><source>Windows app support is not installed. Install the ECZOS Windows feature to use this page.</source><translation>Ondersteuning voor Windows-apps is niet geïnstalleerd. Installeer de ECZOS Windows-functie om deze pagina te gebruiken.</translation></message>
+    <message><source>This optional ECZOS feature is currently unavailable.</source><translation>Deze optionele ECZOS-functie is momenteel niet beschikbaar.</translation></message>
     <message>
         <location filename="../main.cpp" line="624"/>
         <source>Search again</source>
@@ -786,8 +802,8 @@
     </message>
     <message>
         <location filename="../main.cpp" line="667"/>
-        <source>Start, repair and remove Windows programs without a separate management app.</source>
-        <translation>Windows-programma&apos;s starten, herstellen en verwijderen zonder een los beheerprogramma.</translation>
+        <source>Start, configure, repair and remove Windows programs from one place.</source>
+        <translation>Windows-programma&apos;s vanuit één plek starten, instellen, herstellen en verwijderen.</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="678"/>
@@ -1485,13 +1501,13 @@ Backend: Linux LIO / pSCSI</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1401"/>
-        <source>Choose a light or dark appearance, or let ECZOS follow the time of day.</source>
-        <translation>Kies een lichte of donkere weergave, of laat ECZOS het tijdstip van de dag volgen.</translation>
+        <source>Choose a light or dark appearance, or let ECZOS follow KDE Night Light.</source>
+        <translation>Kies een lichte of donkere weergave, of laat ECZOS KDE Nachtlicht volgen.</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1409"/>
-        <source>Automatic</source>
-        <translation>Automatisch</translation>
+        <source>Night Light</source>
+        <translation>Nachtlicht</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1410"/>
@@ -1505,8 +1521,8 @@ Backend: Linux LIO / pSCSI</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1438"/>
-        <source>Automatic uses the light appearance from 08:00 to 19:00 and the dark appearance at night.</source>
-        <translation>Automatisch gebruikt de lichte weergave van 08.00 tot 19.00 uur en &apos;s nachts de donkere weergave.</translation>
+        <source>Night Light uses the dark appearance when Night Light is active and the light appearance when it is inactive.</source>
+        <translation>Nachtlicht gebruikt de donkere weergave wanneer Nachtlicht actief is en de lichte weergave wanneer het niet actief is.</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1451"/>
@@ -1523,5 +1539,273 @@ Backend: Linux LIO / pSCSI</translation>
         <source>Changing the appearance failed.</source>
         <translation>Het wijzigen van de weergave is mislukt.</translation>
     </message>
+    <message><source>Installation needs attention</source><translation>Installatie heeft aandacht nodig</translation></message>
+    <message><source>Installed program not found yet</source><translation>Geïnstalleerd programma nog niet gevonden</translation></message>
+    <message><source>Windows environment needs repair</source><translation>Windows-omgeving moet worden hersteld</translation></message>
+    <message><source>Installation media could not be copied</source><translation>Installatiemedium kon niet worden gekopieerd</translation></message>
+    <message><source>Copying installation media…</source><translation>Installatiemedium kopiëren…</translation></message>
+    <message><source>Preparing Windows environment…</source><translation>Windows-omgeving voorbereiden…</translation></message>
+    <message><source>Setup is running…</source><translation>Installatieprogramma wordt uitgevoerd…</translation></message>
+    <message><source>Needs attention</source><translation>Heeft aandacht nodig</translation></message>
+    <message><source>%1
+Compatibility engine: %2</source><translation>%1
+Compatibiliteitsengine: %2</translation></message>
+    <message><source>Start app
+Open the program</source><translation>App starten
+Programma openen</translation></message>
+    <message><source>Start this Windows application.</source><translation>Start deze Windows-applicatie.</translation></message>
+    <message><source>App settings
+Advanced Windows tools</source><translation>App-instellingen
+Geavanceerde Windows-hulpmiddelen</translation></message>
+    <message><source>Open Wine settings and Windows maintenance tools for only this app.</source><translation>Open Wine-instellingen en Windows-onderhoudshulpmiddelen alleen voor deze app.</translation></message>
+    <message><source>Components
+Add required runtimes</source><translation>Onderdelen
+Vereiste runtimes toevoegen</translation></message>
+    <message><source>Install optional components such as Visual C++, .NET or classic-game support.</source><translation>Installeer optionele onderdelen zoals Visual C++, .NET of ondersteuning voor klassieke games.</translation></message>
+    <message><source>Run setup again
+Use the saved installer</source><translation>Setup opnieuw uitvoeren
+Opgeslagen installer gebruiken</translation></message>
+    <message><source>Run the original installer again without deleting this app.</source><translation>Voer het oorspronkelijke installatieprogramma opnieuw uit zonder deze app te verwijderen.</translation></message>
+    <message><source>Find program again
+Repair a missing launcher</source><translation>Programma opnieuw zoeken
+Ontbrekende starter herstellen</translation></message>
+    <message><source>Search the managed Windows environment for the correct program file.</source><translation>Zoek in de beheerde Windows-omgeving naar het juiste programmabestand.</translation></message>
+    <message><source>Check and repair
+Fix this app automatically</source><translation>Controleren en herstellen
+App automatisch repareren</translation></message>
+    <message><source>Check the isolated Windows environment and automatically repair known problems.</source><translation>Controleer de aparte Windows-omgeving en herstel bekende problemen automatisch.</translation></message>
+    <message><source>Remove app
+Delete app and its data</source><translation>App verwijderen
+App en gegevens wissen</translation></message>
+    <message><source>Remove this app and its separate Windows environment.</source><translation>Verwijder deze app en de bijbehorende aparte Windows-omgeving.</translation></message>
+    <message><source>Ready. Choose an action for an application below.</source><translation>Gereed. Kies hieronder een actie voor een applicatie.</translation></message>
+    <message><source>Starting %1…</source><translation>%1 starten…</translation></message>
+    <message><source>%1 is starting…</source><translation>%1 wordt gestart…</translation></message>
+    <message><source>%1 could not be started: %2</source><translation>%1 kon niet worden gestart: %2</translation></message>
+    <message><source>Windows app could not start</source><translation>Windows-app kon niet starten</translation></message>
+    <message><source>%1 stopped before it could start. Choose ‘Check and repair’ and try again.</source><translation>%1 stopte voordat de app kon starten. Kies ‘Controleren en herstellen’ en probeer het opnieuw.</translation></message>
+    <message><source>Windows app needs attention</source><translation>Windows-app heeft aandacht nodig</translation></message>
+    <message><source>%1 has closed.</source><translation>%1 is afgesloten.</translation></message>
+    <message><source>Check and repair complete</source><translation>Controle en herstel voltooid</translation></message>
+    <message><source>ECZ Windows checked and repaired the environment for ‘%1’. You can start the app again now.</source><translation>ECZ Windows heeft de omgeving van ‘%1’ gecontroleerd en hersteld. Je kunt de app nu opnieuw starten.</translation></message>
+    <message><source>Program search complete</source><translation>Zoeken naar programma voltooid</translation></message>
+    <message><source>ECZ Windows found and registered the start program for ‘%1’.</source><translation>ECZ Windows heeft het startprogramma voor ‘%1’ gevonden en geregistreerd.</translation></message>
+    <message><source>The requested action could not be completed.</source><translation>De gevraagde actie kon niet worden voltooid.</translation></message>
+    <message><source>Cannot start: obsolete SafeDisc disc protection</source><translation>Kan niet starten: verouderde SafeDisc-cd-beveiliging</translation></message>
+    <message><source>Cannot start with the current compatibility engine</source><translation>Kan niet starten met de huidige compatibiliteitsengine</translation></message>
+    <message><source>The original disc needs a publisher update or legitimate DRM-free release; adding runtimes cannot repair this.</source><translation>De originele cd vereist een update van de uitgever of een legitieme DRM-vrije uitgave; extra runtimes kunnen dit niet herstellen.</translation></message>
+</context>
+<context>
+    <name>QObject</name>
+    <message><source>Keyboard and mouse sharing</source><translation>Toetsenbord en muis delen</translation></message>
+    <message><source>Use one keyboard and mouse across computers</source><translation>Gebruik één toetsenbord en muis op meerdere computers</translation></message>
+</context>
+<context>
+    <name>SettingsWindow</name>
+    <message><source>ECZOS can keep Deskflow, Synergy or Barrier available without starting duplicate background services.</source><translation>ECZOS kan Deskflow, Synergy of Barrier beschikbaar houden zonder dubbele achtergrondservices te starten.</translation></message>
+    <message><source>Sharing application</source><translation>Deeltoepassing</translation></message>
+    <message><source>Checking…</source><translation>Controleren…</translation></message>
+    <message><source>Managed startup</source><translation>Beheerd opstarten</translation></message>
+    <message><source>Connection</source><translation>Verbinding</translation></message>
+    <message><source>Old startup methods</source><translation>Oude opstartmethoden</translation></message>
+    <message><source>Manage automatically</source><translation>Automatisch beheren</translation></message>
+    <message><source>Start or reconnect</source><translation>Starten of opnieuw verbinden</translation></message>
+    <message><source>Release local input</source><translation>Lokale invoer vrijgeven</translation></message>
+    <message><source>Disable automatic startup</source><translation>Automatisch opstarten uitschakelen</translation></message>
+    <message><source>Open sharing application settings</source><translation>Instellingen van deeltoepassing openen</translation></message>
+    <message><source>If input ever appears stuck, choose ‘Release local input’. The same emergency action is available from the application menu.</source><translation>Als de invoer ooit vast lijkt te zitten, kies je ‘Lokale invoer vrijgeven’. Dezelfde noodactie staat in het toepassingenmenu.</translation></message>
+    <message><source>Checking keyboard and mouse sharing…</source><translation>Delen van toetsenbord en muis controleren…</translation></message>
+    <message><source>%1 detected</source><translation>%1 gedetecteerd</translation></message>
+    <message><source>Not installed</source><translation>Niet geïnstalleerd</translation></message>
+    <message><source>Running and starts automatically</source><translation>Actief en start automatisch</translation></message>
+    <message><source>Enabled, currently stopped</source><translation>Ingeschakeld, momenteel gestopt</translation></message>
+    <message><source>Not managed by ECZOS yet</source><translation>Nog niet door ECZOS beheerd</translation></message>
+    <message><source>No remote computer configured</source><translation>Geen externe computer ingesteld</translation></message>
+    <message><source>Remote computer: %1 · %2 session</source><translation>Externe computer: %1 · %2-sessie</translation></message>
+    <message><source>Conflicting startup methods found</source><translation>Conflicterende opstartmethoden gevonden</translation></message>
+    <message><source>%1 existing startup method detected</source><translation>%1 bestaande opstartmethode gedetecteerd</translation></message>
+    <message><source>No conflicting startup methods</source><translation>Geen conflicterende opstartmethoden</translation></message>
+    <message><source>Status updated</source><translation>Status bijgewerkt</translation></message>
+    <message><source>Taking over existing startup safely…</source><translation>Bestaande opstart veilig overnemen…</translation></message>
+    <message><source>Reconnecting…</source><translation>Opnieuw verbinden…</translation></message>
+    <message><source>Releasing local input…</source><translation>Lokale invoer vrijgeven…</translation></message>
+    <message><source>Disabling automatic startup…</source><translation>Automatisch opstarten uitschakelen…</translation></message>
+    <message><source>Reliable shared input with automatic reconnect and an immediate emergency stop.</source><translation>Betrouwbaar gedeelde invoer met automatisch opnieuw verbinden en een directe noodstop.</translation></message>
+</context>
+<context><name>QObject</name>
+    <message><source>Date and time</source><translation>Datum en tijd</translation></message>
+    <message><source>Timezone and automatic synchronization</source><translation>Tijdzone en automatische synchronisatie</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+    <message><source>Clock status</source><translation>Klokstatus</translation></message><message><source>Network time service</source><translation>Netwerktijdservice</translation></message>
+    <message><source>Timezone</source><translation>Tijdzone</translation></message><message><source>Hardware clock</source><translation>Hardwareklok</translation></message>
+    <message><source>Repair automatic time</source><translation>Automatische tijd herstellen</translation></message><message><source>Change date, time or timezone</source><translation>Datum, tijd of tijdzone wijzigen</translation></message>
+    <message><source>Checking date and time…</source><translation>Datum en tijd controleren…</translation></message><message><source>Automatically synchronized</source><translation>Automatisch gesynchroniseerd</translation></message>
+    <message><source>Not synchronized</source><translation>Niet gesynchroniseerd</translation></message><message><source>%1 · %2</source><translation>%1 · %2</translation></message>
+    <message><source>running</source><translation>actief</translation></message><message><source>stopped</source><translation>gestopt</translation></message>
+    <message><source>Local time (kept for compatibility)</source><translation>Lokale tijd (behouden voor compatibiliteit)</translation></message>
+    <message><source>This computer stores local time in its hardware clock, which may be intentional for another operating system. Automatic repair will not change it.</source><translation>Deze computer bewaart lokale tijd in de hardwareklok, mogelijk bewust voor een ander besturingssysteem. Automatisch herstel verandert dit niet.</translation></message>
+    <message><source>The hardware clock uses the recommended UTC mode.</source><translation>De hardwareklok gebruikt de aanbevolen UTC-modus.</translation></message>
+    <message><source>Repairing automatic time…</source><translation>Automatische tijd herstellen…</translation></message>
+    <message><source>Date and time</source><translation>Datum en tijd</translation></message><message><source>Keep the system clock accurate while preserving multi-boot compatibility.</source><translation>Houd de systeemklok nauwkeurig en behoud multibootcompatibiliteit.</translation></message>
+</context>
+<context><name>QObject</name><message><source>Hardware profile</source><translation>Hardwareprofiel</translation></message><message><source>Memory, storage and performance profile</source><translation>Profiel voor geheugen, opslag en prestaties</translation></message></context>
+<context><name>SettingsWindow</name>
+<message><source>The optional ECZOS hardware module is not installed.</source><translation>De optionele ECZOS-hardwaremodule is niet geïnstalleerd.</translation></message><message><source>Hardware profile</source><translation>Hardwareprofiel</translation></message><message><source>Memory, storage and performance profile</source><translation>Profiel voor geheugen, opslag en prestaties</translation></message>
+<message><source>Detecting hardware…</source><translation>Hardware detecteren…</translation></message><message><source>Lightweight — for limited memory or older processors</source><translation>Lightweight — voor weinig geheugen of oudere processors</translation></message><message><source>Standard — balanced everyday use</source><translation>Standard — gebalanceerd dagelijks gebruik</translation></message><message><source>Performance — powerful workstation</source><translation>Performance — krachtige workstation</translation></message><message><source>Gaming — prioritise games and compressed memory</source><translation>Gaming — prioriteit voor games en gecomprimeerd geheugen</translation></message><message><source>Enterprise — stable managed defaults</source><translation>Enterprise — stabiele beheerde standaardinstellingen</translation></message>
+<message><source>Apply profile</source><translation>Profiel toepassen</translation></message><message><source>Profiles tune zram and memory behaviour. Existing disk swap is preserved. ECZOS does not change CPU, GPU or battery controls without showing a separate setting.</source><translation>Profielen regelen zram en geheugengedrag. Bestaande schijfswap blijft behouden. ECZOS wijzigt CPU-, GPU- of batterijbeheer niet zonder een aparte instelling te tonen.</translation></message>
+<message><source>No graphics adapter identified</source><translation>Geen grafische adapter geïdentificeerd</translation></message><message><source>active</source><translation>actief</translation></message><message><source>inactive</source><translation>inactief</translation></message><message><source>not selected</source><translation>niet geselecteerd</translation></message><message><source>Hardware detection complete</source><translation>Hardwaredetectie voltooid</translation></message><message><source>Apply hardware profile?</source><translation>Hardwareprofiel toepassen?</translation></message><message><source>Apply the selected memory profile? Existing swap remains available.</source><translation>Het geselecteerde geheugenprofiel toepassen? Bestaande swap blijft beschikbaar.</translation></message><message><source>Applying hardware profile…</source><translation>Hardwareprofiel toepassen…</translation></message><message><source>Choose safe memory behaviour based on this computer's actual hardware.</source><translation>Kies veilig geheugengedrag op basis van de werkelijke hardware van deze computer.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>No hardware problems detected</source><translation>Geen hardwareproblemen gedetecteerd</translation></message><message><source>Hardware needs attention:
+%1</source><translation>Hardware heeft aandacht nodig:
+%1</translation></message><message><source>No graphics adapter was detected.</source><translation>Er is geen grafische adapter gedetecteerd.</translation></message><message><source>A graphics adapter has no active kernel driver.</source><translation>Een grafische adapter heeft geen actieve kerneldriver.</translation></message><message><source>Graphics are using slow software rendering.</source><translation>De grafische weergave gebruikt trage software-rendering.</translation></message><message><source>The system disk has less than 10% free space.</source><translation>De systeemschijf heeft minder dan 10% vrije ruimte.</translation></message><message><source>No active network connection was detected.</source><translation>Er is geen actieve netwerkverbinding gedetecteerd.</translation></message><message><source>Bluetooth hardware is present but blocked.</source><translation>Bluetooth-hardware is aanwezig maar geblokkeerd.</translation></message><message><source>Bluetooth hardware is present but its service is not running.</source><translation>Bluetooth-hardware is aanwezig maar de service is niet actief.</translation></message><message><source>A hardware profile is selected, but zram is not active.</source><translation>Er is een hardwareprofiel gekozen, maar zram is niet actief.</translation></message><message><source>%1 system service(s) failed.</source><translation>%1 systeemservice(s) zijn mislukt.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Remote support</source><translation>Hulp op afstand</translation></message>
+<message><source>Graphics crash detected earlier · safe software encoding is active</source><translation>Eerder is een grafische crash gedetecteerd · veilige software-encoding is actief</translation></message>
+<message><source>Running with safe software encoding</source><translation>Actief met veilige software-encoding</translation></message>
+<message><source>Safe software encoding configured · currently stopped</source><translation>Veilige software-encoding ingesteld · momenteel gestopt</translation></message>
+<message><source>Hardware encoding can make the desktop unstable</source><translation>Hardware-encoding kan het bureaublad instabiel maken</translation></message>
+<message><source>Repair</source><translation>Herstellen</translation></message>
+<message><source>Repairing the detected problem…</source><translation>Het gedetecteerde probleem herstellen…</translation></message>
+<message><source>No automatic change is offered because these findings require a hardware, storage, network or driver choice.</source><translation>Er wordt geen automatische wijziging aangeboden, omdat deze bevindingen een keuze voor hardware, opslag, netwerk of stuurprogramma vereisen.</translation></message>
+</context>
+<context><name>QObject</name>
+<message><source>Network shares</source><translation>Netwerkshares</translation></message>
+<message><source>Open shared folders and servers</source><translation>Gedeelde mappen en servers openen</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>The optional network-share component is not installed.</source><translation>Het optionele onderdeel voor netwerkshares is niet geïnstalleerd.</translation></message>
+<message><source>Network shares</source><translation>Netwerkshares</translation></message>
+<message><source>Open shared folders and servers</source><translation>Gedeelde mappen en servers openen</translation></message>
+<message><source>Add SMB, NFS, WebDAV or SFTP locations. Passwords are requested and stored by KDE Wallet, never by ECZOS.</source><translation>Voeg SMB-, NFS-, WebDAV- of SFTP-locaties toe. Wachtwoorden worden door KDE Wallet gevraagd en opgeslagen, nooit door ECZOS.</translation></message>
+<message><source>Add network location</source><translation>Netwerklocatie toevoegen</translation></message>
+<message><source>Find on local network</source><translation>Zoeken op lokaal netwerk</translation></message>
+<message><source>Loading network locations…</source><translation>Netwerklocaties laden…</translation></message>
+<message><source>Test connection</source><translation>Verbinding testen</translation></message>
+<message><source>Opening network location…</source><translation>Netwerklocatie openen…</translation></message>
+<message><source>Testing the connection…</source><translation>Verbinding testen…</translation></message>
+<message><source>Remove network location?</source><translation>Netwerklocatie verwijderen?</translation></message>
+<message><source>Remove this location from ECZOS and the file manager? Stored credentials remain under your control in KDE Wallet.</source><translation>Deze locatie uit ECZOS en de bestandsbeheerder verwijderen? Opgeslagen aanmeldgegevens blijven onder jouw beheer in KDE Wallet.</translation></message>
+<message><source>Removing network location…</source><translation>Netwerklocatie verwijderen…</translation></message>
+<message><source>No managed network locations yet.</source><translation>Nog geen beheerde netwerklocaties.</translation></message>
+<message><source>Already mounted outside ECZOS</source><translation>Al buiten ECZOS gekoppeld</translation></message>
+<message><source>%1 at %2 · %3</source><translation>%1 op %2 · %3</translation></message>
+<message><source>Network locations updated</source><translation>Netwerklocaties bijgewerkt</translation></message>
+<message><source>Network address</source><translation>Netwerkadres</translation></message>
+<message><source>Adding network location…</source><translation>Netwerklocatie toevoegen…</translation></message>
+<message><source>Searching the local network…</source><translation>Op het lokale netwerk zoeken…</translation></message>
+<message><source>No supported network services were found automatically. You can still add an address manually.</source><translation>Er zijn niet automatisch ondersteunde netwerkdiensten gevonden. Je kunt nog steeds handmatig een adres toevoegen.</translation></message>
+<message><source>Network services found</source><translation>Netwerkdiensten gevonden</translation></message>
+<message><source>Choose a location</source><translation>Kies een locatie</translation></message>
+<message><source>Name</source><translation>Naam</translation></message>
+<message><source>Open</source><translation>Openen</translation></message>
+<message><source>%1 · %2 · %3</source><translation>%1 · %2 · %3</translation></message>
+<message><source>Secure access to shared folders through KDE Wallet and on-demand reconnect.</source><translation>Veilige toegang tot gedeelde mappen via KDE Wallet en opnieuw verbinden wanneer nodig.</translation></message>
+<message><source>Already available in Dolphin</source><translation>Al beschikbaar in Dolphin</translation></message>
+<message><source>Connect to server</source><translation>Verbind met server</translation></message>
+<message><source>Enter the complete network address.
+
+SMB (Windows/NAS): smb://server/share
+SFTP (secure files): sftp://server/folder
+NFS: nfs://server/export
+Secure WebDAV: webdavs://server/folder
+
+For SMB, the part after the server name is the shared folder.</source><translation>Voer het volledige netwerkadres in.
+
+SMB (Windows/NAS): smb://server/share
+SFTP (veilige bestanden): sftp://server/map
+NFS: nfs://server/export
+Veilige WebDAV: webdavs://server/map
+
+Bij SMB is het deel na de servernaam de gedeelde map.</translation></message>
+</context>
+<context><name>QObject</name>
+<message><source>Startup and operating systems</source><translation>Opstarten en besturingssystemen</translation></message>
+<message><source>Detect systems and manage the boot menu safely</source><translation>Systemen detecteren en het opstartmenu veilig beheren</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>The optional boot-management component is not installed.</source><translation>Het optionele onderdeel voor opstartbeheer is niet geïnstalleerd.</translation></message>
+<message><source>Startup and operating systems</source><translation>Opstarten en besturingssystemen</translation></message>
+<message><source>Detect systems and manage the boot menu safely</source><translation>Systemen detecteren en het opstartmenu veilig beheren</translation></message>
+<message><source>ECZOS can detect other operating systems and refresh the GRUB menu. It never changes EFI boot order or reinstalls a bootloader from this page.</source><translation>ECZOS kan andere besturingssystemen detecteren en het GRUB-menu vernieuwen. Vanaf deze pagina wordt nooit de EFI-opstartvolgorde gewijzigd of een bootloader opnieuw geïnstalleerd.</translation></message>
+<message><source>Reading boot information…</source><translation>Opstartinformatie lezen…</translation></message>
+<message><source>Scan again</source><translation>Opnieuw scannen</translation></message>
+<message><source>Update boot menu safely</source><translation>Opstartmenu veilig bijwerken</translation></message>
+<message><source>Boot mode: %1 · Bootloader: %2 · Detection of other systems: %3</source><translation>Opstartmodus: %1 · Bootloader: %2 · Detectie van andere systemen: %3</translation></message>
+<message><source>enabled</source><translation>ingeschakeld</translation></message><message><source>disabled</source><translation>uitgeschakeld</translation></message>
+<message><source>Unknown operating system</source><translation>Onbekend besturingssysteem</translation></message>
+<message><source>boot files verified</source><translation>opstartbestanden gecontroleerd</translation></message><message><source>boot files could not be verified</source><translation>opstartbestanden konden niet worden gecontroleerd</translation></message>
+<message><source>No other operating systems were detected.</source><translation>Er zijn geen andere besturingssystemen gedetecteerd.</translation></message>
+<message><source>Run a new scan to inspect this computer.</source><translation>Voer een nieuwe scan uit om deze computer te controleren.</translation></message><message><source>Boot scan complete</source><translation>Opstartscan voltooid</translation></message>
+<message><source>Scanning disks and boot files…</source><translation>Schijven en opstartbestanden scannen…</translation></message>
+<message><source>Update boot menu?</source><translation>Opstartmenu bijwerken?</translation></message>
+<message><source>ECZOS will create a backup, generate a new GRUB menu, validate it and restore the previous menu automatically if verification fails. Continue?</source><translation>ECZOS maakt een back-up, genereert een nieuw GRUB-menu, controleert het en herstelt bij een mislukte controle automatisch het vorige menu. Doorgaan?</translation></message>
+<message><source>Generating and verifying the boot menu…</source><translation>Opstartmenu genereren en controleren…</translation></message>
+<message><source>Validated multiboot detection with transactional GRUB updates.</source><translation>Gevalideerde multibootdetectie met transactionele GRUB-updates.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Recent ECZOS activity</source><translation>Recente ECZOS-activiteit</translation></message>
+<message><source>No recent ECZOS activity was found.</source><translation>Er is geen recente ECZOS-activiteit gevonden.</translation></message>
+<message><source>Refresh activity</source><translation>Activiteit vernieuwen</translation></message>
+<message><source>Loading privacy-filtered activity…</source><translation>Privacygefilterde activiteit laden…</translation></message>
+<message><source>Activity updated</source><translation>Activiteit bijgewerkt</translation></message>
+<message><source>Activity could not be loaded</source><translation>Activiteit kon niet worden geladen</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Save support report</source><translation>Supportrapport opslaan</translation></message>
+<message><source>Email EasyComp Zeeland</source><translation>EasyComp Zeeland e-mailen</translation></message>
+<message><source>Report a problem on GitHub</source><translation>Probleem melden op GitHub</translation></message>
+<message><source>The support report could not be found after it was created.</source><translation>Het supportrapport kon na het aanmaken niet worden gevonden.</translation></message>
+<message><source>ECZOS support request</source><translation>ECZOS-supportverzoek</translation></message>
+<message><source>Describe what happened, what you expected, and the steps that reproduce the problem. The privacy-filtered ECZOS support report is attached.</source><translation>Beschrijf wat er gebeurde, wat je verwachtte en met welke stappen het probleem opnieuw optreedt. Het privacygefilterde ECZOS-supportrapport is bijgevoegd.</translation></message>
+<message><source>A draft email with the report attached was opened. Review it and press Send in your mail app.</source><translation>Er is een conceptmail met het rapport als bijlage geopend. Controleer deze en druk in je mailprogramma op Verzenden.</translation></message>
+<message><source>The email app could not be opened. The report is saved at %1</source><translation>Het mailprogramma kon niet worden geopend. Het rapport is opgeslagen in %1</translation></message>
+<message><source>The report could not be read. It is saved at %1</source><translation>Het rapport kon niet worden gelezen. Het is opgeslagen in %1</translation></message>
+<message><source>Describe the problem and the steps that reproduce it here. Then paste the privacy-filtered report from your clipboard below.</source><translation>Beschrijf hier het probleem en de stappen waarmee het opnieuw optreedt. Plak daarna hieronder het privacygefilterde rapport vanaf het klembord.</translation></message>
+<message><source>GitHub was opened and the report was copied. Review the issue, paste the report, and submit it yourself.</source><translation>GitHub is geopend en het rapport is gekopieerd. Controleer de melding, plak het rapport en verstuur de melding zelf.</translation></message>
+<message><source>GitHub could not be opened. The report is saved at %1</source><translation>GitHub kon niet worden geopend. Het rapport is opgeslagen in %1</translation></message>
+<message><source>Support report saved at %1</source><translation>Supportrapport opgeslagen in %1</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Advanced mode</source><translation>Geavanceerde modus</translation></message>
+<message><source>Show technical details and specialist maintenance tools.</source><translation>Technische details en specialistische onderhoudshulpmiddelen tonen.</translation></message>
+<message><source>Ready to start</source><translation>Klaar om op te starten</translation></message>
+<message><source>Boot files could not be verified</source><translation>Opstartbestanden konden niet worden gecontroleerd</translation></message>
+<message><source>Enable Advanced mode in the sidebar to inspect the privacy-filtered technical activity.</source><translation>Schakel Geavanceerde modus in de zijbalk in om de privacygefilterde technische activiteit te bekijken.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Automatic date and time</source><translation>Automatische datum en tijd</translation></message>
+<message><source>Check again</source><translation>Opnieuw controleren</translation></message>
+<message><source>Date and time status is unavailable.</source><translation>De status van datum en tijd is niet beschikbaar.</translation></message>
+<message><source>Timezone: %1
+Automatic synchronization: %2
+Time service: %3 · %4</source><translation>Tijdzone: %1
+Automatische synchronisatie: %2
+Tijdservice: %3 · %4</translation></message>
+<message><source>working</source><translation>werkt</translation></message><message><source>needs attention</source><translation>heeft aandacht nodig</translation></message>
+<message><source>The hardware clock uses local time for compatibility with another operating system. ECZOS will preserve this setting.</source><translation>De hardwareklok gebruikt lokale tijd voor compatibiliteit met een ander besturingssysteem. ECZOS behoudt deze instelling.</translation></message>
+<message><source>SMB — Windows PC or NAS</source><translation>SMB — Windows-pc of NAS</translation></message>
+<message><source>SFTP — secure files over SSH</source><translation>SFTP — beveiligde bestanden via SSH</translation></message>
+<message><source>NFS — Linux or Unix share</source><translation>NFS — gedeelde map van Linux of Unix</translation></message>
+<message><source>WebDAV — web folder</source><translation>WebDAV — webmap</translation></message>
+<message><source>Secure WebDAV — encrypted web folder</source><translation>Beveiligde WebDAV — versleutelde webmap</translation></message>
+<message><source>server name or IP address</source><translation>servernaam of IP-adres</translation></message>
+<message><source>optional; password is requested by KDE Wallet</source><translation>optioneel; KDE Wallet vraagt om het wachtwoord</translation></message>
+<message><source>automatic</source><translation>automatisch</translation></message>
+<message><source>Name shown in Dolphin</source><translation>Naam die in Dolphin wordt getoond</translation></message>
+<message><source>Protocol</source><translation>Protocol</translation></message><message><source>Server</source><translation>Server</translation></message>
+<message><source>Shared folder or path</source><translation>Gedeelde map of pad</translation></message><message><source>Username</source><translation>Gebruikersnaam</translation></message><message><source>Port</source><translation>Poort</translation></message>
+<message><source>for example: Shared Documents</source><translation>bijvoorbeeld: Gedeelde documenten</translation></message>
+<message><source>Use the share name shown by the Windows PC or NAS. Result: smb://server/Shared%20Documents</source><translation>Gebruik de sharenaam die de Windows-pc of NAS toont. Resultaat: smb://server/Gedeelde%20documenten</translation></message>
+<message><source>for example: home/name/files</source><translation>bijvoorbeeld: home/naam/bestanden</translation></message>
+<message><source>SFTP uses an SSH account. KDE Wallet asks for and stores the password securely.</source><translation>SFTP gebruikt een SSH-account. KDE Wallet vraagt om het wachtwoord en slaat dit veilig op.</translation></message>
+<message><source>for example: exports/shared</source><translation>bijvoorbeeld: exports/gedeeld</translation></message>
+<message><source>Enter the exported NFS path configured on the server.</source><translation>Voer het geëxporteerde NFS-pad in dat op de server is ingesteld.</translation></message>
+<message><source>for example: remote.php/dav/files/name</source><translation>bijvoorbeeld: remote.php/dav/files/naam</translation></message>
+<message><source>Enter the WebDAV path supplied by the server or cloud provider.</source><translation>Voer het WebDAV-pad in dat de server of cloudprovider heeft verstrekt.</translation></message>
+<message><source>Incomplete network location</source><translation>Onvolledige netwerklocatie</translation></message>
+<message><source>Enter a display name, server and shared folder or path. The optional port must be between 1 and 65535.</source><translation>Voer een weergavenaam, server en gedeelde map of pad in. De optionele poort moet tussen 1 en 65535 liggen.</translation></message>
 </context>
 </TS>

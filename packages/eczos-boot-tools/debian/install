@@ -1,0 +1,4 @@
+bin/* usr/bin/
+lib/* usr/lib/eczos/boot/
+polkit/*.policy usr/share/polkit-1/actions/
+systemd/*.service usr/lib/systemd/system/

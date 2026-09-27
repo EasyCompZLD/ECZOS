@@ -1,3 +1,96 @@
+eczos-windows-core (0.1.1~dev20) UNRELEASED; urgency=medium
+
+  * Run legacy 32-bit InstallShield 10 installers in a real win32 prefix.
+  * Safely replace only an incomplete mismatched prefix before setup retry,
+    preserving the complete cached installation medium and a recovery backup.
+  * Pass the manifest architecture to Wine for every managed operation.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 19:05:00 +0200
+
+eczos-windows-core (0.1.1~dev19) UNRELEASED; urgency=medium
+
+  * Detect InstallShield 10 media and use a Windows XP installer profile.
+  * Recreate only a failed InstallShield 10.50 engine cache before retrying.
+  * Apply each manifest's Windows version before setup, repair and launch.
+  * Detect SafeDisc driver-protected discs and report the real unsupported DRM
+    blocker instead of claiming that a runtime repair fixed the application.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 18:20:00 +0200
+
+eczos-windows-core (0.1.1~dev18) UNRELEASED; urgency=medium
+
+  * Enforce non-empty, canonical executable paths before an application is
+    ever marked installed or receives a launcher.
+  * Correct legacy installed records with an empty entry point to the guided
+    setup/search state instead of offering a Start button that cannot work.
+  * Derive a stable display title when third-party installer metadata is empty.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 16:35:00 +0200
+
+eczos-windows-core (0.1.1~dev17) UNRELEASED; urgency=medium
+
+  * Run a safe automatic preflight before every application launch.
+  * Rediscover moved or missing program files without recreating the prefix.
+  * Repair incomplete Wine registry infrastructure while preserving user data
+    and application settings.
+  * Keep a private per-app launch log, recognise safe Wine infrastructure
+    failures, repair them and retry exactly once.
+  * Explain likely Visual C++ and .NET failures in user language and direct the
+    user to the per-application component installer.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 16:10:00 +0200
+
+eczos-windows-core (0.1.1~dev16) UNRELEASED; urgency=medium
+
+  * Detect applications that require X11 and stop safely with a clear Plasma
+    session message instead of allowing a broken or frozen Wayland launch.
+  * Mark classic games using cnc-ddraw as X11 applications automatically.
+  * Scope cnc-ddraw overrides to game executables so launchers and setup tools
+    keep Wine's built-in DirectDraw implementation.
+  * Keep the Worms 2 launcher on built-in DirectDraw while applying cnc-ddraw
+    only to the actual game executable.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sat, 26 Sep 2026 15:00:00 +0200
+
+eczos-windows-core (0.1.1~dev15) UNRELEASED; urgency=medium
+
+  * Add versioned runner profiles and schema-2 application records.
+  * Migrate existing records atomically without recreating their Wine prefixes.
+  * Expose safe per-application Wine configuration tools.
+  * Add a validated per-application Windows component catalogue.
+  * Detect installed Winetricks verbs and record successful installations.
+  * Rerun a cached failed EXE or MSI installer in its existing managed prefix.
+  * Rediscover the installed executable and restore launchers after retry.
+  * Bypass obsolete Flash/Shockwave disc wrappers when a validated Now.ini
+    points to the real offline game installer.
+  * Recover interrupted installer retries without recreating the prefix.
+  * Discover legacy applications registered outside Program Files, including
+    App Paths entries that omit the .exe suffix.
+  * Resolve registered Windows paths case-insensitively on the Linux host.
+  * Ask the user to choose when several credible launch programs remain.
+  * Classify legacy DirectPlay applications as games in the application menu.
+  * Offer registered launcher/front-end alternatives instead of assuming that
+    an App Paths executable is always the user-facing program.
+  * Install the archive helpers required by the supported Winetricks workflow.
+  * Fetch the pinned Winetricks 20260125 helper with SHA-256 verification so
+    Microsoft runtime installs do not rely on Debian's stale download hashes.
+  * Support explicit per-application optical mappings with both a mounted disc
+    directory and Wine's raw device link for legacy CD checks and CD audio.
+  * Accept any verified mountpoint when one optical device is mounted more than
+    once instead of checking only the first result returned by findmnt.
+  * Remount a configured optical disc through UDisks when an application is
+    launched after login, keeping legacy CD mappings usable across restarts.
+  * Repair Worms 2's historical C:\\nw2 level and water paths from the managed
+    installation and cached original media before launching the game.
+  * Launch installed executables from their own application directory instead
+    of C:\\, matching Windows and fixing programs that use relative paths.
+  * Offer cnc-ddraw as a managed classic-game component for fullscreen scaling
+    and matching mouse coordinates in low-resolution DirectDraw games.
+  * Configure the Worms 2 profile for fullscreen aspect-preserving scaling and
+    scaled mouse coordinates whenever its classic DirectDraw component exists.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Fri, 25 Sep 2026 22:00:00 +0200
+
 eczos-windows-core (0.1.0) trixie; urgency=medium
 
   * Release managed Windows application compatibility for ECZOS 0.1.

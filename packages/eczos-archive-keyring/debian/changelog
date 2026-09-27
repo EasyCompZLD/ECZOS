@@ -1,3 +1,9 @@
+eczos-archive-keyring (2026.09.27~dev1) UNRELEASED; urgency=medium
+
+  * Give the next qualification image a unique post-0.1 package identity.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 07:30:00 +0200
+
 eczos-archive-keyring (2026.09.20) trixie; urgency=medium
 
   * Publish the ECZOS 0.1 repository signing key package.

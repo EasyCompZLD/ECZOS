@@ -2,4 +2,7 @@ applications/org.eczos.Windows.desktop usr/share/applications/
 applications/org.eczos.Windows.Manager.desktop usr/share/applications/
 bin/eczos-windows usr/bin/
 lib/runtime-wine-system usr/lib/eczos/windows/
+runtime-definitions/*.json usr/share/eczos/windows/runtimes/
+dependencies/*.json usr/share/eczos/windows/dependencies/
+schema/*.json usr/share/eczos/windows/schema/
 xdg/eczos-windows-first-run.desktop etc/xdg/autostart/

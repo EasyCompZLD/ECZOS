@@ -54,6 +54,7 @@ for input in includes.chroot package-lists hooks bootloaders; do
     rsync -a --exclude='8*.hook.chroot' "$ROOT_DIR/image/config/$input" "$WORK_DIR/config/"
 done
 install -m 0644 "$BUNDLE_DIR"/*.deb "$WORK_DIR/config/packages.chroot/"
+"$ROOT_DIR/scripts/verify-staged-package-versions-vm.sh" "$WORK_DIR/config/packages.chroot"
 install -m 0755 "$ROOT_DIR/image/auto/config" "$RUN_DIR/configure-image"
 cd "$WORK_DIR"
 ECZOS_ISO_VOLUME=ECZOS_0_1_0_AMD64 \

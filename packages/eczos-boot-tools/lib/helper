@@ -1,0 +1,179 @@
+#!/usr/bin/python3
+from __future__ import annotations
+
+import datetime
+import fcntl
+import json
+import os
+import pathlib
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+
+STATE_DIR = pathlib.Path("/var/lib/eczos/boot")
+STATE = STATE_DIR / "inventory.json"
+BACKUPS = STATE_DIR / "backups"
+GRUB_CONFIG = pathlib.Path("/boot/grub/grub.cfg")
+
+
+def run(argv, timeout=30):
+    try:
+        return subprocess.run(argv, check=False, capture_output=True, text=True, timeout=timeout,
+                              env={**os.environ, "LC_ALL": "C"})
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+
+def os_prober_enabled() -> bool:
+    try:
+        text = pathlib.Path("/etc/default/grub").read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    match = re.search(r"^\s*GRUB_DISABLE_OS_PROBER\s*=\s*([^#\s]+)", text, re.MULTILINE)
+    return bool(match and match.group(1).strip("'\"").lower() == "false")
+
+
+def mounted_target(device: str) -> str:
+    result = run(["findmnt", "-rn", "-S", device, "-o", "TARGET"], 8)
+    return result.stdout.splitlines()[0] if result and result.stdout.strip() else ""
+
+
+def validate_efi_file(device: str, boot_file: str) -> bool:
+    target = mounted_target(device)
+    temporary = None
+    try:
+        if not target:
+            temporary = tempfile.mkdtemp(prefix="eczos-boot-scan-", dir="/run")
+            mounted = run(["mount", "-o", "ro,nosuid,nodev,noexec", device, temporary], 15)
+            if not mounted or mounted.returncode != 0:
+                return False
+            target = temporary
+        candidate = pathlib.Path(target) / boot_file.lstrip("/")
+        return candidate.is_file() and not candidate.is_symlink()
+    finally:
+        if temporary:
+            run(["umount", temporary], 15)
+            pathlib.Path(temporary).rmdir()
+
+
+def firmware_entries() -> list[dict]:
+    result = run(["efibootmgr", "-v"], 10) if shutil.which("efibootmgr") else None
+    entries = []
+    if result and result.returncode == 0:
+        for line in result.stdout.splitlines():
+            match = re.match(r"Boot([0-9A-Fa-f]{4})(\*)?\s+(.+?)(?:\s{2,}|\t)(.+)$", line)
+            if match:
+                entries.append({"number": match.group(1).upper(), "active": bool(match.group(2)),
+                                "label": match.group(3).strip(), "path": match.group(4).strip()})
+    return entries
+
+
+def scan() -> dict:
+    mode = "uefi" if pathlib.Path("/sys/firmware/efi").is_dir() else "bios"
+    bootloader = "grub-uefi" if mode == "uefi" else "grub-bios"
+    systems = []
+    result = run(["os-prober"], 60) if shutil.which("os-prober") else None
+    if result:
+        for line in result.stdout.splitlines():
+            parts = line.split(":", 3)
+            if len(parts) != 4:
+                continue
+            location, label, short_name, kind = parts
+            device, separator, boot_file = location.partition("@")
+            try:
+                info = os.stat(device)
+                block_device = stat.S_ISBLK(info.st_mode)
+            except OSError:
+                block_device = False
+            method = "efi-chainload" if kind == "efi" else "grub-chainload"
+            validated = block_device
+            reason = "block-device-verified" if block_device else "device-missing"
+            if kind == "efi":
+                validated = block_device and bool(separator) and validate_efi_file(device, boot_file)
+                reason = "efi-file-verified" if validated else "efi-file-missing"
+            elif kind == "linux" and shutil.which("linux-boot-prober"):
+                linux_probe = run(["linux-boot-prober", device], 45)
+                validated = bool(block_device and linux_probe and linux_probe.returncode == 0 and linux_probe.stdout.strip())
+                reason = "linux-boot-files-verified" if validated else "linux-boot-files-missing"
+            systems.append({"id": f"{device}:{short_name}:{kind}", "device": device, "label": label,
+                            "family": short_name, "kind": kind, "method": method,
+                            "bootFile": boot_file if separator else "", "validated": validated,
+                            "status": "ready" if validated else "invalid", "reason": reason})
+    return {"schemaVersion": 1, "available": bool(shutil.which("grub-mkconfig")), "stale": False,
+            "scannedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(), "mode": mode,
+            "bootloader": bootloader, "osProberEnabled": os_prober_enabled(),
+            "operatingSystems": systems, "firmwareEntries": firmware_entries(),
+            "policy": {"changesBootOrder": False, "reinstallsBootloader": False, "transactionalMenuOnly": True}}
+
+
+def write_state(data: dict) -> None:
+    STATE_DIR.mkdir(mode=0o755, parents=True, exist_ok=True)
+    descriptor, name = tempfile.mkstemp(prefix="inventory.", dir=STATE_DIR)
+    temporary = pathlib.Path(name)
+    try:
+        os.fchmod(descriptor, 0o644)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(data, stream, indent=2, ensure_ascii=False); stream.write("\n"); stream.flush(); os.fsync(stream.fileno())
+        os.replace(temporary, STATE)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def update_menu() -> None:
+    inventory = scan()
+    write_state(inventory)
+    if not inventory["available"] or not GRUB_CONFIG.parent.is_dir():
+        raise RuntimeError("A supported GRUB installation was not found.")
+    if not inventory["osProberEnabled"]:
+        raise RuntimeError("Detection of other operating systems is disabled in GRUB settings.")
+    invalid = [item["label"] for item in inventory["operatingSystems"] if not item["validated"]]
+    if invalid:
+        raise RuntimeError("The boot menu was not changed because a detected entry could not be validated: " + ", ".join(invalid))
+    BACKUPS.mkdir(mode=0o700, parents=True, exist_ok=True)
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + f"-{os.getpid()}"
+    backup = BACKUPS / f"grub.cfg.{stamp}"
+    if GRUB_CONFIG.is_file():
+        shutil.copy2(GRUB_CONFIG, backup)
+        os.chmod(backup, 0o600)
+    with tempfile.TemporaryDirectory(prefix="eczos-grub-", dir="/run") as directory:
+        generated = pathlib.Path(directory) / "grub.cfg"
+        result = run(["grub-mkconfig", "-o", str(generated)], 180)
+        if not result or result.returncode != 0:
+            raise RuntimeError((result.stderr if result else "GRUB generation timed out.").strip())
+        checked = run(["grub-script-check", str(generated)], 30)
+        if not checked or checked.returncode != 0 or generated.stat().st_size < 512:
+            raise RuntimeError("The generated boot menu failed syntax or completeness validation.")
+        destination = GRUB_CONFIG.with_suffix(".cfg.eczos-new")
+        shutil.copyfile(generated, destination); os.chmod(destination, 0o644)
+        with destination.open("rb") as stream: os.fsync(stream.fileno())
+        os.replace(destination, GRUB_CONFIG)
+    verified = run(["grub-script-check", str(GRUB_CONFIG)], 30)
+    if not verified or verified.returncode != 0:
+        if backup.is_file(): shutil.copy2(backup, GRUB_CONFIG)
+        raise RuntimeError("Verification failed after installation; the previous boot menu was restored.")
+    logger = run(["logger", "-t", "eczos-boot", "transactional GRUB menu refresh verified"], 5)
+    print("The boot menu was updated and verified. EFI boot order was not changed.")
+
+
+def main() -> int:
+    if os.geteuid() != 0 or len(sys.argv) != 2 or sys.argv[1] not in {"scan", "update-menu"}:
+        print("This fixed-operation helper must run as root.", file=sys.stderr); return 2
+    STATE_DIR.mkdir(mode=0o755, parents=True, exist_ok=True)
+    lock = os.open(STATE_DIR / "operation.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if sys.argv[1] == "scan":
+            data = scan(); write_state(data); print(json.dumps(data, ensure_ascii=False))
+        else:
+            update_menu()
+    except RuntimeError as error:
+        print(str(error), file=sys.stderr); return 1
+    finally:
+        os.close(lock)
+    return 0
+
+
+if __name__ == "__main__": raise SystemExit(main())

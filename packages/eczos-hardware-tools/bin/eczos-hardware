@@ -1,0 +1,151 @@
+#!/usr/bin/python3
+import argparse, json, os, pathlib, shlex, shutil, subprocess
+
+PROFILES = {
+    "lightweight": {"name": "Lightweight", "zram": "ram / 2", "swappiness": 100, "priority": 150},
+    "standard": {"name": "Standard", "zram": "ram / 4", "swappiness": 80, "priority": 120},
+    "performance": {"name": "Performance", "zram": "ram / 8", "swappiness": 40, "priority": 110},
+    "gaming": {"name": "Gaming", "zram": "ram / 4", "swappiness": 60, "priority": 140},
+    "enterprise": {"name": "Enterprise", "zram": "ram / 4", "swappiness": 60, "priority": 130},
+}
+
+def run(argv):
+    try: return subprocess.run(argv, text=True, capture_output=True, timeout=8, check=False,
+                               env={**os.environ, "LC_ALL": "C"})
+    except (OSError, subprocess.TimeoutExpired): return None
+
+def read(path, default=""):
+    try: return pathlib.Path(path).read_text(errors="replace").strip()
+    except OSError: return default
+
+def meminfo():
+    values = {}
+    for line in read("/proc/meminfo").splitlines():
+        key, _, value = line.partition(":")
+        try: values[key] = int(value.strip().split()[0])
+        except (ValueError, IndexError): pass
+    return values
+
+def service_active(unit):
+    result = run(["/usr/bin/systemctl", "is-active", "--quiet", unit])
+    return bool(result and result.returncode == 0)
+
+def issue(identifier, category, status_value, reason, summary, repair=""):
+    return {"id": identifier, "category": category, "status": status_value,
+            "reason": reason, "summary": summary, "repair": repair,
+            "repairable": bool(repair)}
+
+def status():
+    memory = meminfo(); ram = memory.get("MemTotal", 0); swap = memory.get("SwapTotal", 0)
+    cpu_model = ""
+    for line in read("/proc/cpuinfo").splitlines():
+        if line.startswith("model name"):
+            cpu_model = line.partition(":")[2].strip(); break
+    gpu, gpu_details = [], []
+    result = run(["/usr/bin/lspci", "-mm"])
+    if result:
+        for line in result.stdout.splitlines():
+            if any(kind in line for kind in ('"VGA compatible controller"', '"3D controller"', '"Display controller"')):
+                parts = shlex.split(line)
+                if len(parts) >= 4:
+                    slot, name = parts[0], f"{parts[2]} {parts[3]}"
+                    device_path = pathlib.Path("/sys/bus/pci/devices") / (slot if slot.startswith("0000:") else f"0000:{slot}")
+                    driver = ""
+                    try:
+                        if (device_path / "driver").exists(): driver = (device_path / "driver").resolve().name
+                    except OSError: pass
+                    gpu.append(name); gpu_details.append({"slot": slot, "name": name, "driver": driver})
+    renderer = ""
+    glxinfo = shutil.which("glxinfo")
+    if glxinfo and os.environ.get("DISPLAY"):
+        render_result = run([glxinfo, "-B"])
+        if render_result:
+            for line in render_result.stdout.splitlines():
+                if "OpenGL renderer string:" in line: renderer = line.partition(":")[2].strip(); break
+    root_source = (run(["/usr/bin/findmnt", "-nro", "SOURCE", "/"]) or type("R", (), {"stdout":""})()).stdout.strip()
+    root_disk = root_source
+    parent = run(["/usr/bin/lsblk", "-no", "PKNAME", root_source]) if root_source else None
+    if parent and parent.stdout.strip(): root_disk = "/dev/" + parent.stdout.splitlines()[0].strip()
+    storage = {"source": root_source, "device": root_disk, "rotational": None, "transport": ""}
+    if root_disk:
+        info = run(["/usr/bin/lsblk", "-dnro", "ROTA,TRAN", root_disk])
+        if info and info.stdout.strip():
+            parts = info.stdout.split(); storage["rotational"] = parts[0] == "1"; storage["transport"] = parts[1] if len(parts) > 1 else ""
+    zram_devices = sorted(pathlib.Path("/sys/block").glob("zram*"))
+    zram_bytes = sum(int(read(device / "disksize", "0")) for device in zram_devices)
+    battery = any(pathlib.Path("/sys/class/power_supply").glob("BAT*"))
+    current = ""
+    try: current = json.loads(read("/etc/eczos/hardware-profile.json", "{}" )).get("profile", "")
+    except json.JSONDecodeError: pass
+    disk = shutil.disk_usage("/")
+    storage["totalBytes"], storage["freeBytes"] = disk.total, disk.free
+    storage["usedPercent"] = round((disk.used / disk.total) * 100, 1) if disk.total else 0
+    network_devices, connected_networks = [], 0
+    nmcli = shutil.which("nmcli")
+    if nmcli:
+        network_result = run([nmcli, "-t", "-f", "DEVICE,TYPE,STATE", "device"])
+        if network_result:
+            for line in network_result.stdout.splitlines():
+                parts = line.rsplit(":", 2)
+                if len(parts) == 3:
+                    record = {"device": parts[0].replace("\\:", ":"), "type": parts[1], "state": parts[2]}
+                    network_devices.append(record)
+                    if parts[2] in ("connected", "verbonden"): connected_networks += 1
+    bluetooth_present = any(pathlib.Path("/sys/class/bluetooth").glob("hci*"))
+    bluetooth_blocked = False
+    rfkill = shutil.which("rfkill")
+    if rfkill:
+        rfkill_result = run([rfkill, "--json"])
+        if rfkill_result and rfkill_result.returncode == 0:
+            try:
+                for item in json.loads(rfkill_result.stdout).get("rfkilldevices", []):
+                    if item.get("type") == "bluetooth" and (item.get("soft") == "blocked" or item.get("hard") == "blocked"):
+                        bluetooth_blocked = True
+            except json.JSONDecodeError: pass
+    failed_result = run(["/usr/bin/systemctl", "--failed", "--no-legend", "--plain"])
+    failed_units = len([line for line in failed_result.stdout.splitlines() if line.strip()]) if failed_result else 0
+    issues = []
+    if not gpu: issues.append(issue("graphics-missing", "graphics", "unavailable", "no-adapter", "No graphics adapter was detected."))
+    elif any(not item["driver"] for item in gpu_details): issues.append(issue("graphics-driver", "graphics", "degraded", "driver-missing", "A graphics adapter has no active kernel driver."))
+    elif renderer and any(word in renderer.lower() for word in ("llvmpipe", "softpipe", "software rasterizer")):
+        issues.append(issue("graphics-renderer", "graphics", "degraded", "software-rendering", "Graphics are using slow software rendering."))
+    if storage["usedPercent"] >= 90: issues.append(issue("storage-space", "storage", "degraded", "almost-full", "The system disk has less than 10% free space."))
+    if nmcli and connected_networks == 0: issues.append(issue("network-offline", "network", "degraded", "no-active-connection", "No active network connection was detected."))
+    if bluetooth_present and bluetooth_blocked: issues.append(issue("bluetooth-blocked", "bluetooth", "degraded", "rfkill-blocked", "Bluetooth hardware is present but blocked.", "bluetooth-blocked"))
+    elif bluetooth_present and not service_active("bluetooth.service"): issues.append(issue("bluetooth-service", "bluetooth", "degraded", "service-inactive", "Bluetooth hardware is present but its service is not running.", "bluetooth-service"))
+    if current and not (zram_devices and zram_bytes): issues.append(issue("zram-inactive", "memory", "degraded", "configured-not-active", "A hardware profile is selected, but zram is not active.", "zram-inactive"))
+    if failed_units: issues.append(issue("failed-services", "system", "degraded", "systemd-failed", f"{failed_units} system service(s) failed."))
+    threads = os.cpu_count() or 1
+    if ram and ram < 6 * 1024 * 1024: recommended, reason = "lightweight", "limited-memory"
+    elif threads <= 2: recommended, reason = "lightweight", "limited-cpu"
+    elif battery: recommended, reason = "standard", "portable-computer"
+    elif ram >= 16 * 1024 * 1024 and gpu: recommended, reason = "performance", "capable-desktop"
+    else: recommended, reason = "standard", "balanced-hardware"
+    return {"schemaVersion": 2, "cpu": {"model": cpu_model, "logicalProcessors": threads},
+            "memory": {"totalKiB": ram, "swapKiB": swap, "zramActive": bool(zram_devices and zram_bytes),
+                       "zramBytes": zram_bytes, "swappiness": int(read("/proc/sys/vm/swappiness", "-1"))},
+            "graphics": gpu, "graphicsDetails": gpu_details, "renderer": renderer,
+            "systemStorage": storage, "battery": battery,
+            "network": {"devices": network_devices, "connected": connected_networks},
+            "bluetooth": {"present": bluetooth_present, "blocked": bluetooth_blocked,
+                           "serviceActive": service_active("bluetooth.service") if bluetooth_present else False},
+            "firmware": {"available": bool(shutil.which("fwupdmgr")), "serviceActive": service_active("fwupd.service")},
+            "failedUnits": failed_units, "issues": issues,
+            "health": "ready" if not issues else "degraded", "currentProfile": current,
+            "recommendedProfile": recommended, "recommendationReason": reason, "profiles": PROFILES}
+
+parser = argparse.ArgumentParser(prog="eczos-hardware")
+sub = parser.add_subparsers(dest="command", required=True)
+status_parser = sub.add_parser("status"); status_parser.add_argument("--json", action="store_true")
+sub.add_parser("profiles")
+apply_parser = sub.add_parser("apply"); apply_parser.add_argument("profile", choices=PROFILES)
+repair_parser = sub.add_parser("repair"); repair_parser.add_argument("issue", choices=("bluetooth-blocked", "bluetooth-service", "zram-inactive"))
+args = parser.parse_args()
+if args.command == "status":
+    data = status()
+    print(json.dumps(data, ensure_ascii=False) if args.json else f"CPU: {data['cpu']['model']}\nRAM: {data['memory']['totalKiB']/1048576:.1f} GiB\nRecommended: {data['recommendedProfile']}")
+elif args.command == "profiles": print(json.dumps(PROFILES, ensure_ascii=False))
+elif args.command == "apply":
+    os.execvp("pkexec", ["pkexec", "/usr/lib/eczos/hardware/apply-profile", args.profile])
+else:
+    os.execvp("pkexec", ["pkexec", "/usr/lib/eczos/hardware/repair-issue", args.issue])

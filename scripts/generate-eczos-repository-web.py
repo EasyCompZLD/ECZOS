@@ -119,6 +119,12 @@ PACKAGE_DESCRIPTIONS = {
         "de": "Physische CD- und DVD-Laufwerke zwischen ECZOS-Computern teilen",
         "fr": "Partager des lecteurs CD et DVD physiques entre ordinateurs ECZOS",
     },
+    "eczos-network-shares": {
+        "nl": "Beheer SMB-, NFS-, WebDAV- en SFTP-netwerklocaties",
+        "en": "Manage SMB, NFS, WebDAV and SFTP network locations",
+        "de": "SMB-, NFS-, WebDAV- und SFTP-Netzwerkorte verwalten",
+        "fr": "Gérer les emplacements réseau SMB, NFS, WebDAV et SFTP",
+    },
     "eczos-oobe": {
         "nl": "Welkomst- en installatiehulp voor de eerste start van ECZOS",
         "en": "ECZOS first-start welcome and setup experience",
@@ -130,6 +136,12 @@ PACKAGE_DESCRIPTIONS = {
         "en": "User-friendly management and recovery tools for ECZOS",
         "de": "Benutzerfreundliche Verwaltungs- und Wiederherstellungswerkzeuge für ECZOS",
         "fr": "Outils conviviaux de gestion et de récupération pour ECZOS",
+    },
+    "eczos-platform-core": {
+        "nl": "Gedeelde status- en upgrademigratiebasis voor ECZOS",
+        "en": "Shared capability and upgrade migration foundation for ECZOS",
+        "de": "Gemeinsame Status- und Upgrade-Migrationsbasis für ECZOS",
+        "fr": "Base commune d’état et de migration des mises à niveau pour ECZOS",
     },
     "eczos-plymouth-theme": {
         "nl": "ECZOS-opstartanimatie voor Plymouth",
@@ -312,6 +324,9 @@ def main():
     parser.add_argument("repository", type=Path)
     parser.add_argument("release_directory", type=Path)
     parser.add_argument("--version", default="0.1.0")
+    parser.add_argument("--channel", choices=("stable", "testing"), default="stable")
+    parser.add_argument("--image-name")
+    parser.add_argument("--logo-source", type=Path)
     parser.add_argument("--published", default=str(date.today()))
     args = parser.parse_args()
 
@@ -322,7 +337,7 @@ def main():
         packages = [item for item in deb822_paragraphs(stream.read())
                     if item.get("Package", "").startswith("eczos-")]
 
-    image_name = f"ECZOS-{args.version}-amd64.iso"
+    image_name = args.image_name or f"ECZOS-{args.version}-amd64.iso"
     image = args.release_directory / "images" / image_name
     checksum_file = image.with_suffix(image.suffix + ".sha256")
     if not image.is_file() or not checksum_file.is_file():
@@ -335,27 +350,54 @@ def main():
     public_image = args.repository / "images" / image_name
     stage_image(image, public_image)
     atomic_text(public_image.with_suffix(public_image.suffix + ".sha256"), f"{actual}  {image_name}\n")
-    releases = [{
+    release = {
         "version": args.version,
-        "channel": "stable",
+        "channel": args.channel,
         "published": args.published,
         "architecture": "amd64",
         "size": image.stat().st_size,
         "url": f"https://repo.easycomp.cloud/eczos/images/{image_name}",
         "sha256": actual,
-    }]
-    atomic_text(args.repository / "releases.json",
+    }
+    releases = []
+    catalog_path = args.repository / "releases.json"
+    if catalog_path.is_file():
+        try:
+            existing = json.loads(catalog_path.read_text(encoding="utf-8"))
+            if existing.get("schema") == 1 and isinstance(existing.get("releases"), list):
+                releases = [item for item in existing["releases"]
+                            if isinstance(item, dict)
+                            and item.get("version") != args.version]
+        except (OSError, json.JSONDecodeError):
+            releases = []
+    releases.append(release)
+    releases.sort(key=lambda item: (str(item.get("published", "")), str(item.get("version", ""))), reverse=True)
+    atomic_text(catalog_path,
                 json.dumps({"schema": 1, "releases": releases}, ensure_ascii=False, indent=2) + "\n")
     source_root = Path(__file__).resolve().parent.parent
+    logo_destination = args.repository / "assets/eczos-logo-dark.png"
     logo_candidates = (
+        args.logo_source,
+        logo_destination,
         source_root / "packages/eczos-branding/assets/logo/logo-dark.png",
         source_root / "assets/usr/share/ecz/branding/logo/logo.png",
         source_root / "packages/eczos-branding/assets/logo/logo.png",
     )
-    logo_source = next((candidate for candidate in logo_candidates if candidate.is_file()), None)
+    logo_source = None
+    for candidate in logo_candidates:
+        if candidate is None:
+            continue
+        try:
+            if candidate.is_file():
+                logo_source = candidate
+                break
+        except OSError:
+            # A repository publisher may intentionally lack access to the
+            # development source tree. Continue with the staged/public logo.
+            continue
     if logo_source is None:
-        raise SystemExit("ECZOS logo is missing from the source tree")
-    stage_image(logo_source, args.repository / "assets/eczos-logo-dark.png")
+        raise SystemExit("An accessible ECZOS repository logo is missing")
+    stage_image(logo_source, logo_destination)
     atomic_text(args.repository / "index.html", render_index(packages, releases))
     print(f"Generated repository page with {len(packages)} packages and {len(releases)} release image.")
 

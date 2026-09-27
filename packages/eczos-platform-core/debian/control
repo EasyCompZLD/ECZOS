@@ -1,0 +1,19 @@
+Source: eczos-platform-core
+Section: admin
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-platform-core
+Architecture: all
+Depends:
+ ${misc:Depends},
+ jq,
+ systemd,
+ util-linux
+Description: shared capability and configuration migration foundation for ECZOS
+ Provides a stable machine-readable capability result and a locked, auditable,
+ idempotent configuration migration runner shared by ECZOS feature packages.

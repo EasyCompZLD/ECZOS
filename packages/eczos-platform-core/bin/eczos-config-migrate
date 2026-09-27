@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+MIGRATIONS_ROOT=${ECZOS_MIGRATIONS_ROOT:-/usr/lib/eczos/migrations.d}
+STATE_ROOT=${ECZOS_MIGRATION_STATE_ROOT:-/var/lib/eczos/migrations}
+LOCK_FILE=${ECZOS_MIGRATION_LOCK_FILE:-/run/lock/eczos-config-migrate.lock}
+action=${1:-run}; component=${2:-}; json=false
+usage() { printf 'Usage: eczos-config-migrate [run|list|check|status] [COMPONENT] [--json]\n' >&2; }
+case "$action" in run|list|check|status) ;; *) usage; exit 2 ;; esac
+[[ "$component" == --json || ${3:-} == --json ]] && json=true
+[[ "$component" == --json ]] && component=''
+if [[ -n "$component" && ! "$component" =~ ^[a-z0-9][a-z0-9.-]{0,63}$ ]]; then usage; exit 2; fi
+[[ "$action" != run || $(id -u) -eq 0 ]] || { printf 'Configuration migrations must run as root.\n' >&2; exit 1; }
+[[ -z "$component" || -d "$MIGRATIONS_ROOT/$component" ]] || { printf 'Unknown migration component: %s\n' "$component" >&2; exit 2; }
+
+mapfile -t components < <(if [[ -n "$component" ]]; then printf '%s\n' "$component"; elif [[ -d "$MIGRATIONS_ROOT" ]]; then find "$MIGRATIONS_ROOT" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | LC_ALL=C sort; fi)
+validate_migration() {
+    local migration=$1 name; name=$(basename "$migration")
+    [[ "$name" =~ ^[0-9]{4}-[a-z0-9][a-z0-9-]*$ ]] || { printf 'Invalid migration name: %s\n' "$migration" >&2; return 1; }
+    [[ -f "$migration" && -x "$migration" && ! -L "$migration" ]] || { printf 'Migration is not a regular executable: %s\n' "$migration" >&2; return 1; }
+    [[ $(stat -c %u "$migration") -eq 0 ]] || { printf 'Migration is not owned by root: %s\n' "$migration" >&2; return 1; }
+    ! find "$migration" -perm /022 -print -quit | grep -q . || { printf 'Migration is writable outside root: %s\n' "$migration" >&2; return 1; }
+}
+
+# Validate the complete set before any migration may alter the machine.
+for current_component in "${components[@]}"; do
+    [[ "$current_component" =~ ^[a-z0-9][a-z0-9.-]{0,63}$ ]] || { printf 'Invalid component directory: %s\n' "$current_component" >&2; exit 1; }
+    while IFS= read -r -d '' migration; do validate_migration "$migration"; done < <(find "$MIGRATIONS_ROOT/$current_component" -mindepth 1 -maxdepth 1 -type f -print0 | LC_ALL=C sort -z)
+done
+# Also reject state drift for every component before a pending migration runs.
+for current_component in "${components[@]}"; do
+    state_file="$STATE_ROOT/$current_component.json"
+    [[ ! -e "$state_file" || ( -f "$state_file" && ! -L "$state_file" ) ]] || { printf 'Unsafe migration state: %s\n' "$state_file" >&2; exit 1; }
+    [[ ! -s "$state_file" ]] && continue
+    [[ $(stat -c %u "$state_file") -eq 0 ]] || { printf 'Migration state is not owned by root: %s\n' "$state_file" >&2; exit 1; }
+    ! find "$state_file" -perm /022 -print -quit | grep -q . || { printf 'Migration state is writable outside root: %s\n' "$state_file" >&2; exit 1; }
+    state_json=$(<"$state_file")
+    jq -e --arg component "$current_component" '.schema == 1 and .component == $component and (.applied|type=="object")' <<<"$state_json" >/dev/null || { printf 'Invalid migration state: %s\n' "$state_file" >&2; exit 1; }
+    while IFS= read -r -d '' migration; do
+        migration_name=$(basename "$migration")
+        applied_sha=$(jq -r --arg name "$migration_name" '.applied[$name].sha256 // empty' <<<"$state_json")
+        [[ -z "$applied_sha" || "$applied_sha" = "$(sha256sum "$migration" | awk '{print $1}')" ]] || { printf 'Applied migration changed on disk: %s/%s\n' "$current_component" "$migration_name" >&2; exit 1; }
+    done < <(find "$MIGRATIONS_ROOT/$current_component" -mindepth 1 -maxdepth 1 -type f -print0 | LC_ALL=C sort -z)
+done
+if [[ "$action" = check ]]; then printf 'Migration preflight passed for %s component(s).\n' "${#components[@]}"; exit 0; fi
+if [[ "$action" = run ]]; then
+    [[ ! -L "$STATE_ROOT" && ! -L "$LOCK_FILE" ]] || { printf 'Unsafe migration state or lock path.\n' >&2; exit 1; }
+    install -d -m 0755 "$STATE_ROOT" "$(dirname "$LOCK_FILE")"
+    exec 9>"$LOCK_FILE"; flock 9
+fi
+
+status_rows=()
+for current_component in "${components[@]}"; do
+    state_file="$STATE_ROOT/$current_component.json"
+    [[ ! -e "$state_file" || ( -f "$state_file" && ! -L "$state_file" ) ]] || { printf 'Unsafe migration state: %s\n' "$state_file" >&2; exit 1; }
+    if [[ -s "$state_file" ]]; then state_json=$(<"$state_file"); else state_json=$(jq -cn --arg component "$current_component" '{schema:1,component:$component,applied:{},failure:null}'); fi
+    jq -e --arg component "$current_component" '.schema == 1 and .component == $component and (.applied|type=="object")' <<<"$state_json" >/dev/null || { printf 'Invalid migration state: %s\n' "$state_file" >&2; exit 1; }
+        if [[ "$action" = run && ! -s "$state_file" ]]; then printf '%s\n' "$state_json" >"$state_file"; chmod 0644 "$state_file"; fi
+    while IFS= read -r -d '' migration; do
+        migration_name=$(basename "$migration"); migration_sha=$(sha256sum "$migration" | awk '{print $1}')
+        applied_sha=$(jq -r --arg name "$migration_name" '.applied[$name].sha256 // empty' <<<"$state_json"); state=pending
+        if [[ -n "$applied_sha" ]]; then
+            [[ "$applied_sha" = "$migration_sha" ]] || { printf 'Applied migration changed on disk: %s/%s\n' "$current_component" "$migration_name" >&2; exit 1; }
+            state=applied
+        fi
+        if [[ "$action" = list ]]; then printf '%s\t%s\t%s\n' "$state" "$current_component" "$migration_name"; continue; fi
+        if [[ "$action" = status ]]; then status_rows+=("$(jq -cn --arg component "$current_component" --arg migration "$migration_name" --arg state "$state" '{component:$component,migration:$migration,state:$state}')"); continue; fi
+        [[ "$state" = pending ]] || continue
+        logger -t eczos-migration -- "starting $current_component/$migration_name"
+        set +e; "$migration"; migration_status=$?; set -e
+        applied_at=$(date -Iseconds); temp_state="$state_file.new"
+        if ((migration_status != 0)); then
+            jq --arg name "$migration_name" --arg at "$applied_at" --argjson exit "$migration_status" '.failure={migration:$name,at:$at,exitCode:$exit}' "$state_file" >"$temp_state"
+            chmod 0644 "$temp_state"; mv -f "$temp_state" "$state_file"
+            logger -t eczos-migration -- "failed $current_component/$migration_name exit=$migration_status"
+            printf 'Migration failed: %s/%s (exit %s)\n' "$current_component" "$migration_name" "$migration_status" >&2; exit "$migration_status"
+        fi
+        jq --arg name "$migration_name" --arg sha256 "$migration_sha" --arg at "$applied_at" '.applied[$name]={sha256:$sha256,at:$at}|.failure=null' "$state_file" >"$temp_state"
+        chmod 0644 "$temp_state"; mv -f "$temp_state" "$state_file"; state_json=$(<"$state_file")
+        logger -t eczos-migration -- "completed $current_component/$migration_name"
+    done < <(find "$MIGRATIONS_ROOT/$current_component" -mindepth 1 -maxdepth 1 -type f -print0 | LC_ALL=C sort -z)
+done
+if [[ "$action" = status ]]; then
+    rows=$(printf '%s\n' "${status_rows[@]:-}" | jq -s 'map(select(type=="object"))')
+    failures=$(if compgen -G "$STATE_ROOT/*.json" >/dev/null; then jq -s 'map(select(.failure != null)|{component:.component,failure:.failure})' "$STATE_ROOT"/*.json; else printf '[]'; fi)
+    result=$(jq -n --argjson migrations "$rows" --argjson failures "$failures" '{schemaVersion:1,migrations:$migrations,failures:$failures,pending:([$migrations[]|select(.state=="pending")]|length),applied:([$migrations[]|select(.state=="applied")]|length),healthy:($failures|length==0)}')
+    [[ "$json" = true ]] && printf '%s\n' "$result" || jq -r '"Applied: \(.applied)\nPending: \(.pending)\nFailures: \(.failures|length)"' <<<"$result"
+fi

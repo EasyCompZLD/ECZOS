@@ -4,39 +4,56 @@ set -Eeuo pipefail
 CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
 MODE_FILE="$CONFIG_HOME/eczos/theme-mode"
 REQUESTED_MODE=${1:-}
+NIGHTLIGHT_STATE=
 mkdir -p "$CONFIG_HOME/eczos"
 exec 9>"$CONFIG_HOME/eczos/theme-switch.lock"
 flock 9
 
-if [[ -n "$REQUESTED_MODE" ]]; then
+if [[ "$REQUESTED_MODE" = --nightlight-state ]]; then
+    [[ ${2:-} = light || ${2:-} = dark ]] || {
+        printf 'Usage: eczos-theme-switch --nightlight-state [light|dark]\n' >&2
+        exit 2
+    }
+    NIGHTLIGHT_STATE=$2
+    REQUESTED_MODE=
+elif [[ -n "$REQUESTED_MODE" ]]; then
     case "$REQUESTED_MODE" in
-        default|auto|light|dark)
+        default|nightlight|auto|light|dark)
+            # "auto" was the ECZOS 0.1 clock-based mode.  Keep it as a
+            # compatibility alias while storing the new Night Light mode.
+            [[ "$REQUESTED_MODE" != auto ]] || REQUESTED_MODE=nightlight
             printf '%s\n' "$REQUESTED_MODE" > "$MODE_FILE"
             chmod 0600 "$MODE_FILE"
             ;;
         *)
-            printf 'Usage: eczos-theme-switch [default|auto|light|dark]\n' >&2
+            printf 'Usage: eczos-theme-switch [default|nightlight|light|dark]\n' >&2
             exit 2
             ;;
     esac
 fi
 
-MODE=auto
+MODE=nightlight
 if [[ -s "$MODE_FILE" ]]; then
     MODE=$(cat "$MODE_FILE")
 fi
+# Transparently migrate the old clock-based preference.  Existing users keep
+# automatic switching, but KWin Night Light becomes its single source of truth.
+[[ "$MODE" != auto ]] || MODE=nightlight
 
-case "$MODE" in
+if [[ -n "$NIGHTLIGHT_STATE" ]]; then
+    # Ignore delayed D-Bus events after the user has selected a fixed theme.
+    [[ "$MODE" = nightlight ]] || exit 0
+    ACTIVE_MODE=$NIGHTLIGHT_STATE
+fi
+
+case "${ACTIVE_MODE:-}" in
+    light|dark) ;;
+    '') case "$MODE" in
     default)
         ACTIVE_MODE=default
         ;;
-    auto)
-        HOUR=$(date +%H)
-        if ((10#$HOUR >= 8 && 10#$HOUR < 19)); then
-            ACTIVE_MODE=light
-        else
-            ACTIVE_MODE=dark
-        fi
+    nightlight)
+        ACTIVE_MODE=$(/usr/lib/eczos/eczos-theme-nightlight-sync --print-state 2>/dev/null || printf 'light\n')
         ;;
     light|dark)
         ACTIVE_MODE=$MODE
@@ -45,6 +62,7 @@ case "$MODE" in
         printf 'Invalid mode in %s; using auto.\n' "$MODE_FILE" >&2
         ACTIVE_MODE=light
         ;;
+    esac ;;
 esac
 
 if [[ "$ACTIVE_MODE" = default ]]; then

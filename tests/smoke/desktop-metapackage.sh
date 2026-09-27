@@ -15,6 +15,7 @@ for package in \
     eczos-sddm-theme \
     eczos-windows-core \
     eczos-gaming-core \
+    eczos-hardware-tools \
     eczos-network-optical \
     eczos-platform-tools \
     eczos-recovery-media \

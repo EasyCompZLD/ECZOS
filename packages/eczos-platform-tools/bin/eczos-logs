@@ -1,0 +1,75 @@
+#!/usr/bin/python3
+"""Read privacy-filtered ECZOS journal activity."""
+from __future__ import annotations
+import argparse, datetime, json, os, re, socket, subprocess, sys
+
+IDENTIFIERS = {
+    "eczos-windows": "Windows apps", "eczos-gaming": "Gaming", "eczos-hardware": "Hardware",
+    "eczos-time": "Date and time", "eczos-migration": "Upgrades", "eczos-boot": "Boot menu",
+    "eczos-network-optical": "Network optical drives", "eczos-remote-input": "Keyboard and mouse sharing",
+    "eczos-recovery": "Recovery media", "eczos-theme": "Appearance",
+}
+
+def redact(message: str, max_length: int | None = 2000) -> str:
+    message = re.sub(r"(?i)(password|passwd|token|secret|authorization|api[_-]?key)(\s*[=:]\s*)([^\s,;]+)", r"\1\2[REDACTED]", message)
+    message = re.sub(r"([a-z][a-z0-9+.-]*://)[^/@\s:]+:[^/@\s]+@", r"\1[REDACTED]@", message, flags=re.I)
+    message = re.sub(r"/home/[^/\s]+", "/home/USER", message)
+    message = re.sub(r"/(?:run/)?media/[^/\s]+", "/media/USER", message)
+    message = re.sub(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "IP_ADDRESS", message)
+    message = re.sub(r"\b[0-9a-f]{2}(?::[0-9a-f]{2}){5}\b", "MAC_ADDRESS", message, flags=re.I)
+    message = re.sub(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", "EMAIL_ADDRESS", message, flags=re.I)
+    hostname = socket.gethostname().strip()
+    if hostname and hostname not in {"localhost", "localhost.localdomain"}:
+        message = re.sub(rf"\b{re.escape(hostname)}\b", "COMPUTER_NAME", message, flags=re.I)
+    return message if max_length is None else message[:max_length]
+
+def read_journal(days: int) -> list[dict]:
+    matches = []
+    for index, identifier in enumerate(IDENTIFIERS):
+        if index: matches.append("+")
+        matches.append(f"SYSLOG_IDENTIFIER={identifier}")
+    command = ["journalctl", "--since", f"-{days} days", "--no-pager", "-o", "json", "-n", "500", *matches]
+    try: result = subprocess.run(command, capture_output=True, text=True, timeout=20, check=False)
+    except (OSError, subprocess.TimeoutExpired): return []
+    entries = []
+    for line in result.stdout.splitlines():
+        try: item = json.loads(line)
+        except json.JSONDecodeError: continue
+        identifier = item.get("SYSLOG_IDENTIFIER", "")
+        if identifier not in IDENTIFIERS: continue
+        try: timestamp = datetime.datetime.fromtimestamp(int(item.get("__REALTIME_TIMESTAMP", "0")) / 1_000_000, datetime.timezone.utc).isoformat()
+        except (ValueError, TypeError, OSError): timestamp = ""
+        try: priority = int(item.get("PRIORITY", 6))
+        except (ValueError, TypeError): priority = 6
+        entries.append({"module": identifier, "label": IDENTIFIERS[identifier], "timestamp": timestamp,
+                        "priority": priority, "message": redact(str(item.get("MESSAGE", "")))})
+    return sorted(entries, key=lambda item: item["timestamp"])
+
+def main() -> int:
+    parser = argparse.ArgumentParser(prog="eczos-logs")
+    parser.add_argument("command", choices=("summary", "text", "json", "sanitize"))
+    parser.add_argument("--days", type=int, default=7)
+    args = parser.parse_args()
+    days = min(max(args.days, 1), 30)
+    if args.command == "sanitize":
+        sys.stdout.write(redact(sys.stdin.read(), max_length=None))
+        return 0
+    entries = read_journal(days)
+    if args.command == "json": print(json.dumps({"schemaVersion": 1, "days": days, "entries": entries}, ensure_ascii=False)); return 0
+    if args.command == "text":
+        for entry in entries[-200:]:
+            stamp = entry["timestamp"].replace("T", " ")[:19]
+            print(f"{stamp}  {entry['label']}: {entry['message']}")
+        if not entries: print("No recent ECZOS activity was found.")
+        return 0
+    modules = []
+    for identifier, label in IDENTIFIERS.items():
+        selected = [item for item in entries if item["module"] == identifier]
+        if selected:
+            modules.append({"id": identifier, "label": label, "entries": len(selected),
+                            "warnings": sum(item["priority"] <= 4 for item in selected),
+                            "errors": sum(item["priority"] <= 3 for item in selected),
+                            "lastMessage": selected[-1]["message"], "lastTimestamp": selected[-1]["timestamp"]})
+    print(json.dumps({"schemaVersion": 1, "days": days, "total": len(entries), "modules": modules}, ensure_ascii=False))
+    return 0
+if __name__ == "__main__": raise SystemExit(main())

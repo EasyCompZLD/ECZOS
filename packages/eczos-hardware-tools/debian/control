@@ -1,0 +1,32 @@
+Source: eczos-hardware-tools
+Section: admin
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-hardware-tools
+Architecture: all
+Depends:
+ ${misc:Depends},
+ jq,
+ pciutils,
+ pkexec,
+ polkitd,
+ procps,
+ python3,
+ systemd,
+ systemd-zram-generator,
+ util-linux
+Recommends:
+ fwupd,
+ mesa-utils,
+ network-manager,
+ rfkill,
+ smartmontools
+Description: hardware-aware profiles and memory management for ECZOS
+ Detects CPU, memory, graphics, system storage, battery, swap and zram state.
+ Applies explicit, reversible ECZOS memory profiles without removing existing
+ swap or silently changing unrelated power and performance settings.

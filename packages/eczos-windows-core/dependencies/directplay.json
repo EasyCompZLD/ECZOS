@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "directplay",
+  "name": "DirectPlay",
+  "description": "Legacy DirectX networking support required by some older games.",
+  "provider": "winetricks",
+  "verb": "directplay"
+}

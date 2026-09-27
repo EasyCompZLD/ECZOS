@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "dotnet48",
+  "name": ".NET Framework 4.8",
+  "description": "Microsoft .NET Framework for compatible classic Windows applications.",
+  "provider": "winetricks",
+  "verb": "dotnet48"
+}

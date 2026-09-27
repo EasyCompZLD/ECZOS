@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
+CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
+RUNTIME_DIR=${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}
+STATE_DIR="$STATE_HOME/eczos/remote-input"
+SERVICE=eczos-remote-input.service
+
+usage() {
+    printf '%s\n' 'Usage: eczos-remote-input status [--json] | adopt | start | restart | emergency-stop | disable | configure | supervise | cleanup'
+}
+
+require_user() {
+    [[ $(id -u) -ne 0 ]] || { printf 'Remote Input must run as the desktop user.\n' >&2; exit 1; }
+}
+
+provider() {
+    local candidate
+    for candidate in deskflow synergy barrier; do
+        command -v "$candidate" >/dev/null 2>&1 && { printf '%s\n' "$candidate"; return 0; }
+    done
+    printf 'none\n'
+}
+
+process_count() {
+    local name matches count=0
+    for name in deskflow deskflow-core synergy synergyc synergys barrier barrierc barriers; do
+        matches=$(pgrep -u "$(id -u)" -x "$name" 2>/dev/null || true)
+        [[ -z "$matches" ]] || count=$((count + $(wc -l <<<"$matches")))
+    done
+    printf '%s\n' "$count"
+}
+
+legacy_mechanisms() {
+    local file unit
+    if [[ -d "$CONFIG_HOME/autostart" ]]; then
+        while IFS= read -r -d '' file; do
+            grep -Eiq '^Exec=.*(deskflow|synergy|barrier)' "$file" || continue
+            printf 'autostart:%s\n' "$file"
+        done < <(find "$CONFIG_HOME/autostart" -maxdepth 1 -type f -name '*.desktop' -print0 2>/dev/null)
+    fi
+    if [[ -d "$CONFIG_HOME/systemd/user" ]]; then
+        while IFS= read -r -d '' file; do
+            [[ "${file##*/}" != "$SERVICE" ]] || continue
+            grep -Eiq '^ExecStart=.*(deskflow|synergy|barrier)' "$file" || continue
+            unit=${file##*/}
+            systemctl --user is-enabled --quiet "$unit" 2>/dev/null && printf 'systemd:%s\n' "$unit"
+        done < <(find "$CONFIG_HOME/systemd/user" -maxdepth 1 -type f -name '*.service' -print0 2>/dev/null)
+    fi
+}
+
+remote_host() {
+    local config="$CONFIG_HOME/Deskflow/Deskflow.conf"
+    [[ -r "$config" ]] || return 0
+    sed -n 's/^[[:space:]]*remoteHost[[:space:]]*=[[:space:]]*//p' "$config" | head -n1
+}
+
+status() {
+    local json=${1:-false} found processes active=false enabled=false managed=false session host legacy legacy_count duplicate=false
+    found=$(provider)
+    processes=$(process_count)
+    systemctl --user is-active --quiet "$SERVICE" 2>/dev/null && active=true
+    systemctl --user is-enabled --quiet "$SERVICE" 2>/dev/null && enabled=true
+    [[ "$active" = true || "$enabled" = true ]] && managed=true
+    session=${XDG_SESSION_TYPE:-unknown}
+    host=$(remote_host)
+    legacy=$(legacy_mechanisms || true)
+    legacy_count=0
+    [[ -z "$legacy" ]] || legacy_count=$(wc -l <<<"$legacy")
+    ((legacy_count > 1)) && duplicate=true
+    ((legacy_count > 0)) && [[ "$managed" = true ]] && duplicate=true
+    if [[ "$json" = true ]]; then
+        jq -n --arg provider "$found" --arg session "$session" --arg host "$host" \
+            --argjson processes "$processes" --argjson legacy "$legacy_count" \
+            --argjson active "$active" --argjson enabled "$enabled" --argjson managed "$managed" --argjson duplicate "$duplicate" \
+            '{schemaVersion:1,provider:$provider,session:$session,remoteHost:$host,
+              processes:$processes,legacyMechanisms:$legacy,active:$active,
+              enabled:$enabled,managed:$managed,duplicate:$duplicate}'
+    else
+        printf 'Provider: %s\nSession: %s\nProcesses: %s\nManaged: %s\nActive: %s\nAutostart: %s\nLegacy start methods: %s\n' \
+            "$found" "$session" "$processes" "$managed" "$active" "$enabled" "$legacy_count"
+        [[ -z "$host" ]] || printf 'Remote computer: %s\n' "$host"
+    fi
+}
+
+stop_provider_processes() {
+    local name
+    for name in deskflow deskflow-core synergy synergyc synergys barrier barrierc barriers; do
+        pkill -u "$(id -u)" -TERM -x "$name" 2>/dev/null || true
+    done
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+        (( $(process_count) == 0 )) && return 0
+        sleep 0.2
+    done
+    for name in deskflow deskflow-core synergy synergyc synergys barrier barrierc barriers; do
+        pkill -u "$(id -u)" -KILL -x "$name" 2>/dev/null || true
+    done
+}
+
+adopt() {
+    local found file item kind value disabled unit
+    found=$(provider)
+    [[ "$found" != none ]] || { printf 'Install Deskflow, Synergy or Barrier first.\n' >&2; exit 69; }
+    mkdir -p "$STATE_DIR/disabled-autostart"
+    chmod 0700 "$STATE_DIR" "$STATE_DIR/disabled-autostart"
+    while IFS= read -r item; do
+        [[ -n "$item" ]] || continue
+        kind=${item%%:*}
+        value=${item#*:}
+        case "$kind" in
+            autostart)
+                file=$value
+                disabled="$STATE_DIR/disabled-autostart/$(basename "$file").$(date +%s)"
+                mv -- "$file" "$disabled"
+                printf 'Disabled legacy autostart: %s\n' "$file" >>"$STATE_DIR/migration.log"
+                ;;
+            systemd)
+                unit=$value
+                systemctl --user disable --now "$unit" >/dev/null 2>&1 || true
+                printf 'Disabled legacy user service: %s\n' "$unit" >>"$STATE_DIR/migration.log"
+                ;;
+        esac
+    done < <(legacy_mechanisms)
+    if [[ "$found" = deskflow && -r "$CONFIG_HOME/Deskflow/Deskflow.conf" ]] && command -v kwriteconfig6 >/dev/null 2>&1; then
+        kwriteconfig6 --file "$CONFIG_HOME/Deskflow/Deskflow.conf" --group client --key dynamicConnectionInterval true
+    fi
+    systemctl --user daemon-reload
+    stop_provider_processes
+    systemctl --user enable --now "$SERVICE"
+    printf 'ECZOS now manages %s. Existing provider settings were preserved.\n' "$found"
+}
+
+supervise() {
+    local found lock
+    found=$(provider)
+    [[ "$found" != none ]] || exit 69
+    mkdir -p "$RUNTIME_DIR/eczos"
+    lock="$RUNTIME_DIR/eczos/remote-input.lock"
+    exec 9>"$lock"
+    flock -n 9 || { printf 'Another ECZOS Remote Input supervisor is already active.\n' >&2; exit 75; }
+    case "$found" in
+        deskflow) exec /usr/bin/deskflow ;;
+        synergy) exec /usr/bin/synergy ;;
+        barrier) exec /usr/bin/barrier ;;
+    esac
+}
+
+configure() {
+    local found
+    found=$(provider)
+    case "$found" in
+        deskflow) exec /usr/bin/deskflow ;;
+        synergy) exec /usr/bin/synergy ;;
+        barrier) exec /usr/bin/barrier ;;
+        *) printf 'No keyboard and mouse sharing application is installed.\n' >&2; exit 69 ;;
+    esac
+}
+
+require_user
+operation=${1:-}
+shift || true
+case "$operation" in
+    status) [[ ${1:-} = --json ]] && status true || status false ;;
+    adopt) adopt ;;
+    start) systemctl --user start "$SERVICE" ;;
+    restart) systemctl --user restart "$SERVICE" ;;
+    emergency-stop)
+        systemctl --user stop "$SERVICE" >/dev/null 2>&1 || true
+        stop_provider_processes
+        command -v kdialog >/dev/null 2>&1 && kdialog --passivepopup 'Keyboard and mouse sharing has been stopped. Local input is released.' 5 || true
+        printf 'Keyboard and mouse sharing stopped. Local input is released.\n'
+        ;;
+    disable)
+        systemctl --user disable --now "$SERVICE" >/dev/null 2>&1 || true
+        stop_provider_processes
+        printf 'ECZOS Remote Input autostart disabled.\n'
+        ;;
+    configure) configure ;;
+    supervise) supervise ;;
+    cleanup) stop_provider_processes ;;
+    *) usage >&2; exit 2 ;;
+esac

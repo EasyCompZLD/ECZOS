@@ -26,9 +26,10 @@ Depends:
  ${shlibs:Depends},
  eczos-branding (>= 0.1.0),
  eczos-desktop-defaults (>= 0.1.0),
- eczos-network-optical (>= 0.1.0),
+ eczos-platform-core (>= 0.1.0~dev2),
  gettext-base,
  jq,
+ kdialog,
  pciutils,
  procps,
  python3,
@@ -40,9 +41,16 @@ Depends:
  qml6-module-qtquick-dialogs,
  qml6-module-qtquick-layouts,
  rsync,
+ systemd,
+ systemd-timesyncd | time-daemon,
  systemsettings,
  xdg-user-dirs,
  xdg-utils
+Recommends:
+ eczos-boot-tools (>= 0.1.0),
+ eczos-hardware-tools (>= 0.1.0),
+ eczos-network-shares (>= 0.1.0),
+ eczos-network-optical (>= 0.1.0)
 Description: consumer-facing management and recovery tools for ECZOS
  Provides an embedded native KDE settings-module host, understandable system
  diagnostics, a privacy-conscious support report and a safe user-file

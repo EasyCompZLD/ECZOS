@@ -1,6 +1,8 @@
 bin/eczos-theme-switch usr/bin/
 bin/eczos-theme-toggle usr/bin/
 lib/apply-desktop-defaults usr/lib/eczos/
+lib/eczos-theme-nightlight-sync usr/lib/eczos/
+systemd/eczos-theme-nightlight.service usr/lib/systemd/user/
 xdg/eczos-desktop-first-run.desktop etc/xdg/autostart/
 lookandfeel/org.eczos.desktop usr/share/plasma/look-and-feel/
 config/ksplashrc etc/xdg/

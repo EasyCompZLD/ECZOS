@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+[[ $(id -u) -eq 0 ]] || { printf 'This helper must run as root.\n' >&2; exit 1; }
+[[ $# -eq 1 ]] || { printf 'Usage: repair-issue ISSUE\n' >&2; exit 2; }
+issue=$1
+exec 9>/run/lock/eczos-hardware-repair.lock
+flock 9
+
+case "$issue" in
+    bluetooth-blocked)
+        command -v rfkill >/dev/null || { printf 'Bluetooth repair support is not installed.\n' >&2; exit 69; }
+        if rfkill --json | jq -e '.rfkilldevices[]? | select(.type == "bluetooth" and .hard == "blocked")' >/dev/null; then
+            printf 'Bluetooth is disabled by a physical switch or firmware setting. Turn it on there first.\n' >&2
+            exit 78
+        fi
+        rfkill unblock bluetooth
+        if systemctl cat bluetooth.service >/dev/null 2>&1; then
+            systemctl enable --now bluetooth.service
+        fi
+        if rfkill --json | jq -e '.rfkilldevices[]? | select(.type == "bluetooth" and .soft == "blocked")' >/dev/null; then
+            printf 'Bluetooth is still blocked after the repair attempt.\n' >&2
+            exit 75
+        fi
+        logger -t eczos-hardware -- 'verified repair issue=bluetooth-blocked'
+        printf 'Bluetooth is enabled.\n'
+        ;;
+    bluetooth-service)
+        systemctl cat bluetooth.service >/dev/null 2>&1 || { printf 'The Bluetooth service is not installed.\n' >&2; exit 69; }
+        systemctl enable --now bluetooth.service
+        systemctl is-active --quiet bluetooth.service || { printf 'The Bluetooth service could not be started.\n' >&2; exit 75; }
+        logger -t eczos-hardware -- 'verified repair issue=bluetooth-service'
+        printf 'The Bluetooth service is running.\n'
+        ;;
+    zram-inactive)
+        profile=$(jq -er '.profile | select(IN("lightweight","standard","performance","gaming","enterprise"))' \
+            /etc/eczos/hardware-profile.json 2>/dev/null) || {
+            printf 'Choose a hardware profile before repairing compressed memory.\n' >&2
+            exit 78
+        }
+        exec /usr/lib/eczos/hardware/apply-profile "$profile"
+        ;;
+    *)
+        printf 'This problem has no approved automatic repair.\n' >&2
+        exit 64
+        ;;
+esac

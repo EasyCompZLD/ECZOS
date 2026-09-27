@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = configure ]; then
+    if [ -d /var/lib/eczos/migrations ]; then
+        find /var/lib/eczos/migrations -maxdepth 1 -type f -name '*.json' -exec chmod 0644 {} +
+    fi
+    # A migration failure intentionally leaves this package unconfigured. APT
+    # can retry after the underlying problem is corrected; already completed
+    # migrations remain recorded and are never repeated.
+    /usr/bin/eczos-config-migrate run
+fi
+
+#DEBHELPER#
+
+exit 0

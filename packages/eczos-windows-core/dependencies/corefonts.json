@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "corefonts",
+  "name": "Microsoft Core Fonts",
+  "description": "Common fonts expected by older Windows documents and applications.",
+  "provider": "winetricks",
+  "verb": "corefonts"
+}

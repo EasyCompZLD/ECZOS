@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+if [[ $# -lt 5 || $# -gt 6 ]]; then
+    printf 'Usage: eczos-capability COMPONENT CAPABILITY STATUS REASON SUMMARY [DETAILS-JSON]\n' >&2
+    exit 2
+fi
+
+component=$1
+capability=$2
+status=$3
+reason=$4
+summary=$5
+details=${6:-}
+[[ -n "$details" ]] || details='{}'
+
+[[ "$component" =~ ^[a-z0-9][a-z0-9.-]{0,63}$ ]] || { printf 'Invalid component.\n' >&2; exit 2; }
+[[ "$capability" =~ ^[a-z0-9][a-z0-9.-]{0,63}$ ]] || { printf 'Invalid capability.\n' >&2; exit 2; }
+[[ "$reason" =~ ^[a-z0-9][a-z0-9.-]{0,63}$ ]] || { printf 'Invalid reason.\n' >&2; exit 2; }
+case "$status" in
+    ready|degraded|unavailable|blocked|unsupported|error|unknown) ;;
+    *) printf 'Invalid capability status.\n' >&2; exit 2 ;;
+esac
+jq -e 'type == "object"' <<<"$details" >/dev/null || {
+    printf 'Details must be a JSON object.\n' >&2
+    exit 2
+}
+
+jq -n \
+    --arg component "$component" \
+    --arg capability "$capability" \
+    --arg status "$status" \
+    --arg reason "$reason" \
+    --arg summary "$summary" \
+    --arg checkedAt "$(date -Iseconds)" \
+    --argjson details "$details" \
+    '{schema:1,component:$component,capability:$capability,status:$status,reason:$reason,summary:$summary,checkedAt:$checkedAt,details:$details}'

@@ -1,0 +1,26 @@
+Source: eczos-network-shares
+Section: net
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-network-shares
+Architecture: all
+Depends:
+ ${misc:Depends},
+ kde-cli-tools,
+ kio-extras,
+ kio-fuse,
+ python3
+Recommends:
+ avahi-utils,
+ cifs-utils,
+ nfs-common,
+ sshfs
+Description: safe user-facing network share management for ECZOS
+ Manages SMB, NFS, WebDAV and SFTP locations through KDE KIO and KWallet,
+ publishes them in the file manager's Network view and reports existing native
+ mounts without taking ownership of them.

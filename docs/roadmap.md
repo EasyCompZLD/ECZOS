@@ -71,6 +71,16 @@ but are not a prototype release blocker.
       ECZOS release identity
 - [x] FreeOffice host inclusion and physical install test
 - [x] FreeOffice release artifact pinning and ISO integration
+- [x] modular package architecture: product identity remains required while
+      applications, Windows, Gaming, recovery and remote-device features are
+      independently removable
+- [x] user-scoped SMB, NFS, WebDAV and SFTP locations through KDE KIO/KWallet,
+      including LAN discovery and visibility of existing native mounts
+- [x] persistent normal/Advanced mode split in ECZOS Settings; technical logs,
+      runner controls, raw hardware data and boot internals remain available
+      without crowding the default consumer interface
+- [x] central journal-based ECZOS activity reader, full-report privacy filter
+      and reviewed email/GitHub support hand-off
 - [ ] optional cloud and enrolled remote-support services
 - [ ] experimental ECZ Mac compatibility based on Darling, initially limited
       to separately installed CLI and simple GUI applications; this is not a
@@ -95,5 +105,9 @@ but are not a prototype release blocker.
   - [ ] public HTTPS authentication and clean-client update test
   - [ ] `eczos-archive-keyring` and ECZOS client source integration
 - release channels and upgrade policy
+- [x] versioned configuration-migration foundation with full preflight,
+      checksum drift detection, failure state and safe retry behaviour
+- [ ] qualify configuration migrations across a real multi-version upgrade
+      and rollback matrix
 - [x] selected installer implementation (Calamares with ECZOS-owned presentation)
 - [ ] reproducible production images and release qualification

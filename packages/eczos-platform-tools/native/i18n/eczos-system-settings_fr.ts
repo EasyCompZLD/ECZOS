@@ -33,6 +33,12 @@
     </message>
 </context>
 <context>
+    <name>SettingsWindow</name>
+    <message><source>Cannot start: obsolete SafeDisc disc protection</source><translation>Démarrage impossible : protection de disque SafeDisc obsolète</translation></message>
+    <message><source>Cannot start with the current compatibility engine</source><translation>Démarrage impossible avec le moteur de compatibilité actuel</translation></message>
+    <message><source>The original disc needs a publisher update or legitimate DRM-free release; adding runtimes cannot repair this.</source><translation>Le disque original nécessite une mise à jour de l’éditeur ou une édition légitime sans DRM ; l’ajout de composants d’exécution ne peut pas résoudre ce problème.</translation></message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../main.cpp" line="1559"/>
@@ -331,6 +337,22 @@
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
+    <message><source>Settings</source><translation>Paramètres</translation></message>
+    <message><source>%1 · Runner: %2</source><translation>%1 · Moteur : %2</translation></message>
+    <message><source>Wine configuration</source><translation>Configuration de Wine</translation></message>
+    <message><source>Windows Control Panel</source><translation>Panneau de configuration Windows</translation></message>
+    <message><source>Registry Editor</source><translation>Éditeur du Registre</translation></message>
+    <message><source>Task Manager</source><translation>Gestionnaire des tâches</translation></message>
+    <message><source>Uninstall a program</source><translation>Désinstaller un programme</translation></message>
+    <message><source>File Explorer</source><translation>Explorateur de fichiers</translation></message>
+    <message><source>Command Prompt</source><translation>Invite de commandes</translation></message>
+    <message><source>Windows app settings</source><translation>Paramètres de l’application Windows</translation></message>
+    <message><source>Choose a tool for %1:</source><translation>Choisissez un outil pour %1 :</translation></message>
+    <message><source>Install EXE or MSI</source><translation>Installer un EXE ou MSI</translation></message>
+    <message><source>Install a Windows app</source><translation>Installer une application Windows</translation></message>
+    <message><source>Windows programs (*.exe *.msi)</source><translation>Programmes Windows (*.exe *.msi)</translation></message>
+    <message><source>Windows app support is not installed. Install the ECZOS Windows feature to use this page.</source><translation>La prise en charge des applications Windows n’est pas installée. Installez la fonction ECZOS Windows pour utiliser cette page.</translation></message>
+    <message><source>This optional ECZOS feature is currently unavailable.</source><translation>Cette fonction ECZOS facultative est actuellement indisponible.</translation></message>
     <message>
         <location filename="../main.cpp" line="624"/>
         <source>Search again</source>
@@ -374,8 +396,8 @@
     </message>
     <message>
         <location filename="../main.cpp" line="667"/>
-        <source>Start, repair and remove Windows programs without a separate management app.</source>
-        <translation type="unfinished"></translation>
+        <source>Start, configure, repair and remove Windows programs from one place.</source>
+        <translation>Lancer, configurer, réparer et supprimer les programmes Windows depuis un seul endroit.</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="678"/>
@@ -1068,13 +1090,13 @@ Moteur : Linux LIO / pSCSI</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1401"/>
-        <source>Choose a light or dark appearance, or let ECZOS follow the time of day.</source>
-        <translation>Choisissez une apparence claire ou sombre, ou laissez ECZOS suivre l’heure de la journée.</translation>
+        <source>Choose a light or dark appearance, or let ECZOS follow KDE Night Light.</source>
+        <translation>Choisissez une apparence claire ou sombre, ou laissez ECZOS suivre le mode Couleur de nuit de KDE.</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1409"/>
-        <source>Automatic</source>
-        <translation>Automatique</translation>
+        <source>Night Light</source>
+        <translation>Couleur de nuit</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1410"/>
@@ -1088,8 +1110,8 @@ Moteur : Linux LIO / pSCSI</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1438"/>
-        <source>Automatic uses the light appearance from 08:00 to 19:00 and the dark appearance at night.</source>
-        <translation>Le mode automatique utilise l’apparence claire de 08:00 à 19:00 et l’apparence sombre la nuit.</translation>
+        <source>Night Light uses the dark appearance when Night Light is active and the light appearance when it is inactive.</source>
+        <translation>Le mode Couleur de nuit utilise l’apparence sombre lorsqu’il est actif et l’apparence claire lorsqu’il est inactif.</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="1451"/>
@@ -1106,5 +1128,248 @@ Moteur : Linux LIO / pSCSI</translation>
         <source>Changing the appearance failed.</source>
         <translation>La modification de l’apparence a échoué.</translation>
     </message>
+    <message><source>Installation needs attention</source><translation>L’installation nécessite votre attention</translation></message>
+    <message><source>Installed program not found yet</source><translation>Programme installé pas encore trouvé</translation></message>
+    <message><source>Windows environment needs repair</source><translation>L’environnement Windows doit être réparé</translation></message>
+    <message><source>Installation media could not be copied</source><translation>Le support d’installation n’a pas pu être copié</translation></message>
+    <message><source>Copying installation media…</source><translation>Copie du support d’installation…</translation></message>
+    <message><source>Preparing Windows environment…</source><translation>Préparation de l’environnement Windows…</translation></message>
+    <message><source>Setup is running…</source><translation>Le programme d’installation est en cours…</translation></message>
+    <message><source>Needs attention</source><translation>Nécessite votre attention</translation></message>
+    <message><source>%1
+Compatibility engine: %2</source><translation>%1
+Moteur de compatibilité : %2</translation></message>
+    <message><source>Start app
+Open the program</source><translation>Démarrer l’application
+Ouvrir le programme</translation></message>
+    <message><source>Start this Windows application.</source><translation>Démarrer cette application Windows.</translation></message>
+    <message><source>App settings
+Advanced Windows tools</source><translation>Paramètres de l’application
+Outils Windows avancés</translation></message>
+    <message><source>Open Wine settings and Windows maintenance tools for only this app.</source><translation>Ouvrir les paramètres Wine et les outils de maintenance Windows uniquement pour cette application.</translation></message>
+    <message><source>Components
+Add required runtimes</source><translation>Composants
+Ajouter les environnements requis</translation></message>
+    <message><source>Install optional components such as Visual C++, .NET or classic-game support.</source><translation>Installer des composants facultatifs comme Visual C++, .NET ou la prise en charge des jeux classiques.</translation></message>
+    <message><source>Run setup again
+Use the saved installer</source><translation>Relancer l’installation
+Utiliser l’installateur enregistré</translation></message>
+    <message><source>Run the original installer again without deleting this app.</source><translation>Relancer le programme d’installation d’origine sans supprimer cette application.</translation></message>
+    <message><source>Find program again
+Repair a missing launcher</source><translation>Rechercher le programme
+Réparer un lanceur manquant</translation></message>
+    <message><source>Search the managed Windows environment for the correct program file.</source><translation>Rechercher le bon fichier du programme dans l’environnement Windows géré.</translation></message>
+    <message><source>Check and repair
+Fix this app automatically</source><translation>Vérifier et réparer
+Corriger automatiquement</translation></message>
+    <message><source>Check the isolated Windows environment and automatically repair known problems.</source><translation>Vérifier l’environnement Windows isolé et réparer automatiquement les problèmes connus.</translation></message>
+    <message><source>Remove app
+Delete app and its data</source><translation>Supprimer l’application
+Effacer l’application et ses données</translation></message>
+    <message><source>Remove this app and its separate Windows environment.</source><translation>Supprimer cette application et son environnement Windows séparé.</translation></message>
+    <message><source>Ready. Choose an action for an application below.</source><translation>Prêt. Choisissez ci-dessous une action pour une application.</translation></message>
+    <message><source>Starting %1…</source><translation>Démarrage de %1…</translation></message>
+    <message><source>%1 is starting…</source><translation>%1 démarre…</translation></message>
+    <message><source>%1 could not be started: %2</source><translation>%1 n’a pas pu démarrer : %2</translation></message>
+    <message><source>Windows app could not start</source><translation>L’application Windows n’a pas pu démarrer</translation></message>
+    <message><source>%1 stopped before it could start. Choose ‘Check and repair’ and try again.</source><translation>%1 s’est arrêté avant de pouvoir démarrer. Choisissez « Vérifier et réparer », puis réessayez.</translation></message>
+    <message><source>Windows app needs attention</source><translation>L’application Windows nécessite votre attention</translation></message>
+    <message><source>%1 has closed.</source><translation>%1 est fermé.</translation></message>
+    <message><source>Check and repair complete</source><translation>Vérification et réparation terminées</translation></message>
+    <message><source>ECZ Windows checked and repaired the environment for ‘%1’. You can start the app again now.</source><translation>ECZ Windows a vérifié et réparé l’environnement de « %1 ». Vous pouvez maintenant relancer l’application.</translation></message>
+    <message><source>Program search complete</source><translation>Recherche du programme terminée</translation></message>
+    <message><source>ECZ Windows found and registered the start program for ‘%1’.</source><translation>ECZ Windows a trouvé et enregistré le programme de démarrage de « %1 ».</translation></message>
+    <message><source>The requested action could not be completed.</source><translation>L’action demandée n’a pas pu être effectuée.</translation></message>
+</context>
+<context>
+    <name>QObject</name>
+    <message><source>Keyboard and mouse sharing</source><translation>Partage du clavier et de la souris</translation></message>
+    <message><source>Use one keyboard and mouse across computers</source><translation>Utiliser un seul clavier et une seule souris sur plusieurs ordinateurs</translation></message>
+</context>
+<context>
+    <name>SettingsWindow</name>
+    <message><source>ECZOS can keep Deskflow, Synergy or Barrier available without starting duplicate background services.</source><translation>ECZOS peut maintenir Deskflow, Synergy ou Barrier disponible sans lancer de services d’arrière-plan en double.</translation></message>
+    <message><source>Sharing application</source><translation>Application de partage</translation></message>
+    <message><source>Checking…</source><translation>Vérification…</translation></message>
+    <message><source>Managed startup</source><translation>Démarrage géré</translation></message>
+    <message><source>Connection</source><translation>Connexion</translation></message>
+    <message><source>Old startup methods</source><translation>Anciennes méthodes de démarrage</translation></message>
+    <message><source>Manage automatically</source><translation>Gérer automatiquement</translation></message>
+    <message><source>Start or reconnect</source><translation>Démarrer ou reconnecter</translation></message>
+    <message><source>Release local input</source><translation>Libérer la saisie locale</translation></message>
+    <message><source>Disable automatic startup</source><translation>Désactiver le démarrage automatique</translation></message>
+    <message><source>Open sharing application settings</source><translation>Ouvrir les paramètres de l’application de partage</translation></message>
+    <message><source>If input ever appears stuck, choose ‘Release local input’. The same emergency action is available from the application menu.</source><translation>Si la saisie semble bloquée, choisissez « Libérer la saisie locale ». La même action d’urgence est disponible dans le menu des applications.</translation></message>
+    <message><source>Checking keyboard and mouse sharing…</source><translation>Vérification du partage du clavier et de la souris…</translation></message>
+    <message><source>%1 detected</source><translation>%1 détecté</translation></message>
+    <message><source>Not installed</source><translation>Non installé</translation></message>
+    <message><source>Running and starts automatically</source><translation>Actif et démarre automatiquement</translation></message>
+    <message><source>Enabled, currently stopped</source><translation>Activé, actuellement arrêté</translation></message>
+    <message><source>Not managed by ECZOS yet</source><translation>Pas encore géré par ECZOS</translation></message>
+    <message><source>No remote computer configured</source><translation>Aucun ordinateur distant configuré</translation></message>
+    <message><source>Remote computer: %1 · %2 session</source><translation>Ordinateur distant : %1 · session %2</translation></message>
+    <message><source>Conflicting startup methods found</source><translation>Méthodes de démarrage en conflit détectées</translation></message>
+    <message><source>%1 existing startup method detected</source><translation>%1 méthode de démarrage existante détectée</translation></message>
+    <message><source>No conflicting startup methods</source><translation>Aucune méthode de démarrage en conflit</translation></message>
+    <message><source>Status updated</source><translation>État mis à jour</translation></message>
+    <message><source>Taking over existing startup safely…</source><translation>Reprise sécurisée du démarrage existant…</translation></message>
+    <message><source>Reconnecting…</source><translation>Reconnexion…</translation></message>
+    <message><source>Releasing local input…</source><translation>Libération de la saisie locale…</translation></message>
+    <message><source>Disabling automatic startup…</source><translation>Désactivation du démarrage automatique…</translation></message>
+    <message><source>Reliable shared input with automatic reconnect and an immediate emergency stop.</source><translation>Saisie partagée fiable avec reconnexion automatique et arrêt d’urgence immédiat.</translation></message>
+</context>
+<context><name>QObject</name>
+    <message><source>Date and time</source><translation>Date et heure</translation></message><message><source>Timezone and automatic synchronization</source><translation>Fuseau horaire et synchronisation automatique</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+    <message><source>Clock status</source><translation>État de l’horloge</translation></message><message><source>Network time service</source><translation>Service d’heure réseau</translation></message>
+    <message><source>Timezone</source><translation>Fuseau horaire</translation></message><message><source>Hardware clock</source><translation>Horloge matérielle</translation></message>
+    <message><source>Repair automatic time</source><translation>Réparer l’heure automatique</translation></message><message><source>Change date, time or timezone</source><translation>Modifier la date, l’heure ou le fuseau</translation></message>
+    <message><source>Checking date and time…</source><translation>Vérification de la date et de l’heure…</translation></message><message><source>Automatically synchronized</source><translation>Synchronisée automatiquement</translation></message>
+    <message><source>Not synchronized</source><translation>Non synchronisée</translation></message><message><source>%1 · %2</source><translation>%1 · %2</translation></message>
+    <message><source>running</source><translation>actif</translation></message><message><source>stopped</source><translation>arrêté</translation></message>
+    <message><source>Local time (kept for compatibility)</source><translation>Heure locale (conservée pour compatibilité)</translation></message>
+    <message><source>This computer stores local time in its hardware clock, which may be intentional for another operating system. Automatic repair will not change it.</source><translation>Cet ordinateur stocke l’heure locale dans son horloge matérielle, éventuellement pour un autre système. La réparation automatique ne la modifiera pas.</translation></message>
+    <message><source>The hardware clock uses the recommended UTC mode.</source><translation>L’horloge matérielle utilise le mode UTC recommandé.</translation></message><message><source>Repairing automatic time…</source><translation>Réparation de l’heure automatique…</translation></message>
+    <message><source>Date and time</source><translation>Date et heure</translation></message><message><source>Keep the system clock accurate while preserving multi-boot compatibility.</source><translation>Maintenir l’horloge système précise tout en préservant la compatibilité multiboot.</translation></message>
+</context>
+<context><name>QObject</name><message><source>Hardware profile</source><translation>Profil matériel</translation></message><message><source>Memory, storage and performance profile</source><translation>Profil de mémoire, stockage et performances</translation></message></context>
+<context><name>SettingsWindow</name>
+<message><source>The optional ECZOS hardware module is not installed.</source><translation>Le module matériel ECZOS facultatif n’est pas installé.</translation></message><message><source>Hardware profile</source><translation>Profil matériel</translation></message><message><source>Memory, storage and performance profile</source><translation>Profil de mémoire, stockage et performances</translation></message><message><source>Detecting hardware…</source><translation>Détection du matériel…</translation></message>
+<message><source>Lightweight — for limited memory or older processors</source><translation>Lightweight — mémoire limitée ou processeurs anciens</translation></message><message><source>Standard — balanced everyday use</source><translation>Standard — usage quotidien équilibré</translation></message><message><source>Performance — powerful workstation</source><translation>Performance — station de travail puissante</translation></message><message><source>Gaming — prioritise games and compressed memory</source><translation>Gaming — priorité aux jeux et à la mémoire compressée</translation></message><message><source>Enterprise — stable managed defaults</source><translation>Enterprise — réglages gérés stables</translation></message><message><source>Apply profile</source><translation>Appliquer le profil</translation></message>
+<message><source>Profiles tune zram and memory behaviour. Existing disk swap is preserved. ECZOS does not change CPU, GPU or battery controls without showing a separate setting.</source><translation>Les profils règlent zram et la mémoire. Le swap sur disque est conservé. ECZOS ne modifie pas le CPU, le GPU ou la batterie sans afficher un réglage séparé.</translation></message><message><source>No graphics adapter identified</source><translation>Aucun adaptateur graphique identifié</translation></message><message><source>active</source><translation>actif</translation></message><message><source>inactive</source><translation>inactif</translation></message><message><source>not selected</source><translation>non sélectionné</translation></message><message><source>Hardware detection complete</source><translation>Détection du matériel terminée</translation></message><message><source>Apply hardware profile?</source><translation>Appliquer le profil matériel ?</translation></message><message><source>Apply the selected memory profile? Existing swap remains available.</source><translation>Appliquer le profil mémoire sélectionné ? Le swap existant reste disponible.</translation></message><message><source>Applying hardware profile…</source><translation>Application du profil matériel…</translation></message><message><source>Choose safe memory behaviour based on this computer's actual hardware.</source><translation>Choisir un comportement mémoire sûr selon le matériel réel de cet ordinateur.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>No hardware problems detected</source><translation>Aucun problème matériel détecté</translation></message><message><source>Hardware needs attention:
+%1</source><translation>Le matériel nécessite une attention :
+%1</translation></message><message><source>No graphics adapter was detected.</source><translation>Aucun adaptateur graphique détecté.</translation></message><message><source>A graphics adapter has no active kernel driver.</source><translation>Un adaptateur graphique n’a pas de pilote noyau actif.</translation></message><message><source>Graphics are using slow software rendering.</source><translation>L’affichage utilise un rendu logiciel lent.</translation></message><message><source>The system disk has less than 10% free space.</source><translation>Le disque système a moins de 10 % d’espace libre.</translation></message><message><source>No active network connection was detected.</source><translation>Aucune connexion réseau active détectée.</translation></message><message><source>Bluetooth hardware is present but blocked.</source><translation>Le matériel Bluetooth est présent mais bloqué.</translation></message><message><source>Bluetooth hardware is present but its service is not running.</source><translation>Le matériel Bluetooth est présent mais son service n’est pas actif.</translation></message><message><source>A hardware profile is selected, but zram is not active.</source><translation>Un profil matériel est sélectionné, mais zram n’est pas actif.</translation></message><message><source>%1 system service(s) failed.</source><translation>%1 service(s) système ont échoué.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Remote support</source><translation>Assistance à distance</translation></message>
+<message><source>Graphics crash detected earlier · safe software encoding is active</source><translation>Un plantage graphique a été détecté précédemment · l’encodage logiciel sécurisé est actif</translation></message>
+<message><source>Running with safe software encoding</source><translation>Actif avec un encodage logiciel sécurisé</translation></message>
+<message><source>Safe software encoding configured · currently stopped</source><translation>Encodage logiciel sécurisé configuré · actuellement arrêté</translation></message>
+<message><source>Hardware encoding can make the desktop unstable</source><translation>L’encodage matériel peut rendre le bureau instable</translation></message>
+<message><source>Repair</source><translation>Réparer</translation></message>
+<message><source>Repairing the detected problem…</source><translation>Réparation du problème détecté…</translation></message>
+<message><source>No automatic change is offered because these findings require a hardware, storage, network or driver choice.</source><translation>Aucune modification automatique n’est proposée, car ces résultats nécessitent un choix de matériel, de stockage, de réseau ou de pilote.</translation></message>
+</context>
+<context><name>QObject</name>
+<message><source>Network shares</source><translation>Partages réseau</translation></message>
+<message><source>Open shared folders and servers</source><translation>Ouvrir les dossiers partagés et les serveurs</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>The optional network-share component is not installed.</source><translation>Le composant facultatif de partage réseau n’est pas installé.</translation></message>
+<message><source>Network shares</source><translation>Partages réseau</translation></message>
+<message><source>Open shared folders and servers</source><translation>Ouvrir les dossiers partagés et les serveurs</translation></message>
+<message><source>Add SMB, NFS, WebDAV or SFTP locations. Passwords are requested and stored by KDE Wallet, never by ECZOS.</source><translation>Ajoutez des emplacements SMB, NFS, WebDAV ou SFTP. Les mots de passe sont demandés et stockés par KDE Wallet, jamais par ECZOS.</translation></message>
+<message><source>Add network location</source><translation>Ajouter un emplacement réseau</translation></message>
+<message><source>Find on local network</source><translation>Rechercher sur le réseau local</translation></message>
+<message><source>Loading network locations…</source><translation>Chargement des emplacements réseau…</translation></message>
+<message><source>Test connection</source><translation>Tester la connexion</translation></message>
+<message><source>Opening network location…</source><translation>Ouverture de l’emplacement réseau…</translation></message>
+<message><source>Testing the connection…</source><translation>Test de la connexion…</translation></message>
+<message><source>Remove network location?</source><translation>Supprimer l’emplacement réseau ?</translation></message>
+<message><source>Remove this location from ECZOS and the file manager? Stored credentials remain under your control in KDE Wallet.</source><translation>Supprimer cet emplacement d’ECZOS et du gestionnaire de fichiers ? Les identifiants stockés restent sous votre contrôle dans KDE Wallet.</translation></message>
+<message><source>Removing network location…</source><translation>Suppression de l’emplacement réseau…</translation></message>
+<message><source>No managed network locations yet.</source><translation>Aucun emplacement réseau géré pour le moment.</translation></message>
+<message><source>Already mounted outside ECZOS</source><translation>Déjà monté en dehors d’ECZOS</translation></message>
+<message><source>%1 at %2 · %3</source><translation>%1 sur %2 · %3</translation></message>
+<message><source>Network locations updated</source><translation>Emplacements réseau mis à jour</translation></message>
+<message><source>Network address</source><translation>Adresse réseau</translation></message>
+<message><source>Adding network location…</source><translation>Ajout de l’emplacement réseau…</translation></message>
+<message><source>Searching the local network…</source><translation>Recherche sur le réseau local…</translation></message>
+<message><source>No supported network services were found automatically. You can still add an address manually.</source><translation>Aucun service réseau pris en charge n’a été trouvé automatiquement. Vous pouvez toujours ajouter une adresse manuellement.</translation></message>
+<message><source>Network services found</source><translation>Services réseau trouvés</translation></message>
+<message><source>Choose a location</source><translation>Choisir un emplacement</translation></message>
+<message><source>Name</source><translation>Nom</translation></message>
+<message><source>Open</source><translation>Ouvrir</translation></message>
+<message><source>%1 · %2 · %3</source><translation>%1 · %2 · %3</translation></message>
+<message><source>Secure access to shared folders through KDE Wallet and on-demand reconnect.</source><translation>Accès sécurisé aux dossiers partagés via KDE Wallet et reconnexion à la demande.</translation></message>
+<message><source>Already available in Dolphin</source><translation>Déjà disponible dans Dolphin</translation></message>
+<message><source>Connect to server</source><translation>Se connecter au serveur</translation></message>
+<message><source>Enter the complete network address.
+
+SMB (Windows/NAS): smb://server/share
+SFTP (secure files): sftp://server/folder
+NFS: nfs://server/export
+Secure WebDAV: webdavs://server/folder
+
+For SMB, the part after the server name is the shared folder.</source><translation>Saisissez l’adresse réseau complète.
+
+SMB (Windows/NAS) : smb://serveur/partage
+SFTP (fichiers sécurisés) : sftp://serveur/dossier
+NFS : nfs://serveur/export
+WebDAV sécurisé : webdavs://serveur/dossier
+
+Pour SMB, la partie après le nom du serveur correspond au dossier partagé.</translation></message>
+</context>
+<context><name>QObject</name><message><source>Startup and operating systems</source><translation>Démarrage et systèmes d’exploitation</translation></message><message><source>Detect systems and manage the boot menu safely</source><translation>Détecter les systèmes et gérer le menu de démarrage en toute sécurité</translation></message></context>
+<context><name>SettingsWindow</name>
+<message><source>The optional boot-management component is not installed.</source><translation>Le composant facultatif de gestion du démarrage n’est pas installé.</translation></message><message><source>Startup and operating systems</source><translation>Démarrage et systèmes d’exploitation</translation></message><message><source>Detect systems and manage the boot menu safely</source><translation>Détecter les systèmes et gérer le menu de démarrage en toute sécurité</translation></message>
+<message><source>ECZOS can detect other operating systems and refresh the GRUB menu. It never changes EFI boot order or reinstalls a bootloader from this page.</source><translation>ECZOS peut détecter d’autres systèmes d’exploitation et actualiser le menu GRUB. Cette page ne modifie jamais l’ordre de démarrage EFI et ne réinstalle pas de chargeur de démarrage.</translation></message>
+<message><source>Reading boot information…</source><translation>Lecture des informations de démarrage…</translation></message><message><source>Scan again</source><translation>Analyser à nouveau</translation></message><message><source>Update boot menu safely</source><translation>Mettre à jour le menu en toute sécurité</translation></message>
+<message><source>Boot mode: %1 · Bootloader: %2 · Detection of other systems: %3</source><translation>Mode de démarrage : %1 · Chargeur : %2 · Détection des autres systèmes : %3</translation></message><message><source>enabled</source><translation>activée</translation></message><message><source>disabled</source><translation>désactivée</translation></message>
+<message><source>Unknown operating system</source><translation>Système d’exploitation inconnu</translation></message><message><source>boot files verified</source><translation>fichiers de démarrage vérifiés</translation></message><message><source>boot files could not be verified</source><translation>les fichiers de démarrage n’ont pas pu être vérifiés</translation></message>
+<message><source>No other operating systems were detected.</source><translation>Aucun autre système d’exploitation n’a été détecté.</translation></message><message><source>Run a new scan to inspect this computer.</source><translation>Lancez une nouvelle analyse pour inspecter cet ordinateur.</translation></message><message><source>Boot scan complete</source><translation>Analyse du démarrage terminée</translation></message><message><source>Scanning disks and boot files…</source><translation>Analyse des disques et fichiers de démarrage…</translation></message>
+<message><source>Update boot menu?</source><translation>Mettre à jour le menu de démarrage ?</translation></message><message><source>ECZOS will create a backup, generate a new GRUB menu, validate it and restore the previous menu automatically if verification fails. Continue?</source><translation>ECZOS créera une sauvegarde, générera et validera un nouveau menu GRUB, puis restaurera automatiquement l’ancien menu si la vérification échoue. Continuer ?</translation></message><message><source>Generating and verifying the boot menu…</source><translation>Génération et vérification du menu de démarrage…</translation></message><message><source>Validated multiboot detection with transactional GRUB updates.</source><translation>Détection multiboot validée avec mises à jour transactionnelles de GRUB.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Recent ECZOS activity</source><translation>Activité ECZOS récente</translation></message><message><source>No recent ECZOS activity was found.</source><translation>Aucune activité ECZOS récente n’a été trouvée.</translation></message><message><source>Refresh activity</source><translation>Actualiser l’activité</translation></message><message><source>Loading privacy-filtered activity…</source><translation>Chargement de l’activité filtrée pour la confidentialité…</translation></message><message><source>Activity updated</source><translation>Activité mise à jour</translation></message><message><source>Activity could not be loaded</source><translation>L’activité n’a pas pu être chargée</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Save support report</source><translation>Enregistrer le rapport d’assistance</translation></message>
+<message><source>Email EasyComp Zeeland</source><translation>Envoyer un e-mail à EasyComp Zeeland</translation></message>
+<message><source>Report a problem on GitHub</source><translation>Signaler un problème sur GitHub</translation></message>
+<message><source>The support report could not be found after it was created.</source><translation>Le rapport d’assistance est introuvable après sa création.</translation></message>
+<message><source>ECZOS support request</source><translation>Demande d’assistance ECZOS</translation></message>
+<message><source>Describe what happened, what you expected, and the steps that reproduce the problem. The privacy-filtered ECZOS support report is attached.</source><translation>Décrivez ce qui s’est passé, ce que vous attendiez et les étapes permettant de reproduire le problème. Le rapport d’assistance ECZOS filtré pour la confidentialité est joint.</translation></message>
+<message><source>A draft email with the report attached was opened. Review it and press Send in your mail app.</source><translation>Un brouillon d’e-mail avec le rapport en pièce jointe a été ouvert. Vérifiez-le, puis appuyez sur Envoyer dans votre messagerie.</translation></message>
+<message><source>The email app could not be opened. The report is saved at %1</source><translation>La messagerie n’a pas pu être ouverte. Le rapport est enregistré dans %1.</translation></message>
+<message><source>The report could not be read. It is saved at %1</source><translation>Le rapport n’a pas pu être lu. Il est enregistré dans %1.</translation></message>
+<message><source>Describe the problem and the steps that reproduce it here. Then paste the privacy-filtered report from your clipboard below.</source><translation>Décrivez ici le problème et les étapes permettant de le reproduire. Collez ensuite ci-dessous le rapport filtré pour la confidentialité depuis le presse-papiers.</translation></message>
+<message><source>GitHub was opened and the report was copied. Review the issue, paste the report, and submit it yourself.</source><translation>GitHub a été ouvert et le rapport copié. Vérifiez le signalement, collez le rapport et envoyez-le vous-même.</translation></message>
+<message><source>GitHub could not be opened. The report is saved at %1</source><translation>GitHub n’a pas pu être ouvert. Le rapport est enregistré dans %1.</translation></message>
+<message><source>Support report saved at %1</source><translation>Rapport d’assistance enregistré dans %1</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Advanced mode</source><translation>Mode avancé</translation></message>
+<message><source>Show technical details and specialist maintenance tools.</source><translation>Afficher les détails techniques et les outils de maintenance spécialisés.</translation></message>
+<message><source>Ready to start</source><translation>Prêt à démarrer</translation></message>
+<message><source>Boot files could not be verified</source><translation>Les fichiers de démarrage n’ont pas pu être vérifiés</translation></message>
+<message><source>Enable Advanced mode in the sidebar to inspect the privacy-filtered technical activity.</source><translation>Activez le mode avancé dans la barre latérale pour consulter l’activité technique filtrée pour la confidentialité.</translation></message>
+</context>
+<context><name>SettingsWindow</name>
+<message><source>Automatic date and time</source><translation>Date et heure automatiques</translation></message>
+<message><source>Check again</source><translation>Vérifier à nouveau</translation></message>
+<message><source>Date and time status is unavailable.</source><translation>L’état de la date et de l’heure n’est pas disponible.</translation></message>
+<message><source>Timezone: %1
+Automatic synchronization: %2
+Time service: %3 · %4</source><translation>Fuseau horaire : %1
+Synchronisation automatique : %2
+Service de temps : %3 · %4</translation></message>
+<message><source>working</source><translation>fonctionne</translation></message><message><source>needs attention</source><translation>nécessite une intervention</translation></message>
+<message><source>The hardware clock uses local time for compatibility with another operating system. ECZOS will preserve this setting.</source><translation>L’horloge matérielle utilise l’heure locale pour assurer la compatibilité avec un autre système d’exploitation. ECZOS conservera ce réglage.</translation></message>
+<message><source>SMB — Windows PC or NAS</source><translation>SMB — PC Windows ou NAS</translation></message>
+<message><source>SFTP — secure files over SSH</source><translation>SFTP — fichiers sécurisés via SSH</translation></message>
+<message><source>NFS — Linux or Unix share</source><translation>NFS — partage Linux ou Unix</translation></message>
+<message><source>WebDAV — web folder</source><translation>WebDAV — dossier web</translation></message>
+<message><source>Secure WebDAV — encrypted web folder</source><translation>WebDAV sécurisé — dossier web chiffré</translation></message>
+<message><source>server name or IP address</source><translation>nom du serveur ou adresse IP</translation></message>
+<message><source>optional; password is requested by KDE Wallet</source><translation>facultatif ; le mot de passe est demandé par KDE Wallet</translation></message>
+<message><source>automatic</source><translation>automatique</translation></message>
+<message><source>Name shown in Dolphin</source><translation>Nom affiché dans Dolphin</translation></message>
+<message><source>Protocol</source><translation>Protocole</translation></message><message><source>Server</source><translation>Serveur</translation></message>
+<message><source>Shared folder or path</source><translation>Dossier partagé ou chemin</translation></message><message><source>Username</source><translation>Nom d’utilisateur</translation></message><message><source>Port</source><translation>Port</translation></message>
+<message><source>for example: Shared Documents</source><translation>par exemple : Documents partagés</translation></message>
+<message><source>Use the share name shown by the Windows PC or NAS. Result: smb://server/Shared%20Documents</source><translation>Utilisez le nom de partage affiché par le PC Windows ou le NAS. Résultat : smb://server/Documents%20partagés</translation></message>
+<message><source>for example: home/name/files</source><translation>par exemple : home/nom/fichiers</translation></message>
+<message><source>SFTP uses an SSH account. KDE Wallet asks for and stores the password securely.</source><translation>SFTP utilise un compte SSH. KDE Wallet demande le mot de passe et le stocke de manière sécurisée.</translation></message>
+<message><source>for example: exports/shared</source><translation>par exemple : exports/partage</translation></message>
+<message><source>Enter the exported NFS path configured on the server.</source><translation>Saisissez le chemin NFS exporté configuré sur le serveur.</translation></message>
+<message><source>for example: remote.php/dav/files/name</source><translation>par exemple : remote.php/dav/files/nom</translation></message>
+<message><source>Enter the WebDAV path supplied by the server or cloud provider.</source><translation>Saisissez le chemin WebDAV fourni par le serveur ou le fournisseur cloud.</translation></message>
+<message><source>Incomplete network location</source><translation>Emplacement réseau incomplet</translation></message>
+<message><source>Enter a display name, server and shared folder or path. The optional port must be between 1 and 65535.</source><translation>Saisissez un nom d’affichage, un serveur et un dossier partagé ou un chemin. Le port facultatif doit être compris entre 1 et 65535.</translation></message>
 </context>
 </TS>

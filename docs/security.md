@@ -10,6 +10,13 @@ The legacy ECZHOA/RustDesk binary is quarantined by repository policy and must
 not be reused until its credential has been rotated and its package provenance,
 maintainer scripts and update path have been reviewed.
 
+RustDesk-derived ECZHOA builds use software video encoding by default. Hardware
+encoding is an optional performance feature, not a requirement for remote
+support: a failing AMD VCE/VCN encoder can otherwise reset the graphics card and
+terminate the entire Plasma X11 session. The ECZOS remote-support guard changes
+only `enable-hwcodec`; it must preserve the device identity, server address and
+access credentials already stored in each RustDesk profile.
+
 ## Windows executables
 
 Wine is a compatibility layer, not a security boundary. Opening `.exe` or `.msi`

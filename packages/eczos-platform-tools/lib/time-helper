@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+[[ $(id -u) -eq 0 ]] || { printf 'This helper must run as root.\n' >&2; exit 1; }
+[[ ${1:-} == repair && $# -eq 1 ]] || { printf 'Usage: time-helper repair\n' >&2; exit 2; }
+
+exec 9>/run/lock/eczos-time-repair.lock
+flock 9
+event() {
+    jq -cn --arg type progress --arg message "$2" --argjson fraction "$1" \
+        '{type:$type,fraction:$fraction,message:$message}' | sed 's/^/ECZOS_EVENT /'
+}
+
+logger -t eczos-time -- 'starting automatic time repair'
+event 0.1 'Checking automatic time…'
+timedatectl set-ntp true
+
+active=''
+for unit in systemd-timesyncd.service chrony.service chronyd.service ntpsec.service ntp.service; do
+    if systemctl is-active --quiet "$unit" 2>/dev/null; then active=$unit; break; fi
+done
+if [[ -z "$active" ]] && systemctl cat systemd-timesyncd.service >/dev/null 2>&1; then
+    systemctl enable --now systemd-timesyncd.service
+    active=systemd-timesyncd.service
+fi
+[[ -n "$active" ]] || { logger -t eczos-time -- 'no supported time provider'; printf 'No supported network time service is installed.\n' >&2; exit 69; }
+
+event 0.35 'Restarting the network time service…'
+systemctl try-restart "$active"
+for attempt in $(seq 1 20); do
+    if [[ $(timedatectl show -p NTPSynchronized --value 2>/dev/null || true) == yes ]]; then
+        event 1 'The clock is synchronized.'
+        logger -t eczos-time -- "repair verified with $active; hardware-clock mode left unchanged"
+        printf 'Automatic time synchronization is active. The hardware-clock mode was not changed.\n'
+        exit 0
+    fi
+    event "$(awk -v n="$attempt" 'BEGIN {printf "%.2f", 0.35 + n * 0.03}')" 'Waiting for a verified time signal…'
+    sleep 1
+done
+logger -t eczos-time -- "provider $active active but not synchronized after verification window"
+printf 'The time service is running, but synchronization could not yet be verified. Check the network and try again.\n' >&2
+exit 75

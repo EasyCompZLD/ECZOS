@@ -1,3 +1,9 @@
+eczos-oobe (0.1.1~dev1) UNRELEASED; urgency=medium
+
+  * Start the post-0.1 qualification series with a unique package build.
+
+ -- EasyComp Zeeland <support@easycompzeeland.nl>  Sun, 27 Sep 2026 07:30:00 +0200
+
 eczos-oobe (0.1.0) trixie; urgency=medium
 
   * Release the ECZOS 0.1 first-run experience.

@@ -1,0 +1,26 @@
+Source: eczos-boot-tools
+Section: admin
+Priority: optional
+Maintainer: EasyComp Zeeland <support@easycompzeeland.nl>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Homepage: https://easycompzeeland.nl/
+
+Package: eczos-boot-tools
+Architecture: all
+Depends:
+ ${misc:Depends},
+ grub-common,
+ os-prober,
+ pkexec,
+ polkitd,
+ python3,
+ systemd,
+ util-linux
+Recommends:
+ efibootmgr
+Description: safe operating-system and boot-menu management for ECZOS
+ Detects bootable operating systems and firmware entries without changing boot
+ order. GRUB menu refreshes are generated, syntax-checked, backed up, installed
+ transactionally and verified with automatic rollback on failure.

@@ -12,21 +12,27 @@ Architecture: amd64
 Depends:
  ${misc:Depends},
  bubblewrap,
+ cabextract,
  desktop-file-utils,
- eczos-platform-tools (>= 0.1.0),
  file,
  icoutils,
  jq,
  kdialog,
  libglib2.0-bin,
  rsync,
+ unzip,
+ udisks2,
  wine (>= 10.0~repack-6),
  wine64 (>= 10.0~repack-6),
+ wget,
  xdg-user-dirs,
  xdg-utils,
+ xz-utils,
  zenity
 Recommends:
- wine32
+ eczos-platform-tools (>= 0.1.0),
+ wine32,
+ winetricks
 Description: managed Windows application compatibility for ECZOS
  Provides confirmation, inspection, isolated Wine prefixes, application
  records and desktop integration for Windows executables and MSI installers.
